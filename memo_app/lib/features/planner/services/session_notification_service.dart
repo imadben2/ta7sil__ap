@@ -290,20 +290,27 @@ class SessionNotificationService {
   /// Build notification body (Arabic)
   Future<String> _buildBody(StudySession session) async {
     try {
-      // Format start time in Arabic
-      final startTime = DateFormat('h:mm a', 'ar').format(
-        DateTime(
-          2000,
-          1,
-          1,
-          session.scheduledStartTime.hour,
-          session.scheduledStartTime.minute,
-        ),
-      );
+      // Format start time with English numerals (e.g., "3:05 م")
+      final hour = session.scheduledStartTime.hour;
+      final minute = session.scheduledStartTime.minute;
+      final period = hour >= 12 ? 'م' : 'ص';
+      final hour12 = hour > 12 ? hour - 12 : (hour == 0 ? 12 : hour);
+      final startTime = '$hour12:${minute.toString().padLeft(2, '0')} $period';
 
-      // Calculate duration
-      final duration = session.duration ?? 60;
-      final durationText = duration == 60 ? 'ساعة واحدة' : '$duration دقيقة';
+      // Calculate duration in minutes
+      final durationMinutes = session.duration.inMinutes;
+      String durationText;
+      if (durationMinutes >= 60) {
+        final hours = durationMinutes ~/ 60;
+        final mins = durationMinutes % 60;
+        if (mins > 0) {
+          durationText = '$hours ساعة و$mins دقيقة';
+        } else {
+          durationText = hours == 1 ? 'ساعة واحدة' : '$hours ساعات';
+        }
+      } else {
+        durationText = '$durationMinutes دقيقة';
+      }
 
       // Build body
       String body = 'الوقت: $startTime\nالمدة: $durationText';
