@@ -48,6 +48,13 @@ class CourseApiController extends Controller
             $query->where('level', $request->level);
         }
 
+        // Filter by academic phase
+        if ($request->filled('academic_phase_id')) {
+            $query->whereHas('subject.academicYear', function ($q) use ($request) {
+                $q->where('academic_phase_id', $request->academic_phase_id);
+            });
+        }
+
         // Filter by featured
         if ($request->filled('featured')) {
             $query->where('is_featured', true);

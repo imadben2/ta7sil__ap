@@ -55,6 +55,7 @@ class CoursesBloc extends Bloc<CoursesEvent, CoursesState> {
         search: event.search,
         subjectId: event.subjectId,
         level: event.level,
+        academicPhaseId: event.academicPhaseId,
         featured: event.featured,
         isFree: event.isFree,
         sortBy: event.sortBy,

@@ -139,6 +139,7 @@ memo_app/*.env
 
 # IDEs
 .idea/
+.planner/
 .vscode/
 *.swp
 *.swo
