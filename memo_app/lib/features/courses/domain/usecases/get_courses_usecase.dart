@@ -16,6 +16,7 @@ class GetCoursesUseCase {
       search: params.search,
       subjectId: params.subjectId,
       level: params.level,
+      academicPhaseId: params.academicPhaseId,
       featured: params.featured,
       isFree: params.isFree,
       sortBy: params.sortBy,
@@ -30,6 +31,7 @@ class GetCoursesParams {
   final String? search;
   final int? subjectId;
   final String? level;
+  final int? academicPhaseId;
   final bool? featured;
   final bool? isFree;
   final String sortBy;
@@ -41,6 +43,7 @@ class GetCoursesParams {
     this.search,
     this.subjectId,
     this.level,
+    this.academicPhaseId,
     this.featured,
     this.isFree,
     this.sortBy = 'created_at',
@@ -53,6 +56,7 @@ class GetCoursesParams {
     String? search,
     int? subjectId,
     String? level,
+    int? academicPhaseId,
     bool? featured,
     bool? isFree,
     String? sortBy,
@@ -64,6 +68,7 @@ class GetCoursesParams {
       search: search ?? this.search,
       subjectId: subjectId ?? this.subjectId,
       level: level ?? this.level,
+      academicPhaseId: academicPhaseId ?? this.academicPhaseId,
       featured: featured ?? this.featured,
       isFree: isFree ?? this.isFree,
       sortBy: sortBy ?? this.sortBy,

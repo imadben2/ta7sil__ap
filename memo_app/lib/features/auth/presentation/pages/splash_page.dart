@@ -201,10 +201,16 @@ class _SplashPageState extends State<SplashPage>
                               ),
                             ],
                           ),
-                          child: const Icon(
-                            Icons.school,
-                            size: 70,
-                            color: AppColors.primary,
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(
+                              AppDesignTokens.borderRadiusLarge,
+                            ),
+                            child: Image.asset(
+                              'assets/logo/logo.png',
+                              width: 120,
+                              height: 120,
+                              fit: BoxFit.cover,
+                            ),
                           ),
                         ),
                       ),

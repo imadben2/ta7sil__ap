@@ -255,7 +255,7 @@ class UserManualPage extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           const Text(
-            'مرحباً بك في تطبيق ميمو!',
+            'مرحباً بك في تطبيق تحصيل!',
             style: TextStyle(
               fontSize: 22,
               fontWeight: FontWeight.bold,
@@ -476,7 +476,7 @@ class UserManualPage extends StatelessWidget {
             children: [
               _buildContactChip(
                 icon: Icons.email_outlined,
-                label: 'support@memo-app.com',
+                label: 'support@ta7sil.app',
               ),
             ],
           ),
@@ -486,7 +486,7 @@ class UserManualPage extends StatelessWidget {
             children: [
               _buildContactChip(
                 icon: Icons.camera_alt_outlined,
-                label: '@memo_app_dz',
+                label: '@ta7sil_app',
               ),
             ],
           ),

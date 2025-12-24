@@ -27,7 +27,6 @@ class _CoursesPageState extends State<CoursesPage>
   String? _selectedLevel;
   bool? _isFreeFilter;
   String _sortBy = 'created_at';
-  int _selectedTabIndex = 0;
 
   @override
   void initState() {
@@ -96,9 +95,6 @@ class _CoursesPageState extends State<CoursesPage>
 
               // Search Bar
               SliverToBoxAdapter(child: _buildSearchBar()),
-
-              // Tab Selector
-              SliverToBoxAdapter(child: _buildTabSelector()),
 
               // Content
               BlocBuilder<CoursesBloc, CoursesState>(
@@ -299,81 +295,6 @@ class _CoursesPageState extends State<CoursesPage>
         ),
       ),
     );
-  }
-
-  Widget _buildTabSelector() {
-    final tabs = ['الكل', 'المميزة', 'المجانية', 'المدفوعة'];
-
-    return Container(
-      height: 50,
-      margin: const EdgeInsets.only(bottom: 20),
-      child: ListView.builder(
-        scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: 20),
-        itemCount: tabs.length,
-        itemBuilder: (context, index) {
-          final isSelected = _selectedTabIndex == index;
-          return GestureDetector(
-            onTap: () {
-              setState(() => _selectedTabIndex = index);
-              _onTabChanged(index);
-            },
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 200),
-              margin: const EdgeInsets.only(left: 10),
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-              decoration: BoxDecoration(
-                gradient: isSelected
-                    ? const LinearGradient(
-                        colors: [Color(0xFF667EEA), Color(0xFF764BA2)],
-                      )
-                    : null,
-                color: isSelected ? null : Colors.white,
-                borderRadius: BorderRadius.circular(25),
-                boxShadow: [
-                  BoxShadow(
-                    color: isSelected
-                        ? const Color(0xFF667EEA).withOpacity(0.3)
-                        : Colors.black.withOpacity(0.04),
-                    blurRadius: 12,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
-              ),
-              child: Text(
-                tabs[index],
-                style: TextStyle(
-                  fontFamily: 'Cairo',
-                  fontSize: 14,
-                  fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-                  color: isSelected ? Colors.white : const Color(0xFF64748B),
-                ),
-              ),
-            ),
-          );
-        },
-      ),
-    );
-  }
-
-  void _onTabChanged(int index) {
-    switch (index) {
-      case 0: // الكل
-        _isFreeFilter = null;
-        context.read<CoursesBloc>().add(const LoadCoursesEvent());
-        break;
-      case 1: // المميزة
-        context.read<CoursesBloc>().add(const LoadFeaturedCoursesEvent());
-        break;
-      case 2: // المجانية
-        _isFreeFilter = true;
-        context.read<CoursesBloc>().add(const LoadCoursesEvent(isFree: true));
-        break;
-      case 3: // المدفوعة
-        _isFreeFilter = false;
-        context.read<CoursesBloc>().add(const LoadCoursesEvent(isFree: false));
-        break;
-    }
   }
 
   Widget _buildContent(CoursesState state) {

@@ -19,6 +19,7 @@ abstract class CoursesRepository {
     String? search,
     int? subjectId,
     String? level,
+    int? academicPhaseId,
     bool? featured,
     bool? isFree,
     String sortBy = 'created_at',

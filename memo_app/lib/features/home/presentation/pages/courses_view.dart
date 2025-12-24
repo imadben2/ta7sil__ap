@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import '../../../../injection_container.dart';
+import '../../../auth/domain/entities/academic_entities.dart';
+import '../../../auth/domain/usecases/get_academic_phases_usecase.dart';
 import '../../../courses/domain/entities/course_entity.dart';
 import '../../../courses/presentation/bloc/courses/courses_bloc.dart';
 import '../../../courses/presentation/bloc/courses/courses_event.dart';
@@ -16,9 +19,11 @@ class CoursesView extends StatefulWidget {
 }
 
 class _CoursesViewState extends State<CoursesView> {
-  int _selectedTabIndex = 0;
   final PageController _featuredPageController = PageController(viewportFraction: 0.85);
   int _currentFeaturedPage = 0;
+  int? _selectedPhaseId;
+  bool? _isFreeFilter;
+  String _sortBy = 'created_at';
 
   @override
   void initState() {
@@ -51,9 +56,6 @@ class _CoursesViewState extends State<CoursesView> {
             // Modern Header
             SliverToBoxAdapter(child: _buildHeader()),
 
-            // Tab Selector
-            SliverToBoxAdapter(child: _buildTabSelector()),
-
             // Featured Courses Section
             SliverToBoxAdapter(child: _buildSectionHeader('الدورات المميزة', Icons.star_rounded, const Color(0xFFF59E0B))),
             SliverToBoxAdapter(child: _buildFeaturedCourses()),
@@ -78,7 +80,7 @@ class _CoursesViewState extends State<CoursesView> {
         children: [
           // Filter Button
           GestureDetector(
-            onTap: () => context.push('/courses'),
+            onTap: _showFilterSheet,
             child: Container(
               width: 48,
               height: 48,
@@ -98,7 +100,7 @@ class _CoursesViewState extends State<CoursesView> {
                 ],
               ),
               child: const Icon(
-                Icons.tune_rounded,
+                Icons.filter_list_rounded,
                 size: 22,
                 color: Colors.white,
               ),
@@ -148,78 +150,6 @@ class _CoursesViewState extends State<CoursesView> {
         ],
       ),
     );
-  }
-
-  Widget _buildTabSelector() {
-    final tabs = ['الكل', 'المميزة', 'المجانية', 'المدفوعة'];
-
-    return Container(
-      height: 50,
-      margin: const EdgeInsets.symmetric(vertical: 16),
-      child: ListView.builder(
-        scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: 20),
-        itemCount: tabs.length,
-        itemBuilder: (context, index) {
-          final isSelected = _selectedTabIndex == index;
-          return GestureDetector(
-            onTap: () {
-              setState(() => _selectedTabIndex = index);
-              _onTabChanged(index);
-            },
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 200),
-              margin: const EdgeInsets.only(left: 10),
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-              decoration: BoxDecoration(
-                gradient: isSelected
-                    ? const LinearGradient(
-                        colors: [Color(0xFF667EEA), Color(0xFF764BA2)],
-                      )
-                    : null,
-                color: isSelected ? null : Colors.white,
-                borderRadius: BorderRadius.circular(25),
-                boxShadow: [
-                  BoxShadow(
-                    color: isSelected
-                        ? const Color(0xFF667EEA).withValues(alpha: 0.3)
-                        : Colors.black.withValues(alpha: 0.04),
-                    blurRadius: 12,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
-              ),
-              child: Text(
-                tabs[index],
-                style: TextStyle(
-                  fontFamily: 'Cairo',
-                  fontSize: 14,
-                  fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-                  color: isSelected ? Colors.white : const Color(0xFF64748B),
-                ),
-              ),
-            ),
-          );
-        },
-      ),
-    );
-  }
-
-  void _onTabChanged(int index) {
-    switch (index) {
-      case 0:
-        context.read<CoursesBloc>().add(const LoadCoursesEvent());
-        break;
-      case 1:
-        context.read<CoursesBloc>().add(const LoadFeaturedCoursesEvent(limit: 10));
-        break;
-      case 2:
-        context.read<CoursesBloc>().add(const LoadCoursesEvent(isFree: true));
-        break;
-      case 3:
-        context.read<CoursesBloc>().add(const LoadCoursesEvent(isFree: false));
-        break;
-    }
   }
 
   Widget _buildSectionHeader(String title, IconData icon, Color color) {
@@ -947,6 +877,38 @@ class _CoursesViewState extends State<CoursesView> {
     );
   }
 
+  void _showFilterSheet() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => _FilterBottomSheet(
+        selectedPhaseId: _selectedPhaseId,
+        isFreeFilter: _isFreeFilter,
+        sortBy: _sortBy,
+        onApply: (phaseId, isFree, sort) {
+          setState(() {
+            _selectedPhaseId = phaseId;
+            _isFreeFilter = isFree;
+            _sortBy = sort;
+          });
+          _applyFilters();
+        },
+      ),
+    );
+  }
+
+  void _applyFilters() {
+    context.read<CoursesBloc>().add(
+      LoadCoursesEvent(
+        academicPhaseId: _selectedPhaseId,
+        isFree: _isFreeFilter,
+        sortBy: _sortBy,
+      ),
+    );
+    Navigator.pop(context);
+  }
+
   List<Color> _getGradientColors(String subject) {
     final gradients = {
       'رياضيات': [const Color(0xFF667EEA), const Color(0xFF764BA2)],
@@ -969,4 +931,387 @@ class _CoursesViewState extends State<CoursesView> {
     }
     return [const Color(0xFF667EEA), const Color(0xFF764BA2)];
   }
+}
+
+/// Filter Bottom Sheet
+class _FilterBottomSheet extends StatefulWidget {
+  final int? selectedPhaseId;
+  final bool? isFreeFilter;
+  final String sortBy;
+  final Function(int?, bool?, String) onApply;
+
+  const _FilterBottomSheet({
+    this.selectedPhaseId,
+    this.isFreeFilter,
+    required this.sortBy,
+    required this.onApply,
+  });
+
+  @override
+  State<_FilterBottomSheet> createState() => _FilterBottomSheetState();
+}
+
+class _FilterBottomSheetState extends State<_FilterBottomSheet> {
+  late int? _selectedPhaseId;
+  late bool? _isFreeFilter;
+  late String _sortBy;
+  List<AcademicPhase> _phases = [];
+  bool _isLoadingPhases = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedPhaseId = widget.selectedPhaseId;
+    _isFreeFilter = widget.isFreeFilter;
+    _sortBy = widget.sortBy;
+    _loadPhases();
+  }
+
+  Future<void> _loadPhases() async {
+    final useCase = sl<GetAcademicPhasesUseCase>();
+    final result = await useCase();
+
+    result.fold(
+      (failure) {
+        setState(() => _isLoadingPhases = false);
+      },
+      (response) {
+        setState(() {
+          _phases = response.phases;
+          _isLoadingPhases = false;
+        });
+      },
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
+      ),
+      padding: const EdgeInsets.all(24),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // Handle
+          Container(
+            width: 48,
+            height: 5,
+            decoration: BoxDecoration(
+              color: const Color(0xFFE2E8F0),
+              borderRadius: BorderRadius.circular(3),
+            ),
+          ),
+          const SizedBox(height: 24),
+
+          // Header
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              GestureDetector(
+                onTap: () => Navigator.pop(context),
+                child: Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF1F5F9),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: const Icon(
+                    Icons.close_rounded,
+                    color: Color(0xFF64748B),
+                    size: 20,
+                  ),
+                ),
+              ),
+              Row(
+                children: [
+                  const Text(
+                    'تصفية الدورات',
+                    style: TextStyle(
+                      fontFamily: 'Cairo',
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF1E293B),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        colors: [Color(0xFF667EEA), Color(0xFF764BA2)],
+                      ),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: const Icon(
+                      Icons.filter_list_rounded,
+                      color: Colors.white,
+                      size: 20,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+
+          const SizedBox(height: 32),
+
+          // Level Filter (from API)
+          _buildPhasesSection(),
+
+          const SizedBox(height: 24),
+
+          // Price Filter
+          _buildFilterSection(
+            title: 'السعر',
+            icon: Icons.payments_rounded,
+            options: [
+              _FilterOption(label: 'مجانية', value: 'free'),
+              _FilterOption(label: 'مدفوعة', value: 'paid'),
+            ],
+            selectedValue: _isFreeFilter == true
+                ? 'free'
+                : _isFreeFilter == false
+                    ? 'paid'
+                    : null,
+            onSelect: (value) => setState(() {
+              _isFreeFilter = value == 'free'
+                  ? true
+                  : value == 'paid'
+                      ? false
+                      : null;
+            }),
+          ),
+
+          const SizedBox(height: 24),
+
+          // Sort By
+          _buildFilterSection(
+            title: 'الترتيب',
+            icon: Icons.sort_rounded,
+            options: [
+              _FilterOption(label: 'الأحدث', value: 'created_at'),
+              _FilterOption(label: 'الأعلى تقييماً', value: 'average_rating'),
+              _FilterOption(label: 'الأكثر التحاقاً', value: 'total_students'),
+            ],
+            selectedValue: _sortBy,
+            onSelect: (value) => setState(() => _sortBy = value ?? 'created_at'),
+            allowDeselect: false,
+          ),
+
+          const SizedBox(height: 32),
+
+          // Apply Button
+          GestureDetector(
+            onTap: () {
+              widget.onApply(_selectedPhaseId, _isFreeFilter, _sortBy);
+            },
+            child: Container(
+              width: double.infinity,
+              height: 56,
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  colors: [Color(0xFF667EEA), Color(0xFF764BA2)],
+                ),
+                borderRadius: BorderRadius.circular(18),
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color(0xFF667EEA).withValues(alpha: 0.3),
+                    blurRadius: 12,
+                    offset: const Offset(0, 6),
+                  ),
+                ],
+              ),
+              child: const Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.check_rounded, color: Colors.white, size: 22),
+                  SizedBox(width: 10),
+                  Text(
+                    'تطبيق الفلاتر',
+                    style: TextStyle(
+                      fontFamily: 'Cairo',
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+
+          const SizedBox(height: 16),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPhasesSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.end,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            const Text(
+              'المستوى',
+              style: TextStyle(
+                fontFamily: 'Cairo',
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF1E293B),
+              ),
+            ),
+            const SizedBox(width: 10),
+            const Icon(Icons.school_rounded, color: Color(0xFF667EEA), size: 22),
+          ],
+        ),
+        const SizedBox(height: 12),
+        if (_isLoadingPhases)
+          const Center(
+            child: SizedBox(
+              width: 24,
+              height: 24,
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF667EEA)),
+              ),
+            ),
+          )
+        else if (_phases.isEmpty)
+          const Text(
+            'لا توجد مستويات',
+            style: TextStyle(
+              fontFamily: 'Cairo',
+              fontSize: 14,
+              color: Color(0xFF64748B),
+            ),
+          )
+        else
+          Wrap(
+            spacing: 10,
+            runSpacing: 10,
+            alignment: WrapAlignment.end,
+            children: _phases.map((phase) {
+              final isSelected = _selectedPhaseId == phase.id;
+              return GestureDetector(
+                onTap: () {
+                  setState(() {
+                    if (isSelected) {
+                      _selectedPhaseId = null;
+                    } else {
+                      _selectedPhaseId = phase.id;
+                    }
+                  });
+                },
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 200),
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                  decoration: BoxDecoration(
+                    gradient: isSelected
+                        ? const LinearGradient(
+                            colors: [Color(0xFF667EEA), Color(0xFF764BA2)],
+                          )
+                        : null,
+                    color: isSelected ? null : const Color(0xFFF1F5F9),
+                    borderRadius: BorderRadius.circular(25),
+                  ),
+                  child: Text(
+                    phase.nameAr,
+                    style: TextStyle(
+                      fontFamily: 'Cairo',
+                      fontSize: 14,
+                      fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                      color: isSelected ? Colors.white : const Color(0xFF64748B),
+                    ),
+                  ),
+                ),
+              );
+            }).toList(),
+          ),
+      ],
+    );
+  }
+
+  Widget _buildFilterSection({
+    required String title,
+    required IconData icon,
+    required List<_FilterOption> options,
+    String? selectedValue,
+    required Function(String?) onSelect,
+    bool allowDeselect = true,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.end,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            Text(
+              title,
+              style: const TextStyle(
+                fontFamily: 'Cairo',
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF1E293B),
+              ),
+            ),
+            const SizedBox(width: 10),
+            Icon(icon, color: const Color(0xFF667EEA), size: 22),
+          ],
+        ),
+        const SizedBox(height: 12),
+        Wrap(
+          spacing: 10,
+          runSpacing: 10,
+          alignment: WrapAlignment.end,
+          children: options.map((option) {
+            final isSelected = selectedValue == option.value;
+            return GestureDetector(
+              onTap: () {
+                if (allowDeselect && isSelected) {
+                  onSelect(null);
+                } else {
+                  onSelect(option.value);
+                }
+              },
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                decoration: BoxDecoration(
+                  gradient: isSelected
+                      ? const LinearGradient(
+                          colors: [Color(0xFF667EEA), Color(0xFF764BA2)],
+                        )
+                      : null,
+                  color: isSelected ? null : const Color(0xFFF1F5F9),
+                  borderRadius: BorderRadius.circular(25),
+                ),
+                child: Text(
+                  option.label,
+                  style: TextStyle(
+                    fontFamily: 'Cairo',
+                    fontSize: 14,
+                    fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                    color: isSelected ? Colors.white : const Color(0xFF64748B),
+                  ),
+                ),
+              ),
+            );
+          }).toList(),
+        ),
+      ],
+    );
+  }
+}
+
+class _FilterOption {
+  final String label;
+  final String value;
+
+  const _FilterOption({required this.label, required this.value});
 }

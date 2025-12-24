@@ -55,10 +55,6 @@ class ModernProfileHeader extends StatelessWidget {
 
                 // معلومات المستخدم
                 _buildUserInfo(),
-                const SizedBox(height: 14),
-
-                // صف الإحصائيات
-                _buildStatsRow(),
               ],
             ),
           ),

@@ -68,7 +68,7 @@ class _MyCoursesPageState extends State<MyCoursesPage> {
   Widget _buildLoadingState() {
     return CustomScrollView(
       slivers: [
-        _buildSliverHeader(0, 0),
+        _buildSliverHeader(0),
         SliverFillRemaining(
           child: Center(
             child: Column(
@@ -110,7 +110,7 @@ class _MyCoursesPageState extends State<MyCoursesPage> {
       child: CustomScrollView(
         physics: const AlwaysScrollableScrollPhysics(),
         slivers: [
-          _buildSliverHeader(0, 0),
+          _buildSliverHeader(0),
           SliverFillRemaining(
             child: Center(
               child: Padding(
@@ -208,7 +208,7 @@ class _MyCoursesPageState extends State<MyCoursesPage> {
   Widget _buildErrorState(String message) {
     return CustomScrollView(
       slivers: [
-        _buildSliverHeader(0, 0),
+        _buildSliverHeader(0),
         SliverFillRemaining(
           child: Center(
             child: Padding(
@@ -284,7 +284,6 @@ class _MyCoursesPageState extends State<MyCoursesPage> {
 
   Widget _buildCoursesList(List<UserSubscriptionEntity> subscriptions) {
     final activeCourses = subscriptions.where((s) => s.isValid).length;
-    final expiringSoon = subscriptions.where((s) => s.remainingDays <= 7 && s.isValid).length;
 
     return RefreshIndicator(
       onRefresh: () async {
@@ -292,7 +291,7 @@ class _MyCoursesPageState extends State<MyCoursesPage> {
       },
       child: CustomScrollView(
         slivers: [
-          _buildSliverHeader(activeCourses, expiringSoon),
+          _buildSliverHeader(activeCourses),
 
           // Section Title
           SliverToBoxAdapter(
@@ -372,7 +371,7 @@ class _MyCoursesPageState extends State<MyCoursesPage> {
     );
   }
 
-  Widget _buildSliverHeader(int activeCourses, int expiringSoon) {
+  Widget _buildSliverHeader(int activeCourses) {
     return SliverToBoxAdapter(
       child: Container(
         padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top + 16),
@@ -455,32 +454,6 @@ class _MyCoursesPageState extends State<MyCoursesPage> {
 
             const SizedBox(height: 20),
 
-            // Stats Row
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Row(
-                children: [
-                  _buildStatCard(
-                    icon: Icons.play_circle_rounded,
-                    value: activeCourses.toString(),
-                    label: 'نشطة',
-                    iconBgColor: const Color(0xFF10B981),
-                  ),
-                  const SizedBox(width: 12),
-                  _buildStatCard(
-                    icon: Icons.schedule_rounded,
-                    value: expiringSoon.toString(),
-                    label: 'تنتهي قريباً',
-                    iconBgColor: expiringSoon > 0
-                      ? const Color(0xFFF59E0B)
-                      : Colors.white.withOpacity(0.3),
-                  ),
-                ],
-              ),
-            ),
-
-            const SizedBox(height: 20),
-
             // Curved bottom
             Container(
               height: 24,
@@ -498,59 +471,4 @@ class _MyCoursesPageState extends State<MyCoursesPage> {
     );
   }
 
-  Widget _buildStatCard({
-    required IconData icon,
-    required String value,
-    required String label,
-    required Color iconBgColor,
-  }) {
-    return Expanded(
-      child: Container(
-        padding: const EdgeInsets.all(14),
-        decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.15),
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            color: Colors.white.withOpacity(0.1),
-            width: 1,
-          ),
-        ),
-        child: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: iconBgColor.withOpacity(0.2),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Icon(icon, size: 18, color: Colors.white),
-            ),
-            const SizedBox(width: 12),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  value,
-                  style: const TextStyle(
-                    fontFamily: 'Cairo',
-                    fontSize: 18,
-                    fontWeight: FontWeight.w700,
-                    color: Colors.white,
-                  ),
-                ),
-                Text(
-                  label,
-                  style: TextStyle(
-                    fontFamily: 'Cairo',
-                    fontSize: 11,
-                    color: Colors.white.withOpacity(0.75),
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
 }

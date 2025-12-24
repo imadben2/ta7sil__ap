@@ -14,6 +14,7 @@ class LoadCoursesEvent extends CoursesEvent {
   final String? search;
   final int? subjectId;
   final String? level;
+  final int? academicPhaseId;
   final bool? featured;
   final bool? isFree;
   final String sortBy;
@@ -25,6 +26,7 @@ class LoadCoursesEvent extends CoursesEvent {
     this.search,
     this.subjectId,
     this.level,
+    this.academicPhaseId,
     this.featured,
     this.isFree,
     this.sortBy = 'created_at',
@@ -38,6 +40,7 @@ class LoadCoursesEvent extends CoursesEvent {
     search,
     subjectId,
     level,
+    academicPhaseId,
     featured,
     isFree,
     sortBy,

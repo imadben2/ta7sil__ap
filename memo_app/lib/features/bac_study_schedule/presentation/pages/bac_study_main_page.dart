@@ -196,6 +196,8 @@ class _BacStudyMainPageContent extends StatelessWidget {
           builder: (context, state) {
             if (state is BacStudyLoaded) {
               return Container(
+                width: 52,
+                height: 52,
                 decoration: BoxDecoration(
                   gradient: const LinearGradient(
                     begin: Alignment.topLeft,
@@ -205,12 +207,12 @@ class _BacStudyMainPageContent extends StatelessWidget {
                       Color(0xFFFBBF24),
                     ],
                   ),
-                  borderRadius: BorderRadius.circular(20),
+                  borderRadius: BorderRadius.circular(16),
                   boxShadow: [
                     BoxShadow(
                       color: const Color(0xFFF59E0B).withOpacity(0.4),
-                      blurRadius: 16,
-                      offset: const Offset(0, 6),
+                      blurRadius: 12,
+                      offset: const Offset(0, 4),
                     ),
                   ],
                 ),
@@ -223,38 +225,12 @@ class _BacStudyMainPageContent extends StatelessWidget {
                         extra: {'streamId': streamId},
                       );
                     },
-                    borderRadius: BorderRadius.circular(20),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 20,
-                        vertical: 14,
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.all(6),
-                            decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(0.25),
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            child: const Icon(
-                              Icons.card_giftcard_rounded,
-                              color: Colors.white,
-                              size: 20,
-                            ),
-                          ),
-                          const SizedBox(width: 10),
-                          const Text(
-                            'المكافآت',
-                            style: TextStyle(
-                              fontFamily: 'Cairo',
-                              fontSize: 15,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ],
+                    borderRadius: BorderRadius.circular(16),
+                    child: const Center(
+                      child: Icon(
+                        Icons.card_giftcard_rounded,
+                        color: Colors.white,
+                        size: 24,
                       ),
                     ),
                   ),

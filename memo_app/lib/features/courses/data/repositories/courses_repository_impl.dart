@@ -31,6 +31,7 @@ class CoursesRepositoryImpl implements CoursesRepository {
     String? search,
     int? subjectId,
     String? level,
+    int? academicPhaseId,
     bool? featured,
     bool? isFree,
     String sortBy = 'created_at',
@@ -43,6 +44,7 @@ class CoursesRepositoryImpl implements CoursesRepository {
         search == null &&
         subjectId == null &&
         level == null &&
+        academicPhaseId == null &&
         featured == null &&
         isFree == null) {
       final cachedCourses = await localDataSource.getCachedCourses();
@@ -61,6 +63,7 @@ class CoursesRepositoryImpl implements CoursesRepository {
         search: search,
         subjectId: subjectId,
         level: level,
+        academicPhaseId: academicPhaseId,
         featured: featured,
         isFree: isFree,
         sortBy: sortBy,
@@ -74,6 +77,7 @@ class CoursesRepositoryImpl implements CoursesRepository {
           search == null &&
           subjectId == null &&
           level == null &&
+          academicPhaseId == null &&
           featured == null &&
           isFree == null) {
         await localDataSource.cacheCourses(courses);

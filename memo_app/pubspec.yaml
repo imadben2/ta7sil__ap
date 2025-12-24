@@ -128,3 +128,4 @@ flutter:
     - assets/lottie/
     - assets/icons/
     - assets/fonts/  # For PDF generation with Arabic text support
+    - assets/logo/

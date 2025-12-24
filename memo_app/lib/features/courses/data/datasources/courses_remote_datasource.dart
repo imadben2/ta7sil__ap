@@ -18,6 +18,7 @@ abstract class CoursesRemoteDataSource {
     String? search,
     int? subjectId,
     String? level,
+    int? academicPhaseId,
     bool? featured,
     bool? isFree,
     String sortBy = 'created_at',
@@ -103,6 +104,7 @@ class CoursesRemoteDataSourceImpl implements CoursesRemoteDataSource {
     String? search,
     int? subjectId,
     String? level,
+    int? academicPhaseId,
     bool? featured,
     bool? isFree,
     String sortBy = 'created_at',
@@ -119,6 +121,7 @@ class CoursesRemoteDataSourceImpl implements CoursesRemoteDataSource {
         if (search != null) 'search': search,
         if (subjectId != null) 'subject_id': subjectId,
         if (level != null) 'level': level,
+        if (academicPhaseId != null) 'academic_phase_id': academicPhaseId,
         if (featured != null) 'featured': featured ? 1 : 0,
         if (isFree != null) 'is_free': isFree ? 1 : 0,
       };

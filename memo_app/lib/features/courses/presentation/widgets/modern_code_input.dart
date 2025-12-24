@@ -183,19 +183,31 @@ class ModernCodeInputState extends State<ModernCodeInput>
       },
       child: Directionality(
         textDirection: TextDirection.ltr,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: List.generate(widget.length, (index) {
-            return _buildCodeBox(index);
-          }),
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            // Calculate responsive box size based on available width
+            final availableWidth = constraints.maxWidth;
+            final horizontalMargin = 4.0 * 2; // margin on each side
+            final totalMargins = horizontalMargin * widget.length;
+            final boxWidth = ((availableWidth - totalMargins) / widget.length).clamp(36.0, 52.0);
+            final boxHeight = (boxWidth * 1.18).clamp(44.0, 60.0);
+
+            return Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: List.generate(widget.length, (index) {
+                return _buildCodeBox(index, boxWidth, boxHeight);
+              }),
+            );
+          },
         ),
       ),
     );
   }
 
-  Widget _buildCodeBox(int index) {
+  Widget _buildCodeBox(int index, double boxWidth, double boxHeight) {
     final isFocused = _focusNodes[index].hasFocus;
     final hasValue = _controllers[index].text.isNotEmpty;
+    final fontSize = (boxWidth * 0.45).clamp(16.0, 22.0);
 
     return AnimatedBuilder(
       animation: _scaleControllers[index],
@@ -211,8 +223,8 @@ class ModernCodeInputState extends State<ModernCodeInput>
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 200),
           curve: Curves.easeOutCubic,
-          width: 44,
-          height: 52,
+          width: boxWidth,
+          height: boxHeight,
           decoration: BoxDecoration(
             gradient: isFocused
                 ? const LinearGradient(
@@ -288,7 +300,7 @@ class ModernCodeInputState extends State<ModernCodeInput>
                     ],
                     style: TextStyle(
                       fontFamily: 'Cairo',
-                      fontSize: 20,
+                      fontSize: fontSize,
                       fontWeight: FontWeight.bold,
                       color: hasValue
                           ? const Color(0xFF1E293B)

@@ -3,7 +3,7 @@ class AppStringsAr {
   AppStringsAr._();
 
   // App Name
-  static const String appName = 'ميمو';
+  static const String appName = 'تحصيل';
   static const String appSlogan = 'رفيقك نحو النجاح';
 
   // Onboarding

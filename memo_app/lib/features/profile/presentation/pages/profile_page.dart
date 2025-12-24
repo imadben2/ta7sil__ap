@@ -69,14 +69,6 @@ class _ProfilePageState extends State<ProfilePage> {
                   behavior: SnackBarBehavior.floating,
                 ),
               );
-            } else if (state is DataExported) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('تم تصدير البيانات بنجاح'),
-                  backgroundColor: AppColors.success,
-                  behavior: SnackBarBehavior.floating,
-                ),
-              );
             } else if (state is AccountDeleted) {
               context.go('/auth/login');
             }
@@ -378,15 +370,6 @@ class _ProfilePageState extends State<ProfilePage> {
                     onTap: () => context.push('/profile/settings'),
                   ),
 
-                  ModernProfileMenuCard(
-                    icon: Icons.download_rounded,
-                    iconColor: AppColors.cyan500,
-                    iconBgColor: const Color(0xFFECFEFF),
-                    title: 'تصدير البيانات',
-                    subtitle: 'تحميل نسخة من بياناتك',
-                    onTap: _handleExportData,
-                  ),
-
                   const SizedBox(height: 24),
 
                   // قسم تسجيل الخروج
@@ -425,78 +408,6 @@ class _ProfilePageState extends State<ProfilePage> {
                   const SizedBox(height: 40),
                 ],
               ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  /// معالجة تصدير البيانات
-  void _handleExportData() {
-    showDialog(
-      context: context,
-      builder: (dialogContext) => AlertDialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
-        ),
-        title: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: AppColors.cyan500.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: const Icon(
-                Icons.download_rounded,
-                color: AppColors.cyan500,
-                size: 20,
-              ),
-            ),
-            const SizedBox(width: 12),
-            const Text(
-              'تصدير البيانات',
-              style: TextStyle(
-                fontFamily: 'Cairo',
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-          ],
-        ),
-        content: const Text(
-          'سيتم تحميل نسخة كاملة من جميع بياناتك بصيغة JSON. هل تريد المتابعة؟',
-          style: TextStyle(
-            fontFamily: 'Cairo',
-            color: AppColors.slate600,
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext),
-            child: Text(
-              'إلغاء',
-              style: TextStyle(
-                fontFamily: 'Cairo',
-                color: AppColors.slate500,
-              ),
-            ),
-          ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: _primaryPurple,
-              foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-            ),
-            onPressed: () {
-              Navigator.pop(dialogContext);
-              context.read<ProfileBloc>().add(ExportPersonalData());
-            },
-            child: const Text(
-              'تصدير',
-              style: TextStyle(fontFamily: 'Cairo'),
             ),
           ),
         ],

@@ -1,0 +1,82 @@
+=================================================================
+MANUEL D'EXTRACTION PATCH 05 - JOURS 57-70
+Filière: تسيير واقتصاد (Management & Economics)
+=================================================================
+
+INSTRUCTIONS:
+1. Ouvrez chaque image dans l'ordre (commencez par image 41)
+2. Cherchez "اليوم" suivi d'un numéro pour identifier le jour
+3. Pour chaque jour, copiez les informations ci-dessous
+
+=================================================================
+IMAGE 41
+=================================================================
+Jour détecté: اليوم ___
+
+Matières (cocher celles présentes):
+[ ] التسيير المحاسبي والمالي (accounting)
+[ ] الاقتصاد (economics)
+[ ] القانون (law)
+[ ] الرياضيات (mathematics)
+[ ] اللغة العربية (arabic)
+[ ] اللغة الفرنسية (french)
+[ ] اللغة الإنجليزية (english)
+[ ] التربية الإسلامية (islamic-education)
+[ ] التاريخ والجغرافيا (history-geography)
+[ ] الفلسفة (philosophy)
+
+Pour chaque matière, copiez les topics:
+
+1. ______________________ : _______________________________
+   Type: [ ] study  [ ] memorize  [ ] review  [ ] solve  [ ] exercise
+
+2. ______________________ : _______________________________
+   Type: [ ] study  [ ] memorize  [ ] review  [ ] solve  [ ] exercise
+
+3. ______________________ : _______________________________
+   Type: [ ] study  [ ] memorize  [ ] review  [ ] solve  [ ] exercise
+
+
+=================================================================
+IMAGE 42
+=================================================================
+Jour détecté: اليوم ___
+
+[Répéter le même format]
+
+
+=================================================================
+MAPPING IMAGE → JOUR (à remplir au fur et à mesure)
+=================================================================
+Image 41 = Jour ___
+Image 42 = Jour ___
+Image 43 = Jour ___
+Image 44 = Jour ___
+Image 45 = Jour ___
+Image 46 = Jour ___
+Image 47 = Jour ___
+Image 48 = Jour ___
+Image 49 = Jour ___
+Image 50 = Jour ___
+Image 51 = Jour ___
+Image 52 = Jour ___
+Image 53 = Jour ___
+Image 54 = Jour ___
+Image 55 = Jour ___
+
+
+=================================================================
+RAPPEL DES TASK TYPES
+=================================================================
+study       = دراسة / فهم / شرح
+memorize    = حفظ
+review      = مراجعة / تكرار
+solve       = حل تمارين / حل موضوع / تطبيقات
+exercise    = كتابة / تمرين / إنتاج كتابي
+
+
+=================================================================
+JOURS SPÉCIAUX
+=================================================================
+Jour 63 = مكافأة الأسبوع 09 (Week 9 reward) → day_type: 'review'
+Jour 70 = مكافأة الأسبوع 10 (Week 10 reward) → day_type: 'review'
