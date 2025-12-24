@@ -1,0 +1,130 @@
+name: memo_app
+description: "MEMO - Educational platform for Algerian BAC students"
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.9.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+
+  # State Management
+  flutter_bloc: ^8.1.6
+  bloc_concurrency: ^0.2.5
+  equatable: ^2.0.7
+
+  # Navigation
+  go_router: ^14.6.2
+
+  # HTTP Client
+  dio: ^5.7.0
+  http: ^1.2.2
+
+  # Local Storage
+  hive: ^2.2.3
+  hive_flutter: ^1.1.0
+  flutter_secure_storage: ^9.2.2
+  shared_preferences: ^2.3.3
+
+  # Dependency Injection
+  get_it: ^8.0.2
+  injectable: ^2.5.0
+
+  # UI & Design
+  google_fonts: ^6.2.1
+  flutter_svg: ^2.0.10+1
+  lottie: ^3.1.3
+  cached_network_image: ^3.4.1
+  shimmer: ^3.0.0
+  confetti: ^0.7.0
+  table_calendar: ^3.1.2
+  fl_chart: ^0.69.0
+  flutter_slidable: ^3.0.0
+
+  # Video Player (Courses Feature)
+  video_player: ^2.8.1
+  chewie: ^1.7.4
+  youtube_player_flutter: ^9.1.1
+  carousel_slider: ^5.0.0
+  media_kit: ^1.1.10
+  media_kit_video: ^1.2.4
+  media_kit_libs_video: ^1.0.4
+  wakelock_plus: ^1.2.0
+  omni_video_player: ^3.5.1
+  orax_video_player:
+    path: orax_video_player
+  simple_youtube_player: ^0.1.1
+
+
+
+  # File & Image Handling (Courses Feature)
+  image_picker: ^1.0.7
+  image_cropper: ^8.0.2
+  file_picker: ^8.0.0
+  permission_handler: ^11.0.0
+  rename: ^3.1.0
+  # PDF Handling (Certificates)
+  pdf: ^3.10.7
+  flutter_pdfview: ^1.3.2
+
+  # Sharing & Utilities (Courses Feature)
+  share_plus: ^7.2.2
+  url_launcher: ^6.2.4
+  photo_view: ^0.14.0
+
+  # Utilities
+  intl: ^0.20.2
+  dartz: ^0.10.1
+  freezed_annotation: ^2.4.4
+  json_annotation: ^4.9.0
+  uuid: ^4.5.1
+  device_info_plus: ^11.1.1
+  connectivity_plus: ^6.1.1
+  path_provider: ^2.1.5
+  workmanager: ^0.6.0  # Background task scheduling
+  adhan: ^2.0.0  # Islamic prayer times (Phase 3.2)
+
+  # Firebase & Push Notifications
+  firebase_core: ^3.8.0
+  firebase_messaging: ^15.1.5
+
+  # Google Sign-In
+  google_sign_in: ^6.2.1
+  flutter_local_notifications: ^18.0.1
+  timezone: ^0.9.4  # For scheduled local notifications
+
+  # Icons
+  cupertino_icons: ^1.0.8
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+
+  # Code Generation
+  build_runner: ^2.4.13
+  injectable_generator: ^2.6.2
+  freezed: ^2.5.2
+  json_serializable: ^6.8.0
+  hive_generator: ^2.0.1
+
+  # Testing
+  mockito: ^5.4.4
+  bloc_test: ^9.1.7
+
+# For information on the generic Dart part of this file, see the
+# following page: https://dart.dev/tools/pub/pubspec
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/images/
+    - assets/lottie/
+    - assets/icons/
+    - assets/fonts/  # For PDF generation with Arabic text support

@@ -1,0 +1,22 @@
+
+  [41;1m Illuminate\Database\QueryException [49;22m
+
+[39;1m  SQLSTATE[23000]: Integrity constraint violation: 1052 Champ: 'category' dans where clause est ambigu (Connection: mysql, SQL: select `subjects`.*, `subject_stream`.`academic_stream_id` as `pivot_academic_stream_id`, `subject_stream`.`subject_id` as `pivot_subject_id`, `subject_stream`.`coefficient` as `pivot_coefficient`, `subject_stream`.`is_active` as `pivot_is_active`, `subject_stream`.`created_at` as `pivot_created_at`, `subject_stream`.`updated_at` as `pivot_updated_at` from `subjects` inner join `subject_stream` on `subjects`.`id` = `subject_stream`.`subject_id` where `subject_stream`.`academic_stream_id` in (1, 2, 3, 4, 5, 6) and `category` = HARD_CORE order by `name_ar` asc)[39;22m
+
+  at [32mvendor\laravel\framework\src\Illuminate\Database\Connection.php[39m:[32m824[39m
+    820▕                     $this->getName(), $query, $this->prepareBindings($bindings), $e
+    821▕                 );
+    822▕             }
+    823▕ 
+  ➜ 824▕             throw new QueryException(
+    825▕                 $this->getName(), $query, $this->prepareBindings($bindings), $e
+    826▕             );
+    827▕         }
+    828▕     }
+
+  [33m1   [39m[39;1mvendor\laravel\framework\src\Illuminate\Database\Connection.php[39;22m:[39;1m406[39;22m
+  [90m    PDOException::("SQLSTATE[23000]: Integrity constraint violation: 1052 Champ: 'category' dans where clause est ambigu")[39m
+
+  [33m2   [39m[39;1mvendor\laravel\framework\src\Illuminate\Database\Connection.php[39;22m:[39;1m406[39;22m
+  [90m    PDO::prepare("select `subjects`.*, `subject_stream`.`academic_stream_id` as `pivot_academic_stream_id`, `subject_stream`.`subject_id` as `pivot_subject_id`, `subject_stream`.`coefficient` as `pivot_coefficient`, `subject_stream`.`is_active` as `pivot_is_active`, `subject_stream`.`created_at` as `pivot_created_at`, `subject_stream`.`updated_at` as `pivot_updated_at` from `subjects` inner join `subject_stream` on `subjects`.`id` = `subject_stream`.`subject_id` where `subject_stream`.`academic_stream_id` in (1, 2, 3, 4, 5, 6) and `category` = ? order by `name_ar` asc")[39m
+

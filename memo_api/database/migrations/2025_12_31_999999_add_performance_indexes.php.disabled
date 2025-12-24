@@ -1,0 +1,252 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     * Add strategic indexes for performance optimization
+     * Based on: 12-performance-cache.md
+     */
+    public function up(): void
+    {
+        // Users table indexes
+        Schema::table('users', function (Blueprint $table) {
+            if (!$this->indexExists('users', 'users_email_index')) {
+                $table->index('email');
+            }
+            // Skip device_id index - already created in add_device_id_to_users_table migration
+            if (Schema::hasColumn('users', 'is_active')) {
+                if (!$this->indexExists('users', 'users_is_active_created_at_index')) {
+                    $table->index(['is_active', 'created_at']);
+                }
+            }
+        });
+
+        // Contents table indexes
+        Schema::table('contents', function (Blueprint $table) {
+            if (!$this->indexExists('contents', 'contents_subject_id_index')) {
+                $table->index('subject_id');
+            }
+            if (!$this->indexExists('contents', 'contents_is_published_subject_id_index')) {
+                $table->index(['is_published', 'subject_id']);
+            }
+            if (!$this->indexExists('contents', 'contents_chapter_id_index')) {
+                $table->index('chapter_id');
+            }
+            if (!$this->indexExists('contents', 'contents_content_type_id_index')) {
+                $table->index('content_type_id');
+            }
+            // Fulltext index for search (title and description) - only for MySQL/PostgreSQL
+            if (Schema::getConnection()->getDriverName() !== 'sqlite') {
+                if (!$this->indexExists('contents', 'contents_title_ar_description_ar_fulltext')) {
+                    $table->fullText(['title_ar', 'description_ar'], 'contents_search_fulltext');
+                }
+            }
+        });
+
+        // Study Sessions table indexes
+        Schema::table('study_sessions', function (Blueprint $table) {
+            if (!$this->indexExists('study_sessions', 'study_sessions_user_id_scheduled_date_index')) {
+                $table->index(['user_id', 'scheduled_date']);
+            }
+            if (!$this->indexExists('study_sessions', 'study_sessions_user_id_status_index')) {
+                $table->index(['user_id', 'status']);
+            }
+            if (!$this->indexExists('study_sessions', 'study_sessions_subject_id_index')) {
+                $table->index('subject_id');
+            }
+        });
+
+        // Quiz Attempts table indexes
+        Schema::table('quiz_attempts', function (Blueprint $table) {
+            if (!$this->indexExists('quiz_attempts', 'quiz_attempts_user_id_quiz_id_index')) {
+                $table->index(['user_id', 'quiz_id']);
+            }
+            if (!$this->indexExists('quiz_attempts', 'quiz_attempts_user_id_completed_at_index')) {
+                $table->index(['user_id', 'completed_at']);
+            }
+        });
+
+        // Quizzes table indexes
+        Schema::table('quizzes', function (Blueprint $table) {
+            if (!$this->indexExists('quizzes', 'quizzes_subject_id_index')) {
+                $table->index('subject_id');
+            }
+            if (!$this->indexExists('quizzes', 'quizzes_content_id_index')) {
+                $table->index('content_id');
+            }
+            if (!$this->indexExists('quizzes', 'quizzes_is_published_index')) {
+                $table->index('is_published');
+            }
+        });
+
+        // Courses table indexes
+        Schema::table('courses', function (Blueprint $table) {
+            if (!$this->indexExists('courses', 'courses_subject_id_index')) {
+                $table->index('subject_id');
+            }
+            if (!$this->indexExists('courses', 'courses_instructor_id_index')) {
+                $table->index('instructor_id');
+            }
+            if (!$this->indexExists('courses', 'courses_is_published_index')) {
+                $table->index('is_published');
+            }
+            if (!$this->indexExists('courses', 'courses_is_free_index')) {
+                $table->index('is_free');
+            }
+        });
+
+        // User Subscriptions table indexes
+        Schema::table('user_subscriptions', function (Blueprint $table) {
+            if (!$this->indexExists('user_subscriptions', 'user_subscriptions_user_id_index')) {
+                $table->index('user_id');
+            }
+            if (!$this->indexExists('user_subscriptions', 'user_subscriptions_course_id_index')) {
+                $table->index('course_id');
+            }
+            if (!$this->indexExists('user_subscriptions', 'user_subscriptions_status_index')) {
+                $table->index('status');
+            }
+            if (!$this->indexExists('user_subscriptions', 'user_subscriptions_expires_at_index')) {
+                $table->index('expires_at');
+            }
+        });
+
+        // Subjects table indexes
+        Schema::table('subjects', function (Blueprint $table) {
+            if (!$this->indexExists('subjects', 'subjects_academic_phase_id_index')) {
+                $table->index('academic_phase_id');
+            }
+        });
+
+        // Chapters table indexes
+        Schema::table('chapters', function (Blueprint $table) {
+            if (!$this->indexExists('chapters', 'chapters_subject_id_index')) {
+                $table->index('subject_id');
+            }
+        });
+
+        // Academic Years table indexes
+        Schema::table('academic_years', function (Blueprint $table) {
+            if (!$this->indexExists('academic_years', 'academic_years_phase_id_index')) {
+                $table->index('phase_id');
+            }
+        });
+
+        // Academic Streams table indexes
+        Schema::table('academic_streams', function (Blueprint $table) {
+            if (!$this->indexExists('academic_streams', 'academic_streams_year_id_index')) {
+                $table->index('year_id');
+            }
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        // Users
+        Schema::table('users', function (Blueprint $table) {
+            $table->dropIndex(['email']);
+            $table->dropIndex(['device_id']);
+            $table->dropIndex(['is_active', 'created_at']);
+        });
+
+        // Contents
+        Schema::table('contents', function (Blueprint $table) {
+            $table->dropIndex(['subject_id']);
+            $table->dropIndex(['is_published', 'subject_id']);
+            $table->dropIndex(['chapter_id']);
+            $table->dropIndex(['content_type_id']);
+            // Drop fulltext only for non-SQLite
+            if (Schema::getConnection()->getDriverName() !== 'sqlite') {
+                $table->dropFullText('contents_search_fulltext');
+            }
+        });
+
+        // Study Sessions
+        Schema::table('study_sessions', function (Blueprint $table) {
+            $table->dropIndex(['user_id', 'scheduled_date']);
+            $table->dropIndex(['user_id', 'status']);
+            $table->dropIndex(['subject_id']);
+        });
+
+        // Quiz Attempts
+        Schema::table('quiz_attempts', function (Blueprint $table) {
+            $table->dropIndex(['user_id', 'quiz_id']);
+            $table->dropIndex(['user_id', 'completed_at']);
+        });
+
+        // Quizzes
+        Schema::table('quizzes', function (Blueprint $table) {
+            $table->dropIndex(['subject_id']);
+            $table->dropIndex(['content_id']);
+            $table->dropIndex(['is_published']);
+        });
+
+        // Courses
+        Schema::table('courses', function (Blueprint $table) {
+            $table->dropIndex(['subject_id']);
+            $table->dropIndex(['instructor_id']);
+            $table->dropIndex(['is_published']);
+            $table->dropIndex(['is_free']);
+        });
+
+        // User Subscriptions
+        Schema::table('user_subscriptions', function (Blueprint $table) {
+            $table->dropIndex(['user_id']);
+            $table->dropIndex(['course_id']);
+            $table->dropIndex(['status']);
+            $table->dropIndex(['expires_at']);
+        });
+
+        // Subjects
+        Schema::table('subjects', function (Blueprint $table) {
+            $table->dropIndex(['academic_phase_id']);
+        });
+
+        // Chapters
+        Schema::table('chapters', function (Blueprint $table) {
+            $table->dropIndex(['subject_id']);
+        });
+
+        // Academic Years
+        Schema::table('academic_years', function (Blueprint $table) {
+            $table->dropIndex(['phase_id']);
+        });
+
+        // Academic Streams
+        Schema::table('academic_streams', function (Blueprint $table) {
+            $table->dropIndex(['year_id']);
+        });
+    }
+
+    /**
+     * Check if index exists
+     */
+    private function indexExists($table, $index): bool
+    {
+        try {
+            // For SQLite, just return false to attempt index creation
+            // SQLite will ignore duplicate index creation gracefully
+            if (Schema::getConnection()->getDriverName() === 'sqlite') {
+                return false;
+            }
+
+            // For other databases, check if index exists
+            $indexes = Schema::getConnection()
+                ->getDoctrineSchemaManager()
+                ->listTableIndexes($table);
+
+            return isset($indexes[$index]);
+        } catch (\Exception $e) {
+            // If we can't check, assume it doesn't exist
+            return false;
+        }
+    }
+};

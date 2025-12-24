@@ -1,0 +1,169 @@
+# ============================================
+# ROOT .gitignore for memo_app_v2 project
+# Contains: Laravel API (memo_api) + Flutter App (memo_app)
+# ============================================
+
+# ============================================
+# LARAVEL (memo_api/)
+# ============================================
+
+memo_api/vendor/
+memo_api/node_modules/
+memo_api/.env
+memo_api/.env.backup
+memo_api/.env.production
+memo_api/storage/*.key
+memo_api/storage/app/*
+!memo_api/storage/app/.gitkeep
+!memo_api/storage/app/public/
+memo_api/storage/framework/cache/*
+!memo_api/storage/framework/cache/.gitkeep
+memo_api/storage/framework/sessions/*
+!memo_api/storage/framework/sessions/.gitkeep
+memo_api/storage/framework/testing/*
+!memo_api/storage/framework/testing/.gitkeep
+memo_api/storage/framework/views/*
+!memo_api/storage/framework/views/.gitkeep
+memo_api/storage/logs/*
+!memo_api/storage/logs/.gitkeep
+memo_api/bootstrap/cache/*
+!memo_api/bootstrap/cache/.gitkeep
+memo_api/public/storage
+memo_api/public/hot
+memo_api/npm-debug.log
+memo_api/yarn-error.log
+memo_api/.phpunit.result.cache
+memo_api/Homestead.json
+memo_api/Homestead.yaml
+memo_api/auth.json
+memo_api/.idea/
+memo_api/.vscode/
+memo_api/*.swp
+memo_api/*.swo
+memo_api/*~
+
+# ============================================
+# FLUTTER (memo_app/)
+# ============================================
+
+# Flutter/Dart/Pub related
+memo_app/.dart_tool/
+memo_app/.flutter-plugins
+memo_app/.flutter-plugins-dependencies
+memo_app/.packages
+memo_app/.pub-cache/
+memo_app/.pub/
+memo_app/build/
+memo_app/flutter_*.png
+memo_app/linked_*.ds
+memo_app/unlinked.ds
+memo_app/unlinked_spec.ds
+
+# Android related
+memo_app/android/**/gradle-wrapper.jar
+memo_app/android/.gradle/
+memo_app/android/captures/
+memo_app/android/gradlew
+memo_app/android/gradlew.bat
+memo_app/android/local.properties
+memo_app/android/**/GeneratedPluginRegistrant.java
+memo_app/android/key.properties
+memo_app/android/.idea/
+memo_app/android/app/debug/
+memo_app/android/app/profile/
+memo_app/android/app/release/
+
+# iOS/XCode related
+memo_app/ios/**/*.mode1v3
+memo_app/ios/**/*.mode2v3
+memo_app/ios/**/*.moved-aside
+memo_app/ios/**/*.pbxuser
+memo_app/ios/**/*.perspectivev3
+memo_app/ios/**/*sync/
+memo_app/ios/**/.sconsign.dblite
+memo_app/ios/**/.tags*
+memo_app/ios/**/.vagrant/
+memo_app/ios/**/DerivedData/
+memo_app/ios/**/Icon?
+memo_app/ios/**/Pods/
+memo_app/ios/**/.symlinks/
+memo_app/ios/**/profile
+memo_app/ios/**/xcuserdata
+memo_app/ios/.generated/
+memo_app/ios/Flutter/App.framework
+memo_app/ios/Flutter/Flutter.framework
+memo_app/ios/Flutter/Flutter.podspec
+memo_app/ios/Flutter/Generated.xcconfig
+memo_app/ios/Flutter/ephemeral/
+memo_app/ios/Flutter/app.flx
+memo_app/ios/Flutter/app.zip
+memo_app/ios/Flutter/flutter_assets/
+memo_app/ios/Flutter/flutter_export_environment.sh
+memo_app/ios/ServiceDefinitions.json
+memo_app/ios/Runner/GeneratedPluginRegistrant.*
+
+# Web related
+memo_app/web/favicon.png
+
+# macOS
+memo_app/macos/Flutter/GeneratedPluginRegistrant.swift
+memo_app/macos/Flutter/ephemeral/
+
+# Windows
+memo_app/windows/flutter/generated_plugin_registrant.cc
+memo_app/windows/flutter/generated_plugin_registrant.h
+memo_app/windows/flutter/ephemeral/
+
+# Linux
+memo_app/linux/flutter/generated_plugin_registrant.cc
+memo_app/linux/flutter/generated_plugin_registrant.h
+memo_app/linux/flutter/ephemeral/
+
+# Coverage
+memo_app/coverage/
+
+# Exceptions to above rules
+!memo_app/**/ios/**/default.mode1v3
+!memo_app/**/ios/**/default.mode2v3
+!memo_app/**/ios/**/default.pbxuser
+!memo_app/**/ios/**/default.perspectivev3
+
+# Flutter environment config (may contain sensitive keys)
+memo_app/.env
+memo_app/.env.*
+memo_app/*.env
+
+# ============================================
+# GENERAL / IDE / OS
+# ============================================
+
+# IDEs
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+*.backup
+
+# Sensitive data
+*.key
+*.pem
+*.p12
+*.jks
+secrets/
+credentials/
+
+# Documentation build artifacts (optional, uncomment if needed)
+# docs/_build/
+# docs/.doctrees/

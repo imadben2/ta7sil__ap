@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>دليل إعداد Firebase Cloud Messaging</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { font-family: 'Cairo', sans-serif; }
+        .step-number {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.25rem;
+        }
+        .code-block {
+            background: #1e293b;
+            color: #e2e8f0;
+            border-radius: 8px;
+            padding: 16px;
+            font-family: 'Courier New', monospace;
+            direction: ltr;
+            text-align: left;
+            overflow-x: auto;
+        }
+        .highlight {
+            background: linear-gradient(120deg, #fbbf24 0%, #f59e0b 100%);
+            padding: 2px 6px;
+            border-radius: 4px;
+            color: #000;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen">
+    <!-- Header -->
+    <header class="bg-gradient-to-l from-orange-500 to-red-600 text-white py-8 shadow-lg">
+        <div class="container mx-auto px-4">
+            <div class="flex items-center justify-center gap-4">
+                <i class="fas fa-bell text-4xl"></i>
+                <div>
+                    <h1 class="text-3xl font-bold">دليل إعداد Firebase Cloud Messaging</h1>
+                    <p class="text-orange-100 mt-1">لتفعيل الإشعارات الفورية في تطبيق MEMO BAC</p>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 py-8 max-w-4xl">
+
+        <!-- Introduction -->
+        <div class="bg-white rounded-xl shadow-md p-6 mb-8">
+            <div class="flex items-start gap-4">
+                <div class="bg-blue-100 p-3 rounded-lg">
+                    <i class="fas fa-info-circle text-blue-600 text-2xl"></i>
+                </div>
+                <div>
+                    <h2 class="text-xl font-bold text-gray-800 mb-2">لماذا نحتاج هذا الإعداد؟</h2>
+                    <p class="text-gray-600">
+                        Firebase Cloud Messaging (FCM) هو خدمة من Google تتيح إرسال الإشعارات الفورية للمستخدمين.
+                        لكي يعمل نظام الإشعارات في تطبيقك، تحتاج إلى ربط الـ API بحساب Firebase الخاص بمشروعك.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Warning Box -->
+        <div class="bg-amber-50 border-r-4 border-amber-500 rounded-xl p-6 mb-8">
+            <div class="flex items-start gap-4">
+                <i class="fas fa-exclamation-triangle text-amber-500 text-2xl"></i>
+                <div>
+                    <h3 class="font-bold text-amber-800 mb-1">تنبيه مهم</h3>
+                    <p class="text-amber-700">
+                        ملف credentials يحتوي على مفاتيح سرية. <strong>لا تشاركه أبداً</strong> ولا ترفعه على GitHub.
+                        تأكد من إضافته إلى ملف <code class="bg-amber-200 px-1 rounded">.gitignore</code>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Steps -->
+        <div class="space-y-6">
+
+            <!-- Step 1 -->
+            <div class="bg-white rounded-xl shadow-md overflow-hidden">
+                <div class="bg-gradient-to-l from-blue-500 to-blue-600 px-6 py-4">
+                    <div class="flex items-center gap-4">
+                        <div class="step-number bg-white text-blue-600">1</div>
+                        <h3 class="text-xl font-bold text-white">الدخول إلى Firebase Console</h3>
+                    </div>
+                </div>
+                <div class="p-6">
+                    <ol class="space-y-4 text-gray-700">
+                        <li class="flex items-start gap-3">
+                            <span class="bg-blue-100 text-blue-600 rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold shrink-0">أ</span>
+                            <div>
+                                افتح المتصفح واذهب إلى:
+                                <a href="https://console.firebase.google.com" target="_blank" class="text-blue-600 hover:underline font-semibold">
+                                    https://console.firebase.google.com
+                                    <i class="fas fa-external-link-alt text-xs mr-1"></i>
+                                </a>
+                            </div>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <span class="bg-blue-100 text-blue-600 rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold shrink-0">ب</span>
+                            <span>سجل الدخول بحساب Google الذي أنشأت به مشروع Firebase</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <span class="bg-blue-100 text-blue-600 rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold shrink-0">ج</span>
+                            <span>اختر مشروعك <span class="highlight">MEMO BAC</span> من قائمة المشاريع</span>
+                        </li>
+                    </ol>
+
+                    <div class="mt-4 bg-gray-100 rounded-lg p-4">
+                        <p class="text-sm text-gray-600">
+                            <i class="fas fa-lightbulb text-yellow-500 ml-2"></i>
+                            إذا لم يكن لديك مشروع، أنشئ واحداً جديداً بالضغط على "Add project"
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 2 -->
+            <div class="bg-white rounded-xl shadow-md overflow-hidden">
+                <div class="bg-gradient-to-l from-green-500 to-green-600 px-6 py-4">
+                    <div class="flex items-center gap-4">
+                        <div class="step-number bg-white text-green-600">2</div>
+                        <h3 class="text-xl font-bold text-white">الذهاب إلى إعدادات المشروع</h3>
+                    </div>
+                </div>
+                <div class="p-6">
+                    <ol class="space-y-4 text-gray-700">
+                        <li class="flex items-start gap-3">
+                            <span class="bg-green-100 text-green-600 rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold shrink-0">أ</span>
+                            <div>
+                                اضغط على <strong>أيقونة الترس ⚙️</strong> بجانب "Project Overview" في القائمة الجانبية
+                            </div>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <span class="bg-green-100 text-green-600 rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold shrink-0">ب</span>
+                            <span>اختر <span class="highlight">Project settings</span></span>
+                        </li>
+                    </ol>
+
+                    <div class="mt-4 border-2 border-dashed border-green-300 rounded-lg p-4 bg-green-50">
+                        <p class="text-green-700 font-semibold mb-2">
+                            <i class="fas fa-map-marker-alt ml-2"></i>
+                            المسار:
+                        </p>
+                        <p class="text-green-800 text-lg">
+                            Project Overview → ⚙️ → Project settings
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 3 -->
+            <div class="bg-white rounded-xl shadow-md overflow-hidden">
+                <div class="bg-gradient-to-l from-purple-500 to-purple-600 px-6 py-4">
+                    <div class="flex items-center gap-4">
+                        <div class="step-number bg-white text-purple-600">3</div>
+                        <h3 class="text-xl font-bold text-white">الانتقال إلى Service accounts</h3>
+                    </div>
+                </div>
+                <div class="p-6">
+                    <ol class="space-y-4 text-gray-700">
+                        <li class="flex items-start gap-3">
+                            <span class="bg-purple-100 text-purple-600 rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold shrink-0">أ</span>
+                            <span>في صفحة إعدادات المشروع، اضغط على تبويب <span class="highlight">Service accounts</span></span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <span class="bg-purple-100 text-purple-600 rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold shrink-0">ب</span>
+                            <span>تأكد أن <strong>Firebase Admin SDK</strong> محدد</span>
+                        </li>
+                    </ol>
+
+                    <div class="mt-4 bg-purple-50 rounded-lg p-4">
+                        <p class="text-purple-700">
+                            <i class="fas fa-tabs ml-2"></i>
+                            التبويبات المتاحة: General | Cloud Messaging | <strong class="text-purple-900">Service accounts</strong> | ...
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 4 -->
+            <div class="bg-white rounded-xl shadow-md overflow-hidden">
+                <div class="bg-gradient-to-l from-red-500 to-red-600 px-6 py-4">
+                    <div class="flex items-center gap-4">
+                        <div class="step-number bg-white text-red-600">4</div>
+                        <h3 class="text-xl font-bold text-white">توليد مفتاح جديد</h3>
+                    </div>
+                </div>
+                <div class="p-6">
+                    <ol class="space-y-4 text-gray-700">
+                        <li class="flex items-start gap-3">
+                            <span class="bg-red-100 text-red-600 rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold shrink-0">أ</span>
+                            <div>
+                                اضغط على زر <span class="bg-blue-600 text-white px-3 py-1 rounded text-sm">Generate new private key</span>
+                            </div>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <span class="bg-red-100 text-red-600 rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold shrink-0">ب</span>
+                            <span>ستظهر رسالة تحذيرية، اضغط <strong>Generate key</strong> للتأكيد</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <span class="bg-red-100 text-red-600 rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold shrink-0">ج</span>
+                            <span>سيتم تحميل ملف JSON تلقائياً (اسمه شيء مثل <code class="bg-gray-200 px-1 rounded">project-name-firebase-adminsdk-xxxxx.json</code>)</span>
+                        </li>
+                    </ol>
+
+                    <div class="mt-4 bg-red-50 border border-red-200 rounded-lg p-4">
+                        <p class="text-red-700 font-semibold">
+                            <i class="fas fa-shield-alt ml-2"></i>
+                            هذا الملف سري جداً! احتفظ به في مكان آمن ولا تشاركه مع أي شخص.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 5 -->
+            <div class="bg-white rounded-xl shadow-md overflow-hidden">
+                <div class="bg-gradient-to-l from-orange-500 to-orange-600 px-6 py-4">
+                    <div class="flex items-center gap-4">
+                        <div class="step-number bg-white text-orange-600">5</div>
+                        <h3 class="text-xl font-bold text-white">نقل الملف إلى المشروع</h3>
+                    </div>
+                </div>
+                <div class="p-6">
+                    <ol class="space-y-4 text-gray-700">
+                        <li class="flex items-start gap-3">
+                            <span class="bg-orange-100 text-orange-600 rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold shrink-0">أ</span>
+                            <span>ابحث عن الملف المحمّل في مجلد التنزيلات</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <span class="bg-orange-100 text-orange-600 rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold shrink-0">ب</span>
+                            <div>
+                                أعد تسميته إلى: <code class="bg-orange-200 px-2 py-1 rounded font-bold">firebase-credentials.json</code>
+                            </div>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <span class="bg-orange-100 text-orange-600 rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold shrink-0">ج</span>
+                            <div>
+                                انقله إلى المسار التالي في مشروع API:
+                                <div class="code-block mt-2">
+memo_api/storage/app/firebase-credentials.json
+                                </div>
+                            </div>
+                        </li>
+                    </ol>
+
+                    <div class="mt-4 bg-orange-50 rounded-lg p-4">
+                        <p class="text-orange-700">
+                            <i class="fas fa-folder-open ml-2"></i>
+                            المسار الكامل على جهازك:
+                        </p>
+                        <div class="code-block mt-2 text-sm">
+C:\Dev2026\1\memo_api\storage\app\firebase-credentials.json
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 6 -->
+            <div class="bg-white rounded-xl shadow-md overflow-hidden">
+                <div class="bg-gradient-to-l from-teal-500 to-teal-600 px-6 py-4">
+                    <div class="flex items-center gap-4">
+                        <div class="step-number bg-white text-teal-600">6</div>
+                        <h3 class="text-xl font-bold text-white">نسخ Project ID</h3>
+                    </div>
+                </div>
+                <div class="p-6">
+                    <ol class="space-y-4 text-gray-700">
+                        <li class="flex items-start gap-3">
+                            <span class="bg-teal-100 text-teal-600 rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold shrink-0">أ</span>
+                            <span>ارجع إلى صفحة <strong>Project settings</strong> في Firebase</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <span class="bg-teal-100 text-teal-600 rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold shrink-0">ب</span>
+                            <span>في تبويب <strong>General</strong>، ابحث عن <span class="highlight">Project ID</span></span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <span class="bg-teal-100 text-teal-600 rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold shrink-0">ج</span>
+                            <span>انسخ الـ Project ID (مثال: <code class="bg-gray-200 px-1 rounded">memo-bac-app</code>)</span>
+                        </li>
+                    </ol>
+
+                    <div class="mt-4 border-2 border-teal-300 rounded-lg p-4 bg-teal-50">
+                        <p class="text-teal-800">
+                            <i class="fas fa-copy ml-2"></i>
+                            يمكنك أيضاً إيجاد Project ID داخل ملف JSON الذي حمّلته في الخطوة السابقة (ابحث عن "project_id")
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 7 -->
+            <div class="bg-white rounded-xl shadow-md overflow-hidden">
+                <div class="bg-gradient-to-l from-indigo-500 to-indigo-600 px-6 py-4">
+                    <div class="flex items-center gap-4">
+                        <div class="step-number bg-white text-indigo-600">7</div>
+                        <h3 class="text-xl font-bold text-white">تحديث ملف .env</h3>
+                    </div>
+                </div>
+                <div class="p-6">
+                    <ol class="space-y-4 text-gray-700">
+                        <li class="flex items-start gap-3">
+                            <span class="bg-indigo-100 text-indigo-600 rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold shrink-0">أ</span>
+                            <div>
+                                افتح ملف <code class="bg-gray-200 px-1 rounded">.env</code> في مجلد <code>memo_api</code>
+                            </div>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <span class="bg-indigo-100 text-indigo-600 rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold shrink-0">ب</span>
+                            <span>أضف السطور التالية في نهاية الملف:</span>
+                        </li>
+                    </ol>
+
+                    <div class="code-block mt-4">
+<span class="text-green-400"># Firebase Configuration</span>
+FIREBASE_PROJECT_ID=<span class="text-yellow-400">your-project-id-here</span>
+FIREBASE_CREDENTIALS=storage/app/firebase-credentials.json
+                    </div>
+
+                    <div class="mt-4 bg-indigo-50 rounded-lg p-4">
+                        <p class="text-indigo-700">
+                            <i class="fas fa-edit ml-2"></i>
+                            استبدل <code class="bg-indigo-200 px-1 rounded">your-project-id-here</code> بـ Project ID الذي نسخته
+                        </p>
+                    </div>
+
+                    <div class="mt-4 bg-gray-100 rounded-lg p-4">
+                        <p class="text-gray-700 font-semibold mb-2">مثال عملي:</p>
+                        <div class="code-block">
+<span class="text-green-400"># Firebase Configuration</span>
+FIREBASE_PROJECT_ID=memo-bac-12345
+FIREBASE_CREDENTIALS=storage/app/firebase-credentials.json
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 8 -->
+            <div class="bg-white rounded-xl shadow-md overflow-hidden">
+                <div class="bg-gradient-to-l from-pink-500 to-pink-600 px-6 py-4">
+                    <div class="flex items-center gap-4">
+                        <div class="step-number bg-white text-pink-600">8</div>
+                        <h3 class="text-xl font-bold text-white">مسح الـ Cache وإعادة التشغيل</h3>
+                    </div>
+                </div>
+                <div class="p-6">
+                    <p class="text-gray-700 mb-4">افتح Terminal/CMD في مجلد <code class="bg-gray-200 px-1 rounded">memo_api</code> ونفذ الأوامر التالية:</p>
+
+                    <div class="code-block">
+<span class="text-gray-400"># مسح cache الإعدادات</span>
+php artisan config:clear
+
+<span class="text-gray-400"># مسح كل الـ cache</span>
+php artisan cache:clear
+
+<span class="text-gray-400"># إعادة تشغيل السيرفر</span>
+php artisan serve
+                    </div>
+
+                    <div class="mt-4 bg-pink-50 rounded-lg p-4">
+                        <p class="text-pink-700">
+                            <i class="fas fa-sync ml-2"></i>
+                            هذه الخطوة ضرورية لتحميل الإعدادات الجديدة
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 9 - Testing -->
+            <div class="bg-white rounded-xl shadow-md overflow-hidden">
+                <div class="bg-gradient-to-l from-emerald-500 to-emerald-600 px-6 py-4">
+                    <div class="flex items-center gap-4">
+                        <div class="step-number bg-white text-emerald-600">9</div>
+                        <h3 class="text-xl font-bold text-white">اختبار الإعداد</h3>
+                    </div>
+                </div>
+                <div class="p-6">
+                    <ol class="space-y-4 text-gray-700">
+                        <li class="flex items-start gap-3">
+                            <span class="bg-emerald-100 text-emerald-600 rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold shrink-0">أ</span>
+                            <div>
+                                اذهب إلى لوحة التحكم:
+                                <a href="http://127.0.0.1:8084/admin/notifications/configuration" target="_blank" class="text-blue-600 hover:underline">
+                                    إعدادات الإشعارات
+                                    <i class="fas fa-external-link-alt text-xs mr-1"></i>
+                                </a>
+                            </div>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <span class="bg-emerald-100 text-emerald-600 rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold shrink-0">ب</span>
+                            <span>اضغط على زر <strong>"اختبار الاتصال"</strong></span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <span class="bg-emerald-100 text-emerald-600 rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold shrink-0">ج</span>
+                            <span>يجب أن تظهر رسالة <span class="text-green-600 font-bold">"تم الاتصال بنجاح"</span></span>
+                        </li>
+                    </ol>
+
+                    <div class="mt-6 bg-emerald-50 border-2 border-emerald-300 rounded-lg p-4">
+                        <div class="flex items-center gap-3">
+                            <i class="fas fa-check-circle text-emerald-500 text-3xl"></i>
+                            <div>
+                                <p class="text-emerald-800 font-bold text-lg">مبروك! 🎉</p>
+                                <p class="text-emerald-700">إذا نجح الاختبار، فإن نظام الإشعارات جاهز للعمل!</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Troubleshooting -->
+        <div class="bg-white rounded-xl shadow-md p-6 mt-8">
+            <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+                <i class="fas fa-wrench text-gray-600"></i>
+                حل المشاكل الشائعة
+            </h2>
+
+            <div class="space-y-4">
+                <div class="border-r-4 border-red-400 bg-red-50 p-4 rounded">
+                    <p class="font-bold text-red-800">❌ خطأ: "Firebase credentials file not found"</p>
+                    <p class="text-red-700 mt-1">
+                        <strong>الحل:</strong> تأكد أن الملف موجود في المسار الصحيح:
+                        <code class="bg-red-200 px-1 rounded">storage/app/firebase-credentials.json</code>
+                    </p>
+                </div>
+
+                <div class="border-r-4 border-yellow-400 bg-yellow-50 p-4 rounded">
+                    <p class="font-bold text-yellow-800">⚠️ خطأ: "Could not get Firebase access token"</p>
+                    <p class="text-yellow-700 mt-1">
+                        <strong>الحل:</strong> تأكد أن محتوى ملف JSON صحيح ولم يتم تعديله. حمّل ملفاً جديداً من Firebase.
+                    </p>
+                </div>
+
+                <div class="border-r-4 border-blue-400 bg-blue-50 p-4 rounded">
+                    <p class="font-bold text-blue-800">ℹ️ خطأ: "Project ID mismatch"</p>
+                    <p class="text-blue-700 mt-1">
+                        <strong>الحل:</strong> تأكد أن FIREBASE_PROJECT_ID في .env يطابق project_id في ملف JSON.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- File Structure Reference -->
+        <div class="bg-gray-800 text-white rounded-xl shadow-md p-6 mt-8">
+            <h2 class="text-xl font-bold mb-4 flex items-center gap-2">
+                <i class="fas fa-folder-tree text-yellow-400"></i>
+                هيكل الملفات المطلوب
+            </h2>
+
+            <pre class="text-sm overflow-x-auto">
+memo_api/
+├── .env                          <span class="text-green-400">← أضف FIREBASE_PROJECT_ID هنا</span>
+├── config/
+│   └── firebase.php              <span class="text-gray-400">← إعدادات Firebase</span>
+├── storage/
+│   └── app/
+│       └── <span class="text-yellow-400">firebase-credentials.json</span>  <span class="text-green-400">← ضع الملف هنا</span>
+└── ...
+            </pre>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-6 mt-12">
+        <div class="container mx-auto px-4 text-center">
+            <p class="text-gray-400">
+                <i class="fas fa-code ml-2"></i>
+                MEMO BAC - دليل إعداد Firebase
+            </p>
+            <p class="text-gray-500 text-sm mt-2">
+                آخر تحديث: ديسمبر 2025
+            </p>
+        </div>
+    </footer>
+
+</body>
+</html>

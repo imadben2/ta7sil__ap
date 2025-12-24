@@ -1,0 +1,33 @@
+<?php
+
+namespace Database\Factories;
+
+use App\Models\BacYear;
+use Illuminate\Database\Eloquent\Factories\Factory;
+
+class BacYearFactory extends Factory
+{
+    protected $model = BacYear::class;
+
+    public function definition(): array
+    {
+        return [
+            'year' => $this->faker->numberBetween(2015, 2024),
+            'is_active' => $this->faker->boolean(80),
+        ];
+    }
+
+    public function active(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'is_active' => true,
+        ]);
+    }
+
+    public function inactive(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'is_active' => false,
+        ]);
+    }
+}

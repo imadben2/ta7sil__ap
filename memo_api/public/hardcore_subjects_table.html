@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>جدول المواد الأساسية (HARD_CORE)</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 2.2em;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        .summary {
+            background: #ecf0f1;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .summary-item {
+            text-align: center;
+        }
+
+        .summary-item .number {
+            font-size: 2em;
+            font-weight: bold;
+            color: #3498db;
+        }
+
+        .summary-item .label {
+            color: #666;
+            margin-top: 5px;
+        }
+
+        h2 {
+            color: #34495e;
+            margin: 30px 0 15px 0;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #3498db;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 30px;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: right;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background: #3498db;
+            color: white;
+            font-weight: bold;
+            position: sticky;
+            top: 0;
+        }
+
+        tr:hover {
+            background: #f8f9fa;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 15px;
+            font-size: 0.85em;
+            font-weight: bold;
+        }
+
+        .badge-hardcore {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .badge-active {
+            background: #27ae60;
+            color: white;
+        }
+
+        .badge-inactive {
+            background: #95a5a6;
+            color: white;
+        }
+
+        .coefficient {
+            font-weight: bold;
+            color: #e74c3c;
+            font-size: 1.1em;
+        }
+
+        .stream-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+        }
+
+        .stream-tag {
+            background: #3498db;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 0.85em;
+        }
+
+        .footer {
+            text-align: center;
+            color: #999;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+        }
+
+        @media print {
+            body {
+                padding: 0;
+            }
+            .container {
+                box-shadow: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📊 جدول المواد الأساسية (HARD_CORE)</h1>
+        <p class="subtitle">تقرير شامل لجميع المواد الأساسية مصنفة حسب الشعب الأكاديمية</p>
+        <p class="subtitle">2025-12-17 19:26:17</p>
+
+        <div class="summary">
+            <div class="summary-grid">
+                <div class="summary-item">
+                    <div class="number">9</div>
+                    <div class="label">إجمالي المواد الأساسية</div>
+                </div>
+                <div class="summary-item">
+                    <div class="number">6</div>
+                    <div class="label">عدد الشعب</div>
+                </div>
+                <div class="summary-item">
+                    <div class="number">16</div>
+                    <div class="label">إجمالي الارتباطات</div>
+                </div>
+            </div>
+        </div>
+
+        <h2>🎓 ملخص الشعب الأكاديمية</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>اسم الشعبة</th>
+                    <th>الكود</th>
+                    <th>عدد المواد الأساسية</th>
+                    <th>الحالة</th>
+                </tr>
+            </thead>
+            <tbody>
+                                                <tr>
+                    <td>1</td>
+                    <td><strong>آداب وفلسفة</strong></td>
+                    <td>literature-philosophy</td>
+                    <td><span class="coefficient">1</span></td>
+                    <td>
+                        <span class="badge badge-active">
+                            نشط                        </span>
+                    </td>
+                </tr>
+                                <tr>
+                    <td>2</td>
+                    <td><strong>تسيير واقتصاد</strong></td>
+                    <td>management-economics</td>
+                    <td><span class="coefficient">3</span></td>
+                    <td>
+                        <span class="badge badge-active">
+                            نشط                        </span>
+                    </td>
+                </tr>
+                                <tr>
+                    <td>3</td>
+                    <td><strong>تقني رياضي</strong></td>
+                    <td>tech-math</td>
+                    <td><span class="coefficient">5</span></td>
+                    <td>
+                        <span class="badge badge-active">
+                            نشط                        </span>
+                    </td>
+                </tr>
+                                <tr>
+                    <td>4</td>
+                    <td><strong>رياضيات</strong></td>
+                    <td>mathematics</td>
+                    <td><span class="coefficient">3</span></td>
+                    <td>
+                        <span class="badge badge-active">
+                            نشط                        </span>
+                    </td>
+                </tr>
+                                <tr>
+                    <td>5</td>
+                    <td><strong>علوم تجريبية</strong></td>
+                    <td>sciences-exp</td>
+                    <td><span class="coefficient">3</span></td>
+                    <td>
+                        <span class="badge badge-active">
+                            نشط                        </span>
+                    </td>
+                </tr>
+                                <tr>
+                    <td>6</td>
+                    <td><strong>لغات أجنبية</strong></td>
+                    <td>foreign-languages</td>
+                    <td><span class="coefficient">1</span></td>
+                    <td>
+                        <span class="badge badge-active">
+                            نشط                        </span>
+                    </td>
+                </tr>
+                            </tbody>
+        </table>
+
+        <h2>📚 جميع المواد الأساسية (HARD_CORE)</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>اسم المادة</th>
+                    <th>المعامل الافتراضي</th>
+                    <th>الشعب المرتبطة</th>
+                    <th>الفئة</th>
+                    <th>الحالة</th>
+                </tr>
+            </thead>
+            <tbody>
+                                                <tr>
+                    <td>1</td>
+                    <td><strong>الاقتصاد</strong></td>
+                    <td><span class="coefficient">0.0</span></td>
+                    <td>
+                        <div class="stream-list">
+                                                                                                <span class="stream-tag">
+                                        تسيير واقتصاد                                        (5.0)
+                                    </span>
+                                                                                    </div>
+                    </td>
+                    <td><span class="badge badge-hardcore">HARD_CORE</span></td>
+                    <td>
+                        <span class="badge badge-active">
+                            نشط                        </span>
+                    </td>
+                </tr>
+                                <tr>
+                    <td>2</td>
+                    <td><strong>الرياضيات</strong></td>
+                    <td><span class="coefficient">0.0</span></td>
+                    <td>
+                        <div class="stream-list">
+                                                                                                <span class="stream-tag">
+                                        آداب وفلسفة                                        (2.0)
+                                    </span>
+                                                                    <span class="stream-tag">
+                                        تسيير واقتصاد                                        (5.0)
+                                    </span>
+                                                                    <span class="stream-tag">
+                                        تقني رياضي                                        (6.0)
+                                    </span>
+                                                                    <span class="stream-tag">
+                                        رياضيات                                        (7.0)
+                                    </span>
+                                                                    <span class="stream-tag">
+                                        علوم تجريبية                                        (5.0)
+                                    </span>
+                                                                    <span class="stream-tag">
+                                        لغات أجنبية                                        (2.0)
+                                    </span>
+                                                                                    </div>
+                    </td>
+                    <td><span class="badge badge-hardcore">HARD_CORE</span></td>
+                    <td>
+                        <span class="badge badge-active">
+                            نشط                        </span>
+                    </td>
+                </tr>
+                                <tr>
+                    <td>3</td>
+                    <td><strong>العلوم الطبيعية</strong></td>
+                    <td><span class="coefficient">0.0</span></td>
+                    <td>
+                        <div class="stream-list">
+                                                                                                <span class="stream-tag">
+                                        رياضيات                                        (2.0)
+                                    </span>
+                                                                                    </div>
+                    </td>
+                    <td><span class="badge badge-hardcore">HARD_CORE</span></td>
+                    <td>
+                        <span class="badge badge-active">
+                            نشط                        </span>
+                    </td>
+                </tr>
+                                <tr>
+                    <td>4</td>
+                    <td><strong>العلوم الفيزيائية</strong></td>
+                    <td><span class="coefficient">5.0</span></td>
+                    <td>
+                        <div class="stream-list">
+                                                                                                <span class="stream-tag">
+                                        تقني رياضي                                        (6.0)
+                                    </span>
+                                                                    <span class="stream-tag">
+                                        رياضيات                                        (6.0)
+                                    </span>
+                                                                    <span class="stream-tag">
+                                        علوم تجريبية                                        (5.0)
+                                    </span>
+                                                                                    </div>
+                    </td>
+                    <td><span class="badge badge-hardcore">HARD_CORE</span></td>
+                    <td>
+                        <span class="badge badge-active">
+                            نشط                        </span>
+                    </td>
+                </tr>
+                                <tr>
+                    <td>5</td>
+                    <td><strong>المحاسبة</strong></td>
+                    <td><span class="coefficient">0.0</span></td>
+                    <td>
+                        <div class="stream-list">
+                                                                                                <span class="stream-tag">
+                                        تسيير واقتصاد                                        (6.0)
+                                    </span>
+                                                                                    </div>
+                    </td>
+                    <td><span class="badge badge-hardcore">HARD_CORE</span></td>
+                    <td>
+                        <span class="badge badge-active">
+                            نشط                        </span>
+                    </td>
+                </tr>
+                                <tr>
+                    <td>6</td>
+                    <td><strong>الهندسة الكهربائية</strong></td>
+                    <td><span class="coefficient">0.0</span></td>
+                    <td>
+                        <div class="stream-list">
+                                                                                                <span class="stream-tag">
+                                        تقني رياضي                                        (7.0)
+                                    </span>
+                                                                                    </div>
+                    </td>
+                    <td><span class="badge badge-hardcore">HARD_CORE</span></td>
+                    <td>
+                        <span class="badge badge-active">
+                            نشط                        </span>
+                    </td>
+                </tr>
+                                <tr>
+                    <td>7</td>
+                    <td><strong>الهندسة الميكانيكية</strong></td>
+                    <td><span class="coefficient">0.0</span></td>
+                    <td>
+                        <div class="stream-list">
+                                                                                                <span class="stream-tag">
+                                        تقني رياضي                                        (7.0)
+                                    </span>
+                                                                                    </div>
+                    </td>
+                    <td><span class="badge badge-hardcore">HARD_CORE</span></td>
+                    <td>
+                        <span class="badge badge-active">
+                            نشط                        </span>
+                    </td>
+                </tr>
+                                <tr>
+                    <td>8</td>
+                    <td><strong>علوم الطبيعة والحياة</strong></td>
+                    <td><span class="coefficient">6.0</span></td>
+                    <td>
+                        <div class="stream-list">
+                                                                                                <span class="stream-tag">
+                                        علوم تجريبية                                        (6.0)
+                                    </span>
+                                                                                    </div>
+                    </td>
+                    <td><span class="badge badge-hardcore">HARD_CORE</span></td>
+                    <td>
+                        <span class="badge badge-active">
+                            نشط                        </span>
+                    </td>
+                </tr>
+                                <tr>
+                    <td>9</td>
+                    <td><strong>هندسة الطرائق</strong></td>
+                    <td><span class="coefficient">0.0</span></td>
+                    <td>
+                        <div class="stream-list">
+                                                                                                <span class="stream-tag">
+                                        تقني رياضي                                        (7.0)
+                                    </span>
+                                                                                    </div>
+                    </td>
+                    <td><span class="badge badge-hardcore">HARD_CORE</span></td>
+                    <td>
+                        <span class="badge badge-active">
+                            نشط                        </span>
+                    </td>
+                </tr>
+                            </tbody>
+        </table>
+
+                <h2>📖 شعبة: آداب وفلسفة (1 مواد)</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>اسم المادة</th>
+                    <th>المعامل في هذه الشعبة</th>
+                    <th>المعامل الافتراضي</th>
+                    <th>Slug</th>
+                    <th>الحالة</th>
+                </tr>
+            </thead>
+            <tbody>
+                                                                <tr>
+                    <td>1</td>
+                    <td><strong>الرياضيات</strong></td>
+                    <td>
+                        <span class="coefficient">
+                            2.0                        </span>
+                    </td>
+                    <td>0.0</td>
+                    <td style="font-size: 0.85em; color: #666;">mathematics</td>
+                    <td>
+                        <span class="badge badge-active">
+                            نشط                        </span>
+                    </td>
+                </tr>
+                            </tbody>
+        </table>
+                <h2>📖 شعبة: تسيير واقتصاد (3 مواد)</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>اسم المادة</th>
+                    <th>المعامل في هذه الشعبة</th>
+                    <th>المعامل الافتراضي</th>
+                    <th>Slug</th>
+                    <th>الحالة</th>
+                </tr>
+            </thead>
+            <tbody>
+                                                                <tr>
+                    <td>1</td>
+                    <td><strong>الاقتصاد</strong></td>
+                    <td>
+                        <span class="coefficient">
+                            5.0                        </span>
+                    </td>
+                    <td>0.0</td>
+                    <td style="font-size: 0.85em; color: #666;">economics</td>
+                    <td>
+                        <span class="badge badge-active">
+                            نشط                        </span>
+                    </td>
+                </tr>
+                                                <tr>
+                    <td>2</td>
+                    <td><strong>الرياضيات</strong></td>
+                    <td>
+                        <span class="coefficient">
+                            5.0                        </span>
+                    </td>
+                    <td>0.0</td>
+                    <td style="font-size: 0.85em; color: #666;">mathematics</td>
+                    <td>
+                        <span class="badge badge-active">
+                            نشط                        </span>
+                    </td>
+                </tr>
+                                                <tr>
+                    <td>3</td>
+                    <td><strong>المحاسبة</strong></td>
+                    <td>
+                        <span class="coefficient">
+                            6.0                        </span>
+                    </td>
+                    <td>0.0</td>
+                    <td style="font-size: 0.85em; color: #666;">accounting</td>
+                    <td>
+                        <span class="badge badge-active">
+                            نشط                        </span>
+                    </td>
+                </tr>
+                            </tbody>
+        </table>
+                <h2>📖 شعبة: تقني رياضي (5 مواد)</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>اسم المادة</th>
+                    <th>المعامل في هذه الشعبة</th>
+                    <th>المعامل الافتراضي</th>
+                    <th>Slug</th>
+                    <th>الحالة</th>
+                </tr>
+            </thead>
+            <tbody>
+                                                                <tr>
+                    <td>1</td>
+                    <td><strong>الرياضيات</strong></td>
+                    <td>
+                        <span class="coefficient">
+                            6.0                        </span>
+                    </td>
+                    <td>0.0</td>
+                    <td style="font-size: 0.85em; color: #666;">mathematics</td>
+                    <td>
+                        <span class="badge badge-active">
+                            نشط                        </span>
+                    </td>
+                </tr>
+                                                <tr>
+                    <td>2</td>
+                    <td><strong>العلوم الفيزيائية</strong></td>
+                    <td>
+                        <span class="coefficient">
+                            6.0                        </span>
+                    </td>
+                    <td>5.0</td>
+                    <td style="font-size: 0.85em; color: #666;">physics</td>
+                    <td>
+                        <span class="badge badge-active">
+                            نشط                        </span>
+                    </td>
+                </tr>
+                                                <tr>
+                    <td>3</td>
+                    <td><strong>الهندسة الكهربائية</strong></td>
+                    <td>
+                        <span class="coefficient">
+                            7.0                        </span>
+                    </td>
+                    <td>0.0</td>
+                    <td style="font-size: 0.85em; color: #666;">electrical-engineering</td>
+                    <td>
+                        <span class="badge badge-active">
+                            نشط                        </span>
+                    </td>
+                </tr>
+                                                <tr>
+                    <td>4</td>
+                    <td><strong>الهندسة الميكانيكية</strong></td>
+                    <td>
+                        <span class="coefficient">
+                            7.0                        </span>
+                    </td>
+                    <td>0.0</td>
+                    <td style="font-size: 0.85em; color: #666;">mechanical-engineering</td>
+                    <td>
+                        <span class="badge badge-active">
+                            نشط                        </span>
+                    </td>
+                </tr>
+                                                <tr>
+                    <td>5</td>
+                    <td><strong>هندسة الطرائق</strong></td>
+                    <td>
+                        <span class="coefficient">
+                            7.0                        </span>
+                    </td>
+                    <td>0.0</td>
+                    <td style="font-size: 0.85em; color: #666;">process-engineering</td>
+                    <td>
+                        <span class="badge badge-active">
+                            نشط                        </span>
+                    </td>
+                </tr>
+                            </tbody>
+        </table>
+                <h2>📖 شعبة: رياضيات (3 مواد)</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>اسم المادة</th>
+                    <th>المعامل في هذه الشعبة</th>
+                    <th>المعامل الافتراضي</th>
+                    <th>Slug</th>
+                    <th>الحالة</th>
+                </tr>
+            </thead>
+            <tbody>
+                                                                <tr>
+                    <td>1</td>
+                    <td><strong>الرياضيات</strong></td>
+                    <td>
+                        <span class="coefficient">
+                            7.0                        </span>
+                    </td>
+                    <td>0.0</td>
+                    <td style="font-size: 0.85em; color: #666;">mathematics</td>
+                    <td>
+                        <span class="badge badge-active">
+                            نشط                        </span>
+                    </td>
+                </tr>
+                                                <tr>
+                    <td>2</td>
+                    <td><strong>العلوم الطبيعية</strong></td>
+                    <td>
+                        <span class="coefficient">
+                            2.0                        </span>
+                    </td>
+                    <td>0.0</td>
+                    <td style="font-size: 0.85em; color: #666;">biology</td>
+                    <td>
+                        <span class="badge badge-active">
+                            نشط                        </span>
+                    </td>
+                </tr>
+                                                <tr>
+                    <td>3</td>
+                    <td><strong>العلوم الفيزيائية</strong></td>
+                    <td>
+                        <span class="coefficient">
+                            6.0                        </span>
+                    </td>
+                    <td>5.0</td>
+                    <td style="font-size: 0.85em; color: #666;">physics</td>
+                    <td>
+                        <span class="badge badge-active">
+                            نشط                        </span>
+                    </td>
+                </tr>
+                            </tbody>
+        </table>
+                <h2>📖 شعبة: علوم تجريبية (3 مواد)</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>اسم المادة</th>
+                    <th>المعامل في هذه الشعبة</th>
+                    <th>المعامل الافتراضي</th>
+                    <th>Slug</th>
+                    <th>الحالة</th>
+                </tr>
+            </thead>
+            <tbody>
+                                                                <tr>
+                    <td>1</td>
+                    <td><strong>الرياضيات</strong></td>
+                    <td>
+                        <span class="coefficient">
+                            5.0                        </span>
+                    </td>
+                    <td>0.0</td>
+                    <td style="font-size: 0.85em; color: #666;">mathematics</td>
+                    <td>
+                        <span class="badge badge-active">
+                            نشط                        </span>
+                    </td>
+                </tr>
+                                                <tr>
+                    <td>2</td>
+                    <td><strong>العلوم الفيزيائية</strong></td>
+                    <td>
+                        <span class="coefficient">
+                            5.0                        </span>
+                    </td>
+                    <td>5.0</td>
+                    <td style="font-size: 0.85em; color: #666;">physics</td>
+                    <td>
+                        <span class="badge badge-active">
+                            نشط                        </span>
+                    </td>
+                </tr>
+                                                <tr>
+                    <td>3</td>
+                    <td><strong>علوم الطبيعة والحياة</strong></td>
+                    <td>
+                        <span class="coefficient">
+                            6.0                        </span>
+                    </td>
+                    <td>6.0</td>
+                    <td style="font-size: 0.85em; color: #666;">natural-sciences</td>
+                    <td>
+                        <span class="badge badge-active">
+                            نشط                        </span>
+                    </td>
+                </tr>
+                            </tbody>
+        </table>
+                <h2>📖 شعبة: لغات أجنبية (1 مواد)</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>اسم المادة</th>
+                    <th>المعامل في هذه الشعبة</th>
+                    <th>المعامل الافتراضي</th>
+                    <th>Slug</th>
+                    <th>الحالة</th>
+                </tr>
+            </thead>
+            <tbody>
+                                                                <tr>
+                    <td>1</td>
+                    <td><strong>الرياضيات</strong></td>
+                    <td>
+                        <span class="coefficient">
+                            2.0                        </span>
+                    </td>
+                    <td>0.0</td>
+                    <td style="font-size: 0.85em; color: #666;">mathematics</td>
+                    <td>
+                        <span class="badge badge-active">
+                            نشط                        </span>
+                    </td>
+                </tr>
+                            </tbody>
+        </table>
+        
+        <div class="footer">
+            <p><strong>ملاحظة:</strong> المعاملات المعروضة بين الأقواس في عمود "الشعب المرتبطة" تمثل المعامل الخاص بكل شعبة</p>
+            <p>تم إنشاء التقرير بواسطة نظام Memo API | جميع الحقوق محفوظة © 2025</p>
+        </div>
+    </div>
+</body>
+</html>

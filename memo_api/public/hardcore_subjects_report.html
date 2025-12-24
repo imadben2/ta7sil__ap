@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>المواد الأساسية (HARD_CORE) حسب الشعبة</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: #667eea;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header .subtitle {
+            color: #666;
+            font-size: 1.1em;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .stat-card .number {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+
+        .stat-card .label {
+            color: #666;
+            font-size: 1em;
+        }
+
+        .stream-section {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin-bottom: 25px;
+        }
+
+        .stream-header {
+            display: flex;
+            align-items: center;
+            padding-bottom: 15px;
+            border-bottom: 3px solid #667eea;
+            margin-bottom: 20px;
+        }
+
+        .stream-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8em;
+            color: white;
+            margin-left: 15px;
+        }
+
+        .stream-info {
+            flex: 1;
+        }
+
+        .stream-name {
+            font-size: 1.8em;
+            color: #333;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .stream-code {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .subjects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 15px;
+        }
+
+        .subject-card {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 20px;
+            border-radius: 10px;
+            border-right: 5px solid #667eea;
+            transition: all 0.3s ease;
+        }
+
+        .subject-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+        }
+
+        .subject-name {
+            font-size: 1.3em;
+            color: #333;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .subject-details {
+            display: grid;
+            gap: 8px;
+        }
+
+        .subject-detail {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px;
+            background: rgba(255,255,255,0.5);
+            border-radius: 5px;
+        }
+
+        .detail-label {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .detail-value {
+            color: #333;
+            font-weight: bold;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: bold;
+        }
+
+        .badge-hardcore {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .badge-active {
+            background: #27ae60;
+            color: white;
+        }
+
+        .badge-inactive {
+            background: #95a5a6;
+            color: white;
+        }
+
+        .no-subjects {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+            font-size: 1.2em;
+        }
+
+        .footer {
+            text-align: center;
+            color: white;
+            margin-top: 30px;
+            padding: 20px;
+        }
+
+        @media print {
+            body {
+                background: white;
+            }
+
+            .stream-section {
+                page-break-inside: avoid;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📚 المواد الأساسية (HARD_CORE)</h1>
+            <p class="subtitle">توزيع المواد الأساسية حسب الشعب الأكاديمية</p>
+            <p class="subtitle">2025-12-17 19:25:11</p>
+        </div>
+
+        <div class="stats">
+            <div class="stat-card">
+                <div class="number">6</div>
+                <div class="label">عدد الشعب</div>
+            </div>
+            <div class="stat-card">
+                <div class="number">16</div>
+                <div class="label">إجمالي المواد</div>
+            </div>
+            <div class="stat-card">
+                <div class="number">2.7</div>
+                <div class="label">متوسط المواد لكل شعبة</div>
+            </div>
+        </div>
+
+                <div class="stream-section">
+            <div class="stream-header">
+                <div class="stream-icon">🎓</div>
+                <div class="stream-info">
+                    <div class="stream-name">آداب وفلسفة</div>
+                    <div class="stream-code">
+                        الكود:  |
+                        المواد الأساسية: 1                    </div>
+                </div>
+            </div>
+
+                        <div class="subjects-grid">
+                                <div class="subject-card">
+                    <div class="subject-name">
+                        الرياضيات                        <span class="badge badge-hardcore">HARD_CORE</span>
+                    </div>
+                    <div class="subject-details">
+                        <div class="subject-detail">
+                            <span class="detail-label">المعامل:</span>
+                            <span class="detail-value">2.0</span>
+                        </div>
+                        <div class="subject-detail">
+                            <span class="detail-label">الفئة:</span>
+                            <span class="detail-value">HARD_CORE</span>
+                        </div>
+                        <div class="subject-detail">
+                            <span class="detail-label">الحالة:</span>
+                            <span class="badge badge-active">
+                                نشط                            </span>
+                        </div>
+                                                <div class="subject-detail">
+                            <span class="detail-label">Slug:</span>
+                            <span class="detail-value" style="font-size: 0.85em;">mathematics</span>
+                        </div>
+                                            </div>
+                </div>
+                            </div>
+                    </div>
+                <div class="stream-section">
+            <div class="stream-header">
+                <div class="stream-icon">🎓</div>
+                <div class="stream-info">
+                    <div class="stream-name">تسيير واقتصاد</div>
+                    <div class="stream-code">
+                        الكود:  |
+                        المواد الأساسية: 3                    </div>
+                </div>
+            </div>
+
+                        <div class="subjects-grid">
+                                <div class="subject-card">
+                    <div class="subject-name">
+                        الاقتصاد                        <span class="badge badge-hardcore">HARD_CORE</span>
+                    </div>
+                    <div class="subject-details">
+                        <div class="subject-detail">
+                            <span class="detail-label">المعامل:</span>
+                            <span class="detail-value">5.0</span>
+                        </div>
+                        <div class="subject-detail">
+                            <span class="detail-label">الفئة:</span>
+                            <span class="detail-value">HARD_CORE</span>
+                        </div>
+                        <div class="subject-detail">
+                            <span class="detail-label">الحالة:</span>
+                            <span class="badge badge-active">
+                                نشط                            </span>
+                        </div>
+                                                <div class="subject-detail">
+                            <span class="detail-label">Slug:</span>
+                            <span class="detail-value" style="font-size: 0.85em;">economics</span>
+                        </div>
+                                            </div>
+                </div>
+                                <div class="subject-card">
+                    <div class="subject-name">
+                        الرياضيات                        <span class="badge badge-hardcore">HARD_CORE</span>
+                    </div>
+                    <div class="subject-details">
+                        <div class="subject-detail">
+                            <span class="detail-label">المعامل:</span>
+                            <span class="detail-value">5.0</span>
+                        </div>
+                        <div class="subject-detail">
+                            <span class="detail-label">الفئة:</span>
+                            <span class="detail-value">HARD_CORE</span>
+                        </div>
+                        <div class="subject-detail">
+                            <span class="detail-label">الحالة:</span>
+                            <span class="badge badge-active">
+                                نشط                            </span>
+                        </div>
+                                                <div class="subject-detail">
+                            <span class="detail-label">Slug:</span>
+                            <span class="detail-value" style="font-size: 0.85em;">mathematics</span>
+                        </div>
+                                            </div>
+                </div>
+                                <div class="subject-card">
+                    <div class="subject-name">
+                        المحاسبة                        <span class="badge badge-hardcore">HARD_CORE</span>
+                    </div>
+                    <div class="subject-details">
+                        <div class="subject-detail">
+                            <span class="detail-label">المعامل:</span>
+                            <span class="detail-value">6.0</span>
+                        </div>
+                        <div class="subject-detail">
+                            <span class="detail-label">الفئة:</span>
+                            <span class="detail-value">HARD_CORE</span>
+                        </div>
+                        <div class="subject-detail">
+                            <span class="detail-label">الحالة:</span>
+                            <span class="badge badge-active">
+                                نشط                            </span>
+                        </div>
+                                                <div class="subject-detail">
+                            <span class="detail-label">Slug:</span>
+                            <span class="detail-value" style="font-size: 0.85em;">accounting</span>
+                        </div>
+                                            </div>
+                </div>
+                            </div>
+                    </div>
+                <div class="stream-section">
+            <div class="stream-header">
+                <div class="stream-icon">🎓</div>
+                <div class="stream-info">
+                    <div class="stream-name">تقني رياضي</div>
+                    <div class="stream-code">
+                        الكود:  |
+                        المواد الأساسية: 5                    </div>
+                </div>
+            </div>
+
+                        <div class="subjects-grid">
+                                <div class="subject-card">
+                    <div class="subject-name">
+                        الرياضيات                        <span class="badge badge-hardcore">HARD_CORE</span>
+                    </div>
+                    <div class="subject-details">
+                        <div class="subject-detail">
+                            <span class="detail-label">المعامل:</span>
+                            <span class="detail-value">6.0</span>
+                        </div>
+                        <div class="subject-detail">
+                            <span class="detail-label">الفئة:</span>
+                            <span class="detail-value">HARD_CORE</span>
+                        </div>
+                        <div class="subject-detail">
+                            <span class="detail-label">الحالة:</span>
+                            <span class="badge badge-active">
+                                نشط                            </span>
+                        </div>
+                                                <div class="subject-detail">
+                            <span class="detail-label">Slug:</span>
+                            <span class="detail-value" style="font-size: 0.85em;">mathematics</span>
+                        </div>
+                                            </div>
+                </div>
+                                <div class="subject-card">
+                    <div class="subject-name">
+                        العلوم الفيزيائية                        <span class="badge badge-hardcore">HARD_CORE</span>
+                    </div>
+                    <div class="subject-details">
+                        <div class="subject-detail">
+                            <span class="detail-label">المعامل:</span>
+                            <span class="detail-value">6.0</span>
+                        </div>
+                        <div class="subject-detail">
+                            <span class="detail-label">الفئة:</span>
+                            <span class="detail-value">HARD_CORE</span>
+                        </div>
+                        <div class="subject-detail">
+                            <span class="detail-label">الحالة:</span>
+                            <span class="badge badge-active">
+                                نشط                            </span>
+                        </div>
+                                                <div class="subject-detail">
+                            <span class="detail-label">Slug:</span>
+                            <span class="detail-value" style="font-size: 0.85em;">physics</span>
+                        </div>
+                                            </div>
+                </div>
+                                <div class="subject-card">
+                    <div class="subject-name">
+                        الهندسة الكهربائية                        <span class="badge badge-hardcore">HARD_CORE</span>
+                    </div>
+                    <div class="subject-details">
+                        <div class="subject-detail">
+                            <span class="detail-label">المعامل:</span>
+                            <span class="detail-value">7.0</span>
+                        </div>
+                        <div class="subject-detail">
+                            <span class="detail-label">الفئة:</span>
+                            <span class="detail-value">HARD_CORE</span>
+                        </div>
+                        <div class="subject-detail">
+                            <span class="detail-label">الحالة:</span>
+                            <span class="badge badge-active">
+                                نشط                            </span>
+                        </div>
+                                                <div class="subject-detail">
+                            <span class="detail-label">Slug:</span>
+                            <span class="detail-value" style="font-size: 0.85em;">electrical-engineering</span>
+                        </div>
+                                            </div>
+                </div>
+                                <div class="subject-card">
+                    <div class="subject-name">
+                        الهندسة الميكانيكية                        <span class="badge badge-hardcore">HARD_CORE</span>
+                    </div>
+                    <div class="subject-details">
+                        <div class="subject-detail">
+                            <span class="detail-label">المعامل:</span>
+                            <span class="detail-value">7.0</span>
+                        </div>
+                        <div class="subject-detail">
+                            <span class="detail-label">الفئة:</span>
+                            <span class="detail-value">HARD_CORE</span>
+                        </div>
+                        <div class="subject-detail">
+                            <span class="detail-label">الحالة:</span>
+                            <span class="badge badge-active">
+                                نشط                            </span>
+                        </div>
+                                                <div class="subject-detail">
+                            <span class="detail-label">Slug:</span>
+                            <span class="detail-value" style="font-size: 0.85em;">mechanical-engineering</span>
+                        </div>
+                                            </div>
+                </div>
+                                <div class="subject-card">
+                    <div class="subject-name">
+                        هندسة الطرائق                        <span class="badge badge-hardcore">HARD_CORE</span>
+                    </div>
+                    <div class="subject-details">
+                        <div class="subject-detail">
+                            <span class="detail-label">المعامل:</span>
+                            <span class="detail-value">7.0</span>
+                        </div>
+                        <div class="subject-detail">
+                            <span class="detail-label">الفئة:</span>
+                            <span class="detail-value">HARD_CORE</span>
+                        </div>
+                        <div class="subject-detail">
+                            <span class="detail-label">الحالة:</span>
+                            <span class="badge badge-active">
+                                نشط                            </span>
+                        </div>
+                                                <div class="subject-detail">
+                            <span class="detail-label">Slug:</span>
+                            <span class="detail-value" style="font-size: 0.85em;">process-engineering</span>
+                        </div>
+                                            </div>
+                </div>
+                            </div>
+                    </div>
+                <div class="stream-section">
+            <div class="stream-header">
+                <div class="stream-icon">🎓</div>
+                <div class="stream-info">
+                    <div class="stream-name">رياضيات</div>
+                    <div class="stream-code">
+                        الكود:  |
+                        المواد الأساسية: 3                    </div>
+                </div>
+            </div>
+
+                        <div class="subjects-grid">
+                                <div class="subject-card">
+                    <div class="subject-name">
+                        الرياضيات                        <span class="badge badge-hardcore">HARD_CORE</span>
+                    </div>
+                    <div class="subject-details">
+                        <div class="subject-detail">
+                            <span class="detail-label">المعامل:</span>
+                            <span class="detail-value">7.0</span>
+                        </div>
+                        <div class="subject-detail">
+                            <span class="detail-label">الفئة:</span>
+                            <span class="detail-value">HARD_CORE</span>
+                        </div>
+                        <div class="subject-detail">
+                            <span class="detail-label">الحالة:</span>
+                            <span class="badge badge-active">
+                                نشط                            </span>
+                        </div>
+                                                <div class="subject-detail">
+                            <span class="detail-label">Slug:</span>
+                            <span class="detail-value" style="font-size: 0.85em;">mathematics</span>
+                        </div>
+                                            </div>
+                </div>
+                                <div class="subject-card">
+                    <div class="subject-name">
+                        العلوم الطبيعية                        <span class="badge badge-hardcore">HARD_CORE</span>
+                    </div>
+                    <div class="subject-details">
+                        <div class="subject-detail">
+                            <span class="detail-label">المعامل:</span>
+                            <span class="detail-value">2.0</span>
+                        </div>
+                        <div class="subject-detail">
+                            <span class="detail-label">الفئة:</span>
+                            <span class="detail-value">HARD_CORE</span>
+                        </div>
+                        <div class="subject-detail">
+                            <span class="detail-label">الحالة:</span>
+                            <span class="badge badge-active">
+                                نشط                            </span>
+                        </div>
+                                                <div class="subject-detail">
+                            <span class="detail-label">Slug:</span>
+                            <span class="detail-value" style="font-size: 0.85em;">biology</span>
+                        </div>
+                                            </div>
+                </div>
+                                <div class="subject-card">
+                    <div class="subject-name">
+                        العلوم الفيزيائية                        <span class="badge badge-hardcore">HARD_CORE</span>
+                    </div>
+                    <div class="subject-details">
+                        <div class="subject-detail">
+                            <span class="detail-label">المعامل:</span>
+                            <span class="detail-value">6.0</span>
+                        </div>
+                        <div class="subject-detail">
+                            <span class="detail-label">الفئة:</span>
+                            <span class="detail-value">HARD_CORE</span>
+                        </div>
+                        <div class="subject-detail">
+                            <span class="detail-label">الحالة:</span>
+                            <span class="badge badge-active">
+                                نشط                            </span>
+                        </div>
+                                                <div class="subject-detail">
+                            <span class="detail-label">Slug:</span>
+                            <span class="detail-value" style="font-size: 0.85em;">physics</span>
+                        </div>
+                                            </div>
+                </div>
+                            </div>
+                    </div>
+                <div class="stream-section">
+            <div class="stream-header">
+                <div class="stream-icon">🎓</div>
+                <div class="stream-info">
+                    <div class="stream-name">علوم تجريبية</div>
+                    <div class="stream-code">
+                        الكود:  |
+                        المواد الأساسية: 3                    </div>
+                </div>
+            </div>
+
+                        <div class="subjects-grid">
+                                <div class="subject-card">
+                    <div class="subject-name">
+                        الرياضيات                        <span class="badge badge-hardcore">HARD_CORE</span>
+                    </div>
+                    <div class="subject-details">
+                        <div class="subject-detail">
+                            <span class="detail-label">المعامل:</span>
+                            <span class="detail-value">5.0</span>
+                        </div>
+                        <div class="subject-detail">
+                            <span class="detail-label">الفئة:</span>
+                            <span class="detail-value">HARD_CORE</span>
+                        </div>
+                        <div class="subject-detail">
+                            <span class="detail-label">الحالة:</span>
+                            <span class="badge badge-active">
+                                نشط                            </span>
+                        </div>
+                                                <div class="subject-detail">
+                            <span class="detail-label">Slug:</span>
+                            <span class="detail-value" style="font-size: 0.85em;">mathematics</span>
+                        </div>
+                                            </div>
+                </div>
+                                <div class="subject-card">
+                    <div class="subject-name">
+                        العلوم الفيزيائية                        <span class="badge badge-hardcore">HARD_CORE</span>
+                    </div>
+                    <div class="subject-details">
+                        <div class="subject-detail">
+                            <span class="detail-label">المعامل:</span>
+                            <span class="detail-value">5.0</span>
+                        </div>
+                        <div class="subject-detail">
+                            <span class="detail-label">الفئة:</span>
+                            <span class="detail-value">HARD_CORE</span>
+                        </div>
+                        <div class="subject-detail">
+                            <span class="detail-label">الحالة:</span>
+                            <span class="badge badge-active">
+                                نشط                            </span>
+                        </div>
+                                                <div class="subject-detail">
+                            <span class="detail-label">Slug:</span>
+                            <span class="detail-value" style="font-size: 0.85em;">physics</span>
+                        </div>
+                                            </div>
+                </div>
+                                <div class="subject-card">
+                    <div class="subject-name">
+                        علوم الطبيعة والحياة                        <span class="badge badge-hardcore">HARD_CORE</span>
+                    </div>
+                    <div class="subject-details">
+                        <div class="subject-detail">
+                            <span class="detail-label">المعامل:</span>
+                            <span class="detail-value">6.0</span>
+                        </div>
+                        <div class="subject-detail">
+                            <span class="detail-label">الفئة:</span>
+                            <span class="detail-value">HARD_CORE</span>
+                        </div>
+                        <div class="subject-detail">
+                            <span class="detail-label">الحالة:</span>
+                            <span class="badge badge-active">
+                                نشط                            </span>
+                        </div>
+                                                <div class="subject-detail">
+                            <span class="detail-label">Slug:</span>
+                            <span class="detail-value" style="font-size: 0.85em;">natural-sciences</span>
+                        </div>
+                                            </div>
+                </div>
+                            </div>
+                    </div>
+                <div class="stream-section">
+            <div class="stream-header">
+                <div class="stream-icon">🎓</div>
+                <div class="stream-info">
+                    <div class="stream-name">لغات أجنبية</div>
+                    <div class="stream-code">
+                        الكود:  |
+                        المواد الأساسية: 1                    </div>
+                </div>
+            </div>
+
+                        <div class="subjects-grid">
+                                <div class="subject-card">
+                    <div class="subject-name">
+                        الرياضيات                        <span class="badge badge-hardcore">HARD_CORE</span>
+                    </div>
+                    <div class="subject-details">
+                        <div class="subject-detail">
+                            <span class="detail-label">المعامل:</span>
+                            <span class="detail-value">2.0</span>
+                        </div>
+                        <div class="subject-detail">
+                            <span class="detail-label">الفئة:</span>
+                            <span class="detail-value">HARD_CORE</span>
+                        </div>
+                        <div class="subject-detail">
+                            <span class="detail-label">الحالة:</span>
+                            <span class="badge badge-active">
+                                نشط                            </span>
+                        </div>
+                                                <div class="subject-detail">
+                            <span class="detail-label">Slug:</span>
+                            <span class="detail-value" style="font-size: 0.85em;">mathematics</span>
+                        </div>
+                                            </div>
+                </div>
+                            </div>
+                    </div>
+        
+        
+        <div class="footer">
+            <p>تم إنشاء التقرير بواسطة نظام Memo API</p>
+            <p>جميع الحقوق محفوظة © 2025</p>
+        </div>
+    </div>
+</body>
+</html>

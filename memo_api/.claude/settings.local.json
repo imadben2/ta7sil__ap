@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(\"C:\\laragon\\bin\\php\\php-8.3.16-Win32-vs16-x64\\php.exe\" d:/memooo/fix_physics.php)",
+      "Bash(\"C:\\laragon\\bin\\php\\php-8.3.16-Win32-vs16-x64\\php.exe\" d:/memooo/fix_physics_db.php)",
+      "Bash(php artisan tinker:*)",
+      "Bash(findstr:*)",
+      "Bash(cat:*)",
+      "Bash(php artisan route:clear:*)",
+      "Bash(php artisan cache:clear:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

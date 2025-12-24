@@ -1,0 +1,1659 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guide Complet des Notifications - MemoBac</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .status-enabled { background: linear-gradient(135deg, #10b981 0%, #059669 100%); }
+        .status-disabled { background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); }
+        .status-manual { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); }
+        .status-partial { background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); }
+        .code-block { background: #1e293b; color: #e2e8f0; border-radius: 8px; padding: 16px; overflow-x: auto; }
+        .code-block code { font-family: 'Fira Code', monospace; font-size: 14px; }
+        .gradient-header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .card-hover:hover { transform: translateY(-4px); box-shadow: 0 20px 40px rgba(0,0,0,0.15); }
+        .notification-card { transition: all 0.3s ease; }
+        @keyframes pulse-dot { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+        .pulse-dot { animation: pulse-dot 2s infinite; }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Header -->
+    <header class="gradient-header text-white py-8 mb-8">
+        <div class="container mx-auto px-6">
+            <div class="flex items-center gap-4">
+                <div class="bg-white/20 p-4 rounded-2xl">
+                    <i class="fas fa-bell text-4xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-4xl font-bold">Guide des Notifications</h1>
+                    <p class="text-white/80 text-lg mt-2">Documentation complète du système de notifications MemoBac</p>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container mx-auto px-6 pb-16">
+        <!-- Table des matières -->
+        <nav class="bg-white rounded-2xl shadow-lg p-6 mb-8">
+            <h2 class="text-xl font-bold text-gray-800 mb-4"><i class="fas fa-list mr-2"></i>Table des Matières</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <a href="#overview" class="flex items-center gap-2 text-indigo-600 hover:text-indigo-800">
+                    <i class="fas fa-eye"></i> Vue d'ensemble
+                </a>
+                <a href="#types" class="flex items-center gap-2 text-indigo-600 hover:text-indigo-800">
+                    <i class="fas fa-tags"></i> Types de notifications
+                </a>
+                <a href="#local-notifications" class="flex items-center gap-2 text-teal-600 hover:text-teal-800">
+                    <i class="fas fa-mobile-alt"></i> Notifications Locales
+                </a>
+                <a href="#push-vs-local" class="flex items-center gap-2 text-indigo-600 hover:text-indigo-800">
+                    <i class="fas fa-balance-scale"></i> Push vs Local
+                </a>
+                <a href="#notification-details" class="flex items-center gap-2 text-orange-600 hover:text-orange-800">
+                    <i class="fas fa-info-circle"></i> Détails des types
+                </a>
+                <a href="#status" class="flex items-center gap-2 text-indigo-600 hover:text-indigo-800">
+                    <i class="fas fa-toggle-on"></i> Statut actuel
+                </a>
+                <a href="#configuration" class="flex items-center gap-2 text-indigo-600 hover:text-indigo-800">
+                    <i class="fas fa-cogs"></i> Configuration
+                </a>
+                <a href="#scheduler" class="flex items-center gap-2 text-indigo-600 hover:text-indigo-800">
+                    <i class="fas fa-clock"></i> Tâches planifiées
+                </a>
+                <a href="#flow" class="flex items-center gap-2 text-indigo-600 hover:text-indigo-800">
+                    <i class="fas fa-project-diagram"></i> Flux de données
+                </a>
+                <a href="#api" class="flex items-center gap-2 text-indigo-600 hover:text-indigo-800">
+                    <i class="fas fa-code"></i> Endpoints API
+                </a>
+                <a href="#mobile" class="flex items-center gap-2 text-indigo-600 hover:text-indigo-800">
+                    <i class="fas fa-mobile-alt"></i> App Mobile
+                </a>
+                <a href="#troubleshooting" class="flex items-center gap-2 text-indigo-600 hover:text-indigo-800">
+                    <i class="fas fa-wrench"></i> Dépannage
+                </a>
+            </div>
+        </nav>
+
+        <!-- Vue d'ensemble -->
+        <section id="overview" class="bg-white rounded-2xl shadow-lg p-8 mb-8">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-3">
+                <span class="bg-indigo-100 p-2 rounded-lg"><i class="fas fa-eye text-indigo-600"></i></span>
+                Vue d'Ensemble du Système
+            </h2>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div>
+                    <h3 class="font-semibold text-lg text-gray-700 mb-3">Architecture</h3>
+                    <p class="text-gray-600 mb-4">
+                        Le système de notifications utilise <strong>Firebase Cloud Messaging (FCM)</strong> pour envoyer
+                        des notifications push aux appareils Android et iOS. L'API Laravel gère la création, la planification
+                        et l'envoi des notifications.
+                    </p>
+
+                    <div class="bg-gray-50 rounded-xl p-4">
+                        <h4 class="font-medium text-gray-700 mb-2">Composants principaux :</h4>
+                        <ul class="space-y-2 text-gray-600">
+                            <li class="flex items-center gap-2">
+                                <i class="fas fa-server text-blue-500"></i>
+                                <span><strong>API Laravel</strong> - Gestion et envoi</span>
+                            </li>
+                            <li class="flex items-center gap-2">
+                                <i class="fab fa-google text-red-500"></i>
+                                <span><strong>Firebase FCM</strong> - Delivery push</span>
+                            </li>
+                            <li class="flex items-center gap-2">
+                                <i class="fas fa-mobile-alt text-green-500"></i>
+                                <span><strong>Flutter App</strong> - Réception et affichage</span>
+                            </li>
+                            <li class="flex items-center gap-2">
+                                <i class="fas fa-database text-purple-500"></i>
+                                <span><strong>MySQL</strong> - Stockage et historique</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div>
+                    <h3 class="font-semibold text-lg text-gray-700 mb-3">Fonctionnalités</h3>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="bg-green-50 rounded-xl p-4 text-center">
+                            <i class="fas fa-check-circle text-2xl text-green-500 mb-2"></i>
+                            <p class="text-sm font-medium text-gray-700">8 Types de notifications</p>
+                        </div>
+                        <div class="bg-blue-50 rounded-xl p-4 text-center">
+                            <i class="fas fa-clock text-2xl text-blue-500 mb-2"></i>
+                            <p class="text-sm font-medium text-gray-700">Planification automatique</p>
+                        </div>
+                        <div class="bg-purple-50 rounded-xl p-4 text-center">
+                            <i class="fas fa-user-cog text-2xl text-purple-500 mb-2"></i>
+                            <p class="text-sm font-medium text-gray-700">Préférences utilisateur</p>
+                        </div>
+                        <div class="bg-amber-50 rounded-xl p-4 text-center">
+                            <i class="fas fa-moon text-2xl text-amber-500 mb-2"></i>
+                            <p class="text-sm font-medium text-gray-700">Heures silencieuses</p>
+                        </div>
+                        <div class="bg-red-50 rounded-xl p-4 text-center">
+                            <i class="fas fa-link text-2xl text-red-500 mb-2"></i>
+                            <p class="text-sm font-medium text-gray-700">Deep linking</p>
+                        </div>
+                        <div class="bg-cyan-50 rounded-xl p-4 text-center">
+                            <i class="fas fa-broadcast-tower text-2xl text-cyan-500 mb-2"></i>
+                            <p class="text-sm font-medium text-gray-700">Broadcast admin</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Types de notifications -->
+        <section id="types" class="bg-white rounded-2xl shadow-lg p-8 mb-8">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-3">
+                <span class="bg-green-100 p-2 rounded-lg"><i class="fas fa-tags text-green-600"></i></span>
+                Types de Notifications (8 Types)
+            </h2>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+                <!-- Study Reminder -->
+                <div class="notification-card bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl p-6 border-2 border-blue-200 card-hover">
+                    <div class="flex items-center gap-3 mb-4">
+                        <span class="text-4xl">📚</span>
+                        <div>
+                            <h3 class="font-bold text-gray-800">study_reminder</h3>
+                            <p class="text-sm text-gray-500">تذكير دراسي</p>
+                        </div>
+                    </div>
+                    <p class="text-gray-600 text-sm mb-4">
+                        Rappel envoyé <strong>15 minutes avant</strong> chaque session d'étude programmée.
+                    </p>
+                    <div class="flex items-center justify-between">
+                        <span class="px-3 py-1 bg-blue-500 text-white text-xs rounded-full font-semibold">Normal</span>
+                        <span class="status-enabled px-3 py-1 text-white text-xs rounded-full font-semibold">ACTIF</span>
+                    </div>
+                </div>
+
+                <!-- Exam Alert -->
+                <div class="notification-card bg-gradient-to-br from-red-50 to-red-100 rounded-2xl p-6 border-2 border-red-200 card-hover">
+                    <div class="flex items-center gap-3 mb-4">
+                        <span class="text-4xl">🎯</span>
+                        <div>
+                            <h3 class="font-bold text-gray-800">exam_alert</h3>
+                            <p class="text-sm text-gray-500">تنبيه امتحان</p>
+                        </div>
+                    </div>
+                    <p class="text-gray-600 text-sm mb-4">
+                        Alertes envoyées <strong>7j, 3j, 24h, 2h</strong> avant chaque examen.
+                    </p>
+                    <div class="flex items-center justify-between">
+                        <span class="px-3 py-1 bg-red-500 text-white text-xs rounded-full font-semibold">High</span>
+                        <span class="status-enabled px-3 py-1 text-white text-xs rounded-full font-semibold">ACTIF</span>
+                    </div>
+                </div>
+
+                <!-- Daily Summary -->
+                <div class="notification-card bg-gradient-to-br from-green-50 to-green-100 rounded-2xl p-6 border-2 border-green-200 card-hover">
+                    <div class="flex items-center gap-3 mb-4">
+                        <span class="text-4xl">📊</span>
+                        <div>
+                            <h3 class="font-bold text-gray-800">daily_summary</h3>
+                            <p class="text-sm text-gray-500">ملخص يومي</p>
+                        </div>
+                    </div>
+                    <p class="text-gray-600 text-sm mb-4">
+                        Résumé quotidien envoyé à <strong>21h00</strong> avec les statistiques du jour.
+                    </p>
+                    <div class="flex items-center justify-between">
+                        <span class="px-3 py-1 bg-gray-500 text-white text-xs rounded-full font-semibold">Low</span>
+                        <span class="status-enabled px-3 py-1 text-white text-xs rounded-full font-semibold">ACTIF</span>
+                    </div>
+                </div>
+
+                <!-- Weekly Summary -->
+                <div class="notification-card bg-gradient-to-br from-emerald-50 to-emerald-100 rounded-2xl p-6 border-2 border-emerald-200 card-hover">
+                    <div class="flex items-center gap-3 mb-4">
+                        <span class="text-4xl">📈</span>
+                        <div>
+                            <h3 class="font-bold text-gray-800">weekly_summary</h3>
+                            <p class="text-sm text-gray-500">ملخص أسبوعي</p>
+                        </div>
+                    </div>
+                    <p class="text-gray-600 text-sm mb-4">
+                        Résumé hebdomadaire envoyé le <strong>dimanche à 20h</strong>.
+                    </p>
+                    <div class="flex items-center justify-between">
+                        <span class="px-3 py-1 bg-gray-500 text-white text-xs rounded-full font-semibold">Low</span>
+                        <span class="status-enabled px-3 py-1 text-white text-xs rounded-full font-semibold">ACTIF</span>
+                    </div>
+                </div>
+
+                <!-- Course Update -->
+                <div class="notification-card bg-gradient-to-br from-purple-50 to-purple-100 rounded-2xl p-6 border-2 border-purple-200 card-hover">
+                    <div class="flex items-center gap-3 mb-4">
+                        <span class="text-4xl">📖</span>
+                        <div>
+                            <h3 class="font-bold text-gray-800">course_update</h3>
+                            <p class="text-sm text-gray-500">تحديث دورة</p>
+                        </div>
+                    </div>
+                    <p class="text-gray-600 text-sm mb-4">
+                        Envoyé lors de <strong>mises à jour de cours</strong> ou nouvelles leçons.
+                    </p>
+                    <div class="flex items-center justify-between">
+                        <span class="px-3 py-1 bg-purple-500 text-white text-xs rounded-full font-semibold">Normal</span>
+                        <span class="status-manual px-3 py-1 text-white text-xs rounded-full font-semibold">MANUEL</span>
+                    </div>
+                </div>
+
+                <!-- Achievement -->
+                <div class="notification-card bg-gradient-to-br from-amber-50 to-amber-100 rounded-2xl p-6 border-2 border-amber-200 card-hover">
+                    <div class="flex items-center gap-3 mb-4">
+                        <span class="text-4xl">🏆</span>
+                        <div>
+                            <h3 class="font-bold text-gray-800">achievement</h3>
+                            <p class="text-sm text-gray-500">إنجاز</p>
+                        </div>
+                    </div>
+                    <p class="text-gray-600 text-sm mb-4">
+                        Célébration des <strong>accomplissements</strong> : streaks, premiers quiz, etc.
+                    </p>
+                    <div class="flex items-center justify-between">
+                        <span class="px-3 py-1 bg-amber-500 text-white text-xs rounded-full font-semibold">Normal</span>
+                        <span class="status-manual px-3 py-1 text-white text-xs rounded-full font-semibold">MANUEL</span>
+                    </div>
+                </div>
+
+                <!-- System -->
+                <div class="notification-card bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl p-6 border-2 border-gray-200 card-hover">
+                    <div class="flex items-center gap-3 mb-4">
+                        <span class="text-4xl">⚙️</span>
+                        <div>
+                            <h3 class="font-bold text-gray-800">system</h3>
+                            <p class="text-sm text-gray-500">نظام</p>
+                        </div>
+                    </div>
+                    <p class="text-gray-600 text-sm mb-4">
+                        Annonces système envoyées par <strong>l'administrateur</strong>.
+                    </p>
+                    <div class="flex items-center justify-between">
+                        <span class="px-3 py-1 bg-red-500 text-white text-xs rounded-full font-semibold">High</span>
+                        <span class="status-partial px-3 py-1 text-white text-xs rounded-full font-semibold">ADMIN</span>
+                    </div>
+                </div>
+
+                <!-- Announcement -->
+                <div class="notification-card bg-gradient-to-br from-cyan-50 to-cyan-100 rounded-2xl p-6 border-2 border-cyan-200 card-hover">
+                    <div class="flex items-center gap-3 mb-4">
+                        <span class="text-4xl">📢</span>
+                        <div>
+                            <h3 class="font-bold text-gray-800">announcement</h3>
+                            <p class="text-sm text-gray-500">إعلان</p>
+                        </div>
+                    </div>
+                    <p class="text-gray-600 text-sm mb-4">
+                        Annonces générales (défini côté mobile uniquement).
+                    </p>
+                    <div class="flex items-center justify-between">
+                        <span class="px-3 py-1 bg-cyan-500 text-white text-xs rounded-full font-semibold">Normal</span>
+                        <span class="status-disabled px-3 py-1 text-white text-xs rounded-full font-semibold">MOBILE</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Achievement Subtypes -->
+            <div class="mt-8 bg-amber-50 rounded-xl p-6">
+                <h3 class="font-bold text-gray-800 mb-4 flex items-center gap-2">
+                    <i class="fas fa-trophy text-amber-500"></i>
+                    Sous-types d'achievements
+                </h3>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div class="bg-white rounded-lg p-4 text-center shadow-sm">
+                        <span class="text-2xl">🔥</span>
+                        <p class="font-medium text-gray-700 mt-2">streak_7_days</p>
+                        <p class="text-xs text-gray-500">Série de 7 jours</p>
+                    </div>
+                    <div class="bg-white rounded-lg p-4 text-center shadow-sm">
+                        <span class="text-2xl">🎯</span>
+                        <p class="font-medium text-gray-700 mt-2">first_quiz</p>
+                        <p class="text-xs text-gray-500">Premier quiz</p>
+                    </div>
+                    <div class="bg-white rounded-lg p-4 text-center shadow-sm">
+                        <span class="text-2xl">🎓</span>
+                        <p class="font-medium text-gray-700 mt-2">course_completed</p>
+                        <p class="text-xs text-gray-500">Cours terminé</p>
+                    </div>
+                    <div class="bg-white rounded-lg p-4 text-center shadow-sm">
+                        <span class="text-2xl">🚀</span>
+                        <p class="font-medium text-gray-700 mt-2">level_up</p>
+                        <p class="text-xs text-gray-500">Niveau supérieur</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Notifications Locales (Flutter) -->
+        <section id="local-notifications" class="bg-white rounded-2xl shadow-lg p-8 mb-8">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-3">
+                <span class="bg-teal-100 p-2 rounded-lg"><i class="fas fa-mobile-alt text-teal-600"></i></span>
+                Notifications Locales (Flutter)
+            </h2>
+
+            <div class="bg-teal-50 border-l-4 border-teal-500 p-4 mb-6">
+                <p class="text-teal-700">
+                    <strong>Important:</strong> Les rappels de sessions d'étude (<code>study_reminder</code>) utilisent des <strong>notifications locales</strong>
+                    sur l'appareil Flutter, en plus des notifications push FCM. Cela garantit que les rappels fonctionnent même <strong>sans connexion internet</strong>.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+                <div>
+                    <h3 class="font-semibold text-lg text-gray-700 mb-3">Comment ça marche ?</h3>
+                    <div class="bg-gray-50 rounded-xl p-4 space-y-3">
+                        <div class="flex items-start gap-3">
+                            <div class="bg-teal-500 text-white p-2 rounded-lg mt-1">
+                                <i class="fas fa-calendar-check text-sm"></i>
+                            </div>
+                            <div>
+                                <p class="font-medium text-gray-700">Planification locale</p>
+                                <p class="text-sm text-gray-600">Quand une session est créée, une notification est planifiée <strong>15 minutes avant</strong> directement sur l'appareil.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-3">
+                            <div class="bg-teal-500 text-white p-2 rounded-lg mt-1">
+                                <i class="fas fa-wifi-slash text-sm"></i>
+                            </div>
+                            <div>
+                                <p class="font-medium text-gray-700">Fonctionne hors ligne</p>
+                                <p class="text-sm text-gray-600">Aucune connexion internet requise. La notification est déclenchée par le système Android/iOS.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-3">
+                            <div class="bg-teal-500 text-white p-2 rounded-lg mt-1">
+                                <i class="fas fa-clock text-sm"></i>
+                            </div>
+                            <div>
+                                <p class="font-medium text-gray-700">Précision exacte</p>
+                                <p class="text-sm text-gray-600">Utilise <code>zonedSchedule()</code> pour un timing précis à la minute près.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <h3 class="font-semibold text-lg text-gray-700 mb-3">Fichier Flutter</h3>
+                    <div class="bg-teal-50 rounded-lg p-4 mb-4">
+                        <p class="font-mono text-sm text-teal-800">lib/features/planner/services/session_notification_service.dart</p>
+                        <p class="text-sm text-gray-600 mt-2">Service de gestion des notifications de sessions (372 lignes)</p>
+                    </div>
+
+                    <h4 class="font-medium text-gray-700 mb-2">Caractéristiques techniques :</h4>
+                    <ul class="space-y-2 text-sm text-gray-600">
+                        <li class="flex items-center gap-2">
+                            <i class="fas fa-check text-teal-500"></i>
+                            <span>Maximum <strong>64 notifications</strong> (limite Android)</span>
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <i class="fas fa-check text-teal-500"></i>
+                            <span>Traitement par <strong>lots de 10</strong> pour éviter le blocage UI</span>
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <i class="fas fa-check text-teal-500"></i>
+                            <span>Mappings session→notification stockés dans <strong>Hive</strong></span>
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <i class="fas fa-check text-teal-500"></i>
+                            <span>Support complet du <strong>texte arabe RTL</strong></span>
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <i class="fas fa-check text-teal-500"></i>
+                            <span>Synchronisation automatique avec les sessions actives</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Exemple de notification locale -->
+            <div class="bg-gray-50 rounded-xl p-6">
+                <h3 class="font-bold text-gray-800 mb-4 flex items-center gap-2">
+                    <i class="fas fa-bell text-teal-500"></i>
+                    Exemple de notification locale (Arabic)
+                </h3>
+                <div class="bg-white rounded-lg p-4 shadow-sm border-r-4 border-teal-500" dir="rtl">
+                    <p class="font-bold text-gray-800 text-lg">تذكير: الرياضيات - مراجعة</p>
+                    <p class="text-gray-600 mt-2">الوقت: 3:00 م</p>
+                    <p class="text-gray-600">المدة: ساعة واحدة</p>
+                    <p class="text-gray-600">الموضوع: الدوال والمتغيرات</p>
+                </div>
+                <div class="mt-4 code-block">
+<pre><code class="language-dart">// Payload de la notification locale
+{
+  'type': 'session_reminder',
+  'sessionId': 'sess_123',
+  'subjectId': 'math_001',
+  'scheduledDate': '2025-12-22T15:00:00',
+  'route': '/planner/session/sess_123',
+  'action': 'open_session_detail'
+}</code></pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- Push vs Local Comparison -->
+        <section id="push-vs-local" class="bg-white rounded-2xl shadow-lg p-8 mb-8">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-3">
+                <span class="bg-indigo-100 p-2 rounded-lg"><i class="fas fa-balance-scale text-indigo-600"></i></span>
+                Push vs Local : Comparaison
+            </h2>
+
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead>
+                        <tr class="bg-gradient-to-r from-indigo-500 to-purple-500 text-white">
+                            <th class="px-6 py-4 text-left font-semibold rounded-tl-xl">Caractéristique</th>
+                            <th class="px-6 py-4 text-center font-semibold">Push (FCM)</th>
+                            <th class="px-6 py-4 text-center font-semibold rounded-tr-xl">Local (Flutter)</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200">
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-6 py-4 font-medium text-gray-700">Connexion internet requise</td>
+                            <td class="px-6 py-4 text-center"><span class="text-red-500 font-bold">Oui</span></td>
+                            <td class="px-6 py-4 text-center"><span class="text-green-500 font-bold">Non</span></td>
+                        </tr>
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-6 py-4 font-medium text-gray-700">Déclencheur</td>
+                            <td class="px-6 py-4 text-center">Serveur API</td>
+                            <td class="px-6 py-4 text-center">Système OS</td>
+                        </tr>
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-6 py-4 font-medium text-gray-700">Précision du timing</td>
+                            <td class="px-6 py-4 text-center"><span class="text-amber-500">Variable</span></td>
+                            <td class="px-6 py-4 text-center"><span class="text-green-500">Exacte</span></td>
+                        </tr>
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-6 py-4 font-medium text-gray-700">Impact batterie</td>
+                            <td class="px-6 py-4 text-center">Faible</td>
+                            <td class="px-6 py-4 text-center">Très faible</td>
+                        </tr>
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-6 py-4 font-medium text-gray-700">Cas d'utilisation principal</td>
+                            <td class="px-6 py-4 text-center">Événements distants, broadcasts</td>
+                            <td class="px-6 py-4 text-center">Rappels de sessions</td>
+                        </tr>
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-6 py-4 font-medium text-gray-700">Types de notifications</td>
+                            <td class="px-6 py-4 text-center">Tous les 8 types</td>
+                            <td class="px-6 py-4 text-center">study_reminder uniquement</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="bg-blue-50 border border-blue-200 rounded-xl p-4">
+                    <h4 class="font-bold text-blue-700 mb-2"><i class="fas fa-cloud mr-2"></i>Push (FCM)</h4>
+                    <p class="text-sm text-gray-600">
+                        Idéal pour les notifications en temps réel depuis le serveur : résumés quotidiens,
+                        alertes d'examen, mises à jour de cours, achievements, et broadcasts admin.
+                    </p>
+                </div>
+                <div class="bg-teal-50 border border-teal-200 rounded-xl p-4">
+                    <h4 class="font-bold text-teal-700 mb-2"><i class="fas fa-mobile-alt mr-2"></i>Local (Flutter)</h4>
+                    <p class="text-sm text-gray-600">
+                        Parfait pour les rappels de sessions d'étude qui doivent être fiables même sans
+                        connexion internet, avec un timing précis.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Détails des Types de Notifications -->
+        <section id="notification-details" class="bg-white rounded-2xl shadow-lg p-8 mb-8">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-3">
+                <span class="bg-orange-100 p-2 rounded-lg"><i class="fas fa-info-circle text-orange-600"></i></span>
+                Détails de Chaque Type de Notification
+            </h2>
+
+            <!-- study_reminder Details -->
+            <div class="mb-6 border border-blue-200 rounded-xl overflow-hidden">
+                <div class="bg-gradient-to-r from-blue-500 to-blue-600 text-white px-6 py-4">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <span class="text-3xl">📚</span>
+                            <div>
+                                <h3 class="font-bold text-xl">study_reminder</h3>
+                                <p class="text-blue-100">تذكير دراسي - Rappel de session d'étude</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-2">
+                            <span class="bg-teal-400 px-3 py-1 rounded-full text-sm font-semibold">LOCAL</span>
+                            <span class="bg-blue-300 px-3 py-1 rounded-full text-sm font-semibold">PUSH</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="p-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <h4 class="font-semibold text-gray-700 mb-2"><i class="fas fa-clock text-blue-500 mr-2"></i>Déclencheur</h4>
+                            <p class="text-gray-600">15 minutes avant chaque session d'étude programmée</p>
+
+                            <h4 class="font-semibold text-gray-700 mb-2 mt-4"><i class="fas fa-link text-blue-500 mr-2"></i>Deep Link</h4>
+                            <code class="bg-gray-100 px-2 py-1 rounded text-sm">memobac://planner/session/{sessionId}</code>
+
+                            <h4 class="font-semibold text-gray-700 mb-2 mt-4"><i class="fas fa-database text-blue-500 mr-2"></i>Données incluses</h4>
+                            <ul class="text-sm text-gray-600 space-y-1">
+                                <li>• Nom de la matière (subjectName)</li>
+                                <li>• Type de session (study, review, exercise)</li>
+                                <li>• Durée prévue (duration)</li>
+                                <li>• Titre du contenu (contentTitle)</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold text-gray-700 mb-2"><i class="fas fa-bell text-blue-500 mr-2"></i>Exemple de contenu</h4>
+                            <div class="bg-blue-50 rounded-lg p-4" dir="rtl">
+                                <p class="font-bold text-gray-800">تذكير: الرياضيات - مراجعة</p>
+                                <p class="text-gray-600 text-sm mt-1">الوقت: 3:00 م</p>
+                                <p class="text-gray-600 text-sm">المدة: ساعة واحدة</p>
+                                <p class="text-gray-600 text-sm">الموضوع: الدوال</p>
+                            </div>
+                            <p class="text-sm text-gray-500 mt-2 italic">
+                                <i class="fas fa-info-circle mr-1"></i>
+                                Seul type utilisant à la fois notifications locales ET push
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- exam_alert Details -->
+            <div class="mb-6 border border-red-200 rounded-xl overflow-hidden">
+                <div class="bg-gradient-to-r from-red-500 to-red-600 text-white px-6 py-4">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <span class="text-3xl">🎯</span>
+                            <div>
+                                <h3 class="font-bold text-xl">exam_alert</h3>
+                                <p class="text-red-100">تنبيه امتحان - Alerte d'examen</p>
+                            </div>
+                        </div>
+                        <span class="bg-red-300 px-3 py-1 rounded-full text-sm font-semibold">HIGH PRIORITY</span>
+                    </div>
+                </div>
+                <div class="p-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <h4 class="font-semibold text-gray-700 mb-2"><i class="fas fa-clock text-red-500 mr-2"></i>Déclencheurs multiples</h4>
+                            <div class="flex flex-wrap gap-2 mb-4">
+                                <span class="bg-red-100 text-red-700 px-3 py-1 rounded-full text-sm">7 jours avant</span>
+                                <span class="bg-red-100 text-red-700 px-3 py-1 rounded-full text-sm">3 jours avant</span>
+                                <span class="bg-red-100 text-red-700 px-3 py-1 rounded-full text-sm">24 heures avant</span>
+                                <span class="bg-red-100 text-red-700 px-3 py-1 rounded-full text-sm">2 heures avant</span>
+                            </div>
+
+                            <h4 class="font-semibold text-gray-700 mb-2"><i class="fas fa-link text-red-500 mr-2"></i>Deep Link</h4>
+                            <code class="bg-gray-100 px-2 py-1 rounded text-sm">memobac://planner/exam/{examId}</code>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold text-gray-700 mb-2"><i class="fas fa-bell text-red-500 mr-2"></i>Exemple de contenu</h4>
+                            <div class="bg-red-50 rounded-lg p-4" dir="rtl">
+                                <p class="font-bold text-gray-800">تنبيه: امتحان الرياضيات</p>
+                                <p class="text-gray-600 text-sm mt-1">متبقي: 3 أيام</p>
+                                <p class="text-gray-600 text-sm">التاريخ: 25 ديسمبر 2025</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- daily_summary Details -->
+            <div class="mb-6 border border-green-200 rounded-xl overflow-hidden">
+                <div class="bg-gradient-to-r from-green-500 to-green-600 text-white px-6 py-4">
+                    <div class="flex items-center gap-3">
+                        <span class="text-3xl">📊</span>
+                        <div>
+                            <h3 class="font-bold text-xl">daily_summary</h3>
+                            <p class="text-green-100">ملخص يومي - Résumé quotidien</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="p-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <h4 class="font-semibold text-gray-700 mb-2"><i class="fas fa-clock text-green-500 mr-2"></i>Déclencheur</h4>
+                            <p class="text-gray-600">Tous les jours à <strong>21:00</strong></p>
+
+                            <h4 class="font-semibold text-gray-700 mb-2 mt-4"><i class="fas fa-link text-green-500 mr-2"></i>Deep Link</h4>
+                            <code class="bg-gray-100 px-2 py-1 rounded text-sm">memobac://profile/statistics</code>
+
+                            <h4 class="font-semibold text-gray-700 mb-2 mt-4"><i class="fas fa-database text-green-500 mr-2"></i>Données incluses</h4>
+                            <ul class="text-sm text-gray-600 space-y-1">
+                                <li>• Nombre de sessions complétées</li>
+                                <li>• Temps total d'étude</li>
+                                <li>• Matières étudiées</li>
+                                <li>• Points gagnés</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold text-gray-700 mb-2"><i class="fas fa-bell text-green-500 mr-2"></i>Exemple de contenu</h4>
+                            <div class="bg-green-50 rounded-lg p-4" dir="rtl">
+                                <p class="font-bold text-gray-800">ملخص يومك الدراسي</p>
+                                <p class="text-gray-600 text-sm mt-1">الجلسات المكتملة: 4</p>
+                                <p class="text-gray-600 text-sm">وقت الدراسة: 3 ساعات</p>
+                                <p class="text-gray-600 text-sm">النقاط المكتسبة: +120</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- weekly_summary Details -->
+            <div class="mb-6 border border-emerald-200 rounded-xl overflow-hidden">
+                <div class="bg-gradient-to-r from-emerald-500 to-emerald-600 text-white px-6 py-4">
+                    <div class="flex items-center gap-3">
+                        <span class="text-3xl">📈</span>
+                        <div>
+                            <h3 class="font-bold text-xl">weekly_summary</h3>
+                            <p class="text-emerald-100">ملخص أسبوعي - Résumé hebdomadaire</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="p-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <h4 class="font-semibold text-gray-700 mb-2"><i class="fas fa-clock text-emerald-500 mr-2"></i>Déclencheur</h4>
+                            <p class="text-gray-600">Chaque <strong>dimanche à 20:00</strong></p>
+
+                            <h4 class="font-semibold text-gray-700 mb-2 mt-4"><i class="fas fa-link text-emerald-500 mr-2"></i>Deep Link</h4>
+                            <code class="bg-gray-100 px-2 py-1 rounded text-sm">memobac://profile/statistics</code>
+
+                            <h4 class="font-semibold text-gray-700 mb-2 mt-4"><i class="fas fa-database text-emerald-500 mr-2"></i>Données incluses</h4>
+                            <ul class="text-sm text-gray-600 space-y-1">
+                                <li>• Statistiques de la semaine</li>
+                                <li>• Streak actuel</li>
+                                <li>• Comparaison avec semaine précédente</li>
+                                <li>• Classement hebdomadaire</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold text-gray-700 mb-2"><i class="fas fa-bell text-emerald-500 mr-2"></i>Exemple de contenu</h4>
+                            <div class="bg-emerald-50 rounded-lg p-4" dir="rtl">
+                                <p class="font-bold text-gray-800">تقرير أسبوعك</p>
+                                <p class="text-gray-600 text-sm mt-1">إجمالي الدراسة: 18 ساعة</p>
+                                <p class="text-gray-600 text-sm">سلسلة الأيام: 7 أيام 🔥</p>
+                                <p class="text-gray-600 text-sm">التحسن: +25% عن الأسبوع الماضي</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- course_update Details -->
+            <div class="mb-6 border border-purple-200 rounded-xl overflow-hidden">
+                <div class="bg-gradient-to-r from-purple-500 to-purple-600 text-white px-6 py-4">
+                    <div class="flex items-center gap-3">
+                        <span class="text-3xl">📖</span>
+                        <div>
+                            <h3 class="font-bold text-xl">course_update</h3>
+                            <p class="text-purple-100">تحديث دورة - Mise à jour de cours</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="p-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <h4 class="font-semibold text-gray-700 mb-2"><i class="fas fa-clock text-purple-500 mr-2"></i>Déclencheur</h4>
+                            <p class="text-gray-600">Manuel par l'administrateur lors de mises à jour</p>
+
+                            <h4 class="font-semibold text-gray-700 mb-2 mt-4"><i class="fas fa-link text-purple-500 mr-2"></i>Deep Link</h4>
+                            <code class="bg-gray-100 px-2 py-1 rounded text-sm">memobac://courses/{courseId}</code>
+
+                            <h4 class="font-semibold text-gray-700 mb-2 mt-4"><i class="fas fa-tags text-purple-500 mr-2"></i>Sous-types</h4>
+                            <div class="flex flex-wrap gap-2">
+                                <span class="bg-purple-100 text-purple-700 px-2 py-1 rounded text-sm">new_lesson</span>
+                                <span class="bg-purple-100 text-purple-700 px-2 py-1 rounded text-sm">content_updated</span>
+                                <span class="bg-purple-100 text-purple-700 px-2 py-1 rounded text-sm">instructor_message</span>
+                            </div>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold text-gray-700 mb-2"><i class="fas fa-bell text-purple-500 mr-2"></i>Exemple de contenu</h4>
+                            <div class="bg-purple-50 rounded-lg p-4" dir="rtl">
+                                <p class="font-bold text-gray-800">تحديث جديد في الدورة</p>
+                                <p class="text-gray-600 text-sm mt-1">دورة الرياضيات المتقدمة</p>
+                                <p class="text-gray-600 text-sm">تمت إضافة درس جديد: المشتقات</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- achievement Details -->
+            <div class="mb-6 border border-amber-200 rounded-xl overflow-hidden">
+                <div class="bg-gradient-to-r from-amber-500 to-amber-600 text-white px-6 py-4">
+                    <div class="flex items-center gap-3">
+                        <span class="text-3xl">🏆</span>
+                        <div>
+                            <h3 class="font-bold text-xl">achievement</h3>
+                            <p class="text-amber-100">إنجاز - Accomplissement</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="p-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <h4 class="font-semibold text-gray-700 mb-2"><i class="fas fa-clock text-amber-500 mr-2"></i>Déclencheur</h4>
+                            <p class="text-gray-600">Événementiel - déclenché quand un objectif est atteint</p>
+
+                            <h4 class="font-semibold text-gray-700 mb-2 mt-4"><i class="fas fa-link text-amber-500 mr-2"></i>Deep Link</h4>
+                            <code class="bg-gray-100 px-2 py-1 rounded text-sm">memobac://profile/achievements</code>
+
+                            <h4 class="font-semibold text-gray-700 mb-2 mt-4"><i class="fas fa-tags text-amber-500 mr-2"></i>Sous-types</h4>
+                            <div class="flex flex-wrap gap-2">
+                                <span class="bg-amber-100 text-amber-700 px-2 py-1 rounded text-sm">🔥 streak_7_days</span>
+                                <span class="bg-amber-100 text-amber-700 px-2 py-1 rounded text-sm">🎯 first_quiz</span>
+                                <span class="bg-amber-100 text-amber-700 px-2 py-1 rounded text-sm">🎓 course_completed</span>
+                                <span class="bg-amber-100 text-amber-700 px-2 py-1 rounded text-sm">🚀 level_up</span>
+                            </div>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold text-gray-700 mb-2"><i class="fas fa-bell text-amber-500 mr-2"></i>Exemple de contenu</h4>
+                            <div class="bg-amber-50 rounded-lg p-4" dir="rtl">
+                                <p class="font-bold text-gray-800">🎉 مبروك! إنجاز جديد</p>
+                                <p class="text-gray-600 text-sm mt-1">حققت سلسلة 7 أيام متتالية!</p>
+                                <p class="text-gray-600 text-sm">+50 نقطة إضافية</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- system Details -->
+            <div class="mb-6 border border-gray-300 rounded-xl overflow-hidden">
+                <div class="bg-gradient-to-r from-gray-600 to-gray-700 text-white px-6 py-4">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <span class="text-3xl">⚙️</span>
+                            <div>
+                                <h3 class="font-bold text-xl">system</h3>
+                                <p class="text-gray-300">نظام - Notification système</p>
+                            </div>
+                        </div>
+                        <span class="bg-red-400 px-3 py-1 rounded-full text-sm font-semibold">HIGH PRIORITY</span>
+                    </div>
+                </div>
+                <div class="p-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <h4 class="font-semibold text-gray-700 mb-2"><i class="fas fa-clock text-gray-500 mr-2"></i>Déclencheur</h4>
+                            <p class="text-gray-600">Manuel par l'administrateur (broadcast)</p>
+
+                            <h4 class="font-semibold text-gray-700 mb-2 mt-4"><i class="fas fa-users text-gray-500 mr-2"></i>Audience</h4>
+                            <p class="text-gray-600">Tous les utilisateurs ou groupe ciblé</p>
+
+                            <h4 class="font-semibold text-gray-700 mb-2 mt-4"><i class="fas fa-cog text-gray-500 mr-2"></i>Caractéristiques</h4>
+                            <ul class="text-sm text-gray-600 space-y-1">
+                                <li>• Priorité haute (affichage immédiat)</li>
+                                <li>• Titre et corps personnalisables</li>
+                                <li>• Peut inclure un deep link optionnel</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold text-gray-700 mb-2"><i class="fas fa-bell text-gray-500 mr-2"></i>Exemple de contenu</h4>
+                            <div class="bg-gray-100 rounded-lg p-4" dir="rtl">
+                                <p class="font-bold text-gray-800">إعلان هام من الإدارة</p>
+                                <p class="text-gray-600 text-sm mt-1">سيتم إجراء صيانة للتطبيق</p>
+                                <p class="text-gray-600 text-sm">من الساعة 2:00 إلى 4:00 صباحاً</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- announcement Details -->
+            <div class="border border-cyan-200 rounded-xl overflow-hidden">
+                <div class="bg-gradient-to-r from-cyan-500 to-cyan-600 text-white px-6 py-4">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <span class="text-3xl">📢</span>
+                            <div>
+                                <h3 class="font-bold text-xl">announcement</h3>
+                                <p class="text-cyan-100">إعلان - Annonce générale</p>
+                            </div>
+                        </div>
+                        <span class="bg-gray-400 px-3 py-1 rounded-full text-sm font-semibold">MOBILE ONLY</span>
+                    </div>
+                </div>
+                <div class="p-6">
+                    <div class="bg-cyan-50 border-l-4 border-cyan-500 p-4">
+                        <p class="text-cyan-700">
+                            <strong><i class="fas fa-info-circle mr-2"></i>Note:</strong>
+                            Ce type est défini dans l'enum Flutter mais <strong>n'est pas encore implémenté</strong> côté API.
+                            Il est réservé pour une utilisation future pour les annonces générales.
+                        </p>
+                    </div>
+                    <div class="mt-4">
+                        <h4 class="font-semibold text-gray-700 mb-2">Utilisation prévue :</h4>
+                        <ul class="text-sm text-gray-600 space-y-1">
+                            <li>• Annonces générales de l'application</li>
+                            <li>• Nouvelles fonctionnalités</li>
+                            <li>• Promotions et événements</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Statut actuel -->
+        <section id="status" class="bg-white rounded-2xl shadow-lg p-8 mb-8">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-3">
+                <span class="bg-blue-100 p-2 rounded-lg"><i class="fas fa-toggle-on text-blue-600"></i></span>
+                Statut Actuel des Notifications
+            </h2>
+
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead>
+                        <tr class="bg-gray-100">
+                            <th class="px-4 py-3 text-left font-semibold text-gray-700">Type</th>
+                            <th class="px-4 py-3 text-left font-semibold text-gray-700">Code API</th>
+                            <th class="px-4 py-3 text-left font-semibold text-gray-700">Code Mobile</th>
+                            <th class="px-4 py-3 text-left font-semibold text-gray-700">Job Planifié</th>
+                            <th class="px-4 py-3 text-left font-semibold text-gray-700">Statut</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200">
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-4 py-4 font-medium">📚 study_reminder</td>
+                            <td class="px-4 py-4"><span class="text-green-600">✅ sendSessionReminder()</span></td>
+                            <td class="px-4 py-4"><span class="text-green-600">✅ Handled</span></td>
+                            <td class="px-4 py-4"><span class="text-green-600">✅ SendSessionRemindersJob (15 min)</span></td>
+                            <td class="px-4 py-4"><span class="status-enabled px-3 py-1 text-white text-sm rounded-full font-semibold">ACTIF</span></td>
+                        </tr>
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-4 py-4 font-medium">🎯 exam_alert</td>
+                            <td class="px-4 py-4"><span class="text-green-600">✅ scheduleExamAlerts()</span></td>
+                            <td class="px-4 py-4"><span class="text-green-600">✅ Handled</span></td>
+                            <td class="px-4 py-4"><span class="text-green-600">✅ SendExamAlertsJob (hourly)</span></td>
+                            <td class="px-4 py-4"><span class="status-enabled px-3 py-1 text-white text-sm rounded-full font-semibold">ACTIF</span></td>
+                        </tr>
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-4 py-4 font-medium">📊 daily_summary</td>
+                            <td class="px-4 py-4"><span class="text-green-600">✅ sendDailySummary()</span></td>
+                            <td class="px-4 py-4"><span class="text-green-600">✅ Handled</span></td>
+                            <td class="px-4 py-4"><span class="text-green-600">✅ SendDailySummaryJob (21:00)</span></td>
+                            <td class="px-4 py-4"><span class="status-enabled px-3 py-1 text-white text-sm rounded-full font-semibold">ACTIF</span></td>
+                        </tr>
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-4 py-4 font-medium">📈 weekly_summary</td>
+                            <td class="px-4 py-4"><span class="text-green-600">✅ sendWeeklySummary()</span></td>
+                            <td class="px-4 py-4"><span class="text-green-600">✅ Handled</span></td>
+                            <td class="px-4 py-4"><span class="text-green-600">✅ SendWeeklySummaryJob (Dim 20:00)</span></td>
+                            <td class="px-4 py-4"><span class="status-enabled px-3 py-1 text-white text-sm rounded-full font-semibold">ACTIF</span></td>
+                        </tr>
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-4 py-4 font-medium">📖 course_update</td>
+                            <td class="px-4 py-4"><span class="text-green-600">✅ sendCourseUpdateNotification()</span></td>
+                            <td class="px-4 py-4"><span class="text-green-600">✅ Handled</span></td>
+                            <td class="px-4 py-4"><span class="text-amber-600">⚡ Déclenché manuellement</span></td>
+                            <td class="px-4 py-4"><span class="status-manual px-3 py-1 text-white text-sm rounded-full font-semibold">MANUEL</span></td>
+                        </tr>
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-4 py-4 font-medium">🏆 achievement</td>
+                            <td class="px-4 py-4"><span class="text-green-600">✅ sendAchievementNotification()</span></td>
+                            <td class="px-4 py-4"><span class="text-green-600">✅ Handled</span></td>
+                            <td class="px-4 py-4"><span class="text-amber-600">⚡ Déclenché par événements</span></td>
+                            <td class="px-4 py-4"><span class="status-manual px-3 py-1 text-white text-sm rounded-full font-semibold">MANUEL</span></td>
+                        </tr>
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-4 py-4 font-medium">⚙️ system</td>
+                            <td class="px-4 py-4"><span class="text-green-600">✅ sendSystemNotification()</span></td>
+                            <td class="px-4 py-4"><span class="text-green-600">✅ Handled</span></td>
+                            <td class="px-4 py-4"><span class="text-purple-600">👤 Broadcast Admin</span></td>
+                            <td class="px-4 py-4"><span class="status-partial px-3 py-1 text-white text-sm rounded-full font-semibold">ADMIN</span></td>
+                        </tr>
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-4 py-4 font-medium">📢 announcement</td>
+                            <td class="px-4 py-4"><span class="text-red-600">❌ Non implémenté</span></td>
+                            <td class="px-4 py-4"><span class="text-green-600">✅ Dans enum</span></td>
+                            <td class="px-4 py-4"><span class="text-gray-400">—</span></td>
+                            <td class="px-4 py-4"><span class="status-disabled px-3 py-1 text-white text-sm rounded-full font-semibold">MOBILE ONLY</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Configuration -->
+        <section id="configuration" class="bg-white rounded-2xl shadow-lg p-8 mb-8">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-3">
+                <span class="bg-amber-100 p-2 rounded-lg"><i class="fas fa-cogs text-amber-600"></i></span>
+                Configuration du Système
+            </h2>
+
+            <!-- Firebase Configuration -->
+            <div class="mb-8">
+                <h3 class="text-xl font-semibold text-gray-700 mb-4 flex items-center gap-2">
+                    <i class="fab fa-google text-red-500"></i>
+                    Configuration Firebase FCM
+                </h3>
+
+                <div class="bg-gray-50 rounded-xl p-6 mb-4">
+                    <h4 class="font-medium text-gray-700 mb-3">1. Fichier de credentials</h4>
+                    <div class="code-block mb-4">
+                        <code>storage/app/firebase-credentials.json</code>
+                    </div>
+                    <p class="text-gray-600 text-sm">
+                        Téléchargez ce fichier depuis Firebase Console → Project Settings → Service Accounts → Generate New Private Key
+                    </p>
+                </div>
+
+                <div class="bg-gray-50 rounded-xl p-6 mb-4">
+                    <h4 class="font-medium text-gray-700 mb-3">2. Variables d'environnement (.env)</h4>
+                    <div class="code-block">
+<pre><code># Firebase Project ID
+FIREBASE_PROJECT_ID=your-project-id
+
+# FCM Settings
+FCM_DEFAULT_ICON=ic_notification
+FCM_DEFAULT_COLOR=#4CAF50
+FCM_DEFAULT_SOUND=default
+FCM_ANDROID_CHANNEL_ID=memo_bac_notifications
+
+# Rate Limiting
+NOTIFICATION_RATE_LIMIT_ENABLED=true
+NOTIFICATION_MAX_PER_DAY=10
+NOTIFICATION_MAX_PER_HOUR=5
+
+# Deep Linking
+DEEP_LINK_SCHEME=memobac</code></pre>
+                    </div>
+                </div>
+
+                <div class="bg-gray-50 rounded-xl p-6">
+                    <h4 class="font-medium text-gray-700 mb-3">3. Fichier de configuration</h4>
+                    <p class="text-gray-600 mb-2">Chemin: <code class="bg-gray-200 px-2 py-1 rounded">config/firebase.php</code></p>
+                    <div class="code-block">
+<pre><code class="language-php">&lt;?php
+return [
+    'credentials' =&gt; [
+        'file' =&gt; storage_path('app/firebase-credentials.json'),
+    ],
+    'project_id' =&gt; env('FIREBASE_PROJECT_ID'),
+    'fcm' =&gt; [
+        'default_icon' =&gt; env('FCM_DEFAULT_ICON', 'ic_notification'),
+        'default_color' =&gt; env('FCM_DEFAULT_COLOR', '#4CAF50'),
+        'android_channel_id' =&gt; env('FCM_ANDROID_CHANNEL_ID', 'memo_bac_notifications'),
+    ],
+];</code></pre>
+                    </div>
+                </div>
+            </div>
+
+            <!-- User Preferences -->
+            <div>
+                <h3 class="text-xl font-semibold text-gray-700 mb-4 flex items-center gap-2">
+                    <i class="fas fa-user-cog text-purple-500"></i>
+                    Préférences Utilisateur
+                </h3>
+
+                <p class="text-gray-600 mb-4">
+                    Chaque utilisateur peut configurer ses préférences dans la table <code class="bg-gray-200 px-2 py-1 rounded">user_notification_settings</code>
+                </p>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full bg-gray-50 rounded-xl overflow-hidden">
+                        <thead class="bg-gray-100">
+                            <tr>
+                                <th class="px-4 py-3 text-left">Paramètre</th>
+                                <th class="px-4 py-3 text-left">Type</th>
+                                <th class="px-4 py-3 text-left">Défaut</th>
+                                <th class="px-4 py-3 text-left">Description</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-200">
+                            <tr>
+                                <td class="px-4 py-3 font-mono text-sm">notifications_enabled</td>
+                                <td class="px-4 py-3">bool</td>
+                                <td class="px-4 py-3"><span class="text-green-600">true</span></td>
+                                <td class="px-4 py-3">Interrupteur principal</td>
+                            </tr>
+                            <tr>
+                                <td class="px-4 py-3 font-mono text-sm">study_reminders</td>
+                                <td class="px-4 py-3">bool</td>
+                                <td class="px-4 py-3"><span class="text-green-600">true</span></td>
+                                <td class="px-4 py-3">Rappels de sessions</td>
+                            </tr>
+                            <tr>
+                                <td class="px-4 py-3 font-mono text-sm">exam_reminders</td>
+                                <td class="px-4 py-3">bool</td>
+                                <td class="px-4 py-3"><span class="text-green-600">true</span></td>
+                                <td class="px-4 py-3">Alertes d'examens</td>
+                            </tr>
+                            <tr>
+                                <td class="px-4 py-3 font-mono text-sm">daily_summary</td>
+                                <td class="px-4 py-3">bool</td>
+                                <td class="px-4 py-3"><span class="text-green-600">true</span></td>
+                                <td class="px-4 py-3">Résumé quotidien</td>
+                            </tr>
+                            <tr>
+                                <td class="px-4 py-3 font-mono text-sm">weekly_summary</td>
+                                <td class="px-4 py-3">bool</td>
+                                <td class="px-4 py-3"><span class="text-red-600">false</span></td>
+                                <td class="px-4 py-3">Résumé hebdomadaire</td>
+                            </tr>
+                            <tr>
+                                <td class="px-4 py-3 font-mono text-sm">motivational_quotes</td>
+                                <td class="px-4 py-3">bool</td>
+                                <td class="px-4 py-3"><span class="text-green-600">true</span></td>
+                                <td class="px-4 py-3">Notifications achievements</td>
+                            </tr>
+                            <tr>
+                                <td class="px-4 py-3 font-mono text-sm">course_updates</td>
+                                <td class="px-4 py-3">bool</td>
+                                <td class="px-4 py-3"><span class="text-green-600">true</span></td>
+                                <td class="px-4 py-3">Mises à jour de cours</td>
+                            </tr>
+                            <tr>
+                                <td class="px-4 py-3 font-mono text-sm">quiet_hours_enabled</td>
+                                <td class="px-4 py-3">bool</td>
+                                <td class="px-4 py-3"><span class="text-red-600">false</span></td>
+                                <td class="px-4 py-3">Activer heures silencieuses</td>
+                            </tr>
+                            <tr>
+                                <td class="px-4 py-3 font-mono text-sm">quiet_start_time</td>
+                                <td class="px-4 py-3">time</td>
+                                <td class="px-4 py-3">null</td>
+                                <td class="px-4 py-3">Début (ex: 22:00)</td>
+                            </tr>
+                            <tr>
+                                <td class="px-4 py-3 font-mono text-sm">quiet_end_time</td>
+                                <td class="px-4 py-3">time</td>
+                                <td class="px-4 py-3">null</td>
+                                <td class="px-4 py-3">Fin (ex: 07:00)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- Scheduler / Tâches planifiées -->
+        <section id="scheduler" class="bg-white rounded-2xl shadow-lg p-8 mb-8">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-3">
+                <span class="bg-cyan-100 p-2 rounded-lg"><i class="fas fa-clock text-cyan-600"></i></span>
+                Tâches Planifiées (Scheduler)
+            </h2>
+
+            <div class="bg-blue-50 border-l-4 border-blue-500 p-4 mb-6">
+                <p class="text-blue-700">
+                    <strong>Important:</strong> Pour que les tâches planifiées fonctionnent, le scheduler Laravel doit être actif.
+                    Ajoutez cette entrée cron sur votre serveur :
+                </p>
+                <div class="code-block mt-3">
+                    <code>* * * * * cd /path-to-project && php artisan schedule:run >> /dev/null 2>&1</code>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Session Reminders -->
+                <div class="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-6 border border-blue-200">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="bg-blue-500 text-white p-3 rounded-xl">
+                            <i class="fas fa-clock text-xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-gray-800">SendSessionRemindersJob</h3>
+                            <p class="text-sm text-gray-500">Rappels de sessions d'étude</p>
+                        </div>
+                    </div>
+                    <div class="space-y-2 text-sm">
+                        <p><strong>Fréquence:</strong> Toutes les 15 minutes</p>
+                        <p><strong>Action:</strong> Envoie un rappel 15 min avant chaque session</p>
+                        <p><strong>Fichier:</strong> <code class="bg-white px-2 py-1 rounded">app/Jobs/Planner/SendSessionRemindersJob.php</code></p>
+                    </div>
+                </div>
+
+                <!-- Exam Alerts -->
+                <div class="bg-gradient-to-br from-red-50 to-red-100 rounded-xl p-6 border border-red-200">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="bg-red-500 text-white p-3 rounded-xl">
+                            <i class="fas fa-bell text-xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-gray-800">SendExamAlertsJob</h3>
+                            <p class="text-sm text-gray-500">Alertes d'examens</p>
+                        </div>
+                    </div>
+                    <div class="space-y-2 text-sm">
+                        <p><strong>Fréquence:</strong> Toutes les heures</p>
+                        <p><strong>Action:</strong> Planifie alertes à 7j, 3j, 24h, 2h avant</p>
+                        <p><strong>Fichier:</strong> <code class="bg-white px-2 py-1 rounded">app/Jobs/SendExamAlertsJob.php</code></p>
+                    </div>
+                </div>
+
+                <!-- Daily Summary -->
+                <div class="bg-gradient-to-br from-green-50 to-green-100 rounded-xl p-6 border border-green-200">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="bg-green-500 text-white p-3 rounded-xl">
+                            <i class="fas fa-chart-pie text-xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-gray-800">SendDailySummaryJob</h3>
+                            <p class="text-sm text-gray-500">Résumé quotidien</p>
+                        </div>
+                    </div>
+                    <div class="space-y-2 text-sm">
+                        <p><strong>Fréquence:</strong> Tous les jours à 21h00</p>
+                        <p><strong>Action:</strong> Envoie le résumé des sessions du jour</p>
+                        <p><strong>Fichier:</strong> <code class="bg-white px-2 py-1 rounded">app/Jobs/SendDailySummaryJob.php</code></p>
+                    </div>
+                </div>
+
+                <!-- Weekly Summary -->
+                <div class="bg-gradient-to-br from-emerald-50 to-emerald-100 rounded-xl p-6 border border-emerald-200">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="bg-emerald-500 text-white p-3 rounded-xl">
+                            <i class="fas fa-calendar-week text-xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-gray-800">SendWeeklySummaryJob</h3>
+                            <p class="text-sm text-gray-500">Résumé hebdomadaire</p>
+                        </div>
+                    </div>
+                    <div class="space-y-2 text-sm">
+                        <p><strong>Fréquence:</strong> Dimanche à 20h00</p>
+                        <p><strong>Action:</strong> Envoie le résumé de la semaine</p>
+                        <p><strong>Fichier:</strong> <code class="bg-white px-2 py-1 rounded">app/Jobs/SendWeeklySummaryJob.php</code></p>
+                    </div>
+                </div>
+
+                <!-- Process Due Notifications -->
+                <div class="bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl p-6 border border-purple-200">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="bg-purple-500 text-white p-3 rounded-xl">
+                            <i class="fas fa-paper-plane text-xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-gray-800">notifications:process</h3>
+                            <p class="text-sm text-gray-500">Traitement des notifications en attente</p>
+                        </div>
+                    </div>
+                    <div class="space-y-2 text-sm">
+                        <p><strong>Fréquence:</strong> Toutes les minutes</p>
+                        <p><strong>Action:</strong> Envoie les notifications dont scheduled_for &le; now()</p>
+                        <p><strong>Commande:</strong> <code class="bg-white px-2 py-1 rounded">php artisan notifications:process</code></p>
+                    </div>
+                </div>
+
+                <!-- Missed Sessions -->
+                <div class="bg-gradient-to-br from-amber-50 to-amber-100 rounded-xl p-6 border border-amber-200">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="bg-amber-500 text-white p-3 rounded-xl">
+                            <i class="fas fa-exclamation-triangle text-xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-gray-800">CheckMissedSessionsJob</h3>
+                            <p class="text-sm text-gray-500">Sessions manquées</p>
+                        </div>
+                    </div>
+                    <div class="space-y-2 text-sm">
+                        <p><strong>Fréquence:</strong> Toutes les heures</p>
+                        <p><strong>Action:</strong> Marque les sessions non démarrées comme "missed"</p>
+                        <p><strong>Fichier:</strong> <code class="bg-white px-2 py-1 rounded">app/Jobs/Planner/CheckMissedSessionsJob.php</code></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Kernel.php code -->
+            <div class="mt-8">
+                <h3 class="font-semibold text-gray-700 mb-4">Configuration dans Kernel.php</h3>
+                <div class="code-block">
+<pre><code class="language-php">// app/Console/Kernel.php
+
+protected function schedule(Schedule $schedule)
+{
+    // Session reminders - every 15 minutes
+    $schedule->job(new SendSessionRemindersJob())
+        ->everyFifteenMinutes()
+        ->name('planner.send-reminders');
+
+    // Process scheduled notifications - every minute
+    $schedule->command('notifications:process --batch-size=100')
+        ->everyMinute()
+        ->name('notifications.process-scheduled');
+
+    // Daily summary - every day at 21:00
+    $schedule->job(new SendDailySummaryJob())
+        ->daily()
+        ->at('21:00')
+        ->name('notifications.daily-summary');
+
+    // Weekly summary - Sundays at 20:00
+    $schedule->job(new SendWeeklySummaryJob())
+        ->weekly()
+        ->sundays()
+        ->at('20:00')
+        ->name('notifications.weekly-summary');
+
+    // Exam alerts - hourly
+    $schedule->job(new SendExamAlertsJob())
+        ->hourly()
+        ->name('notifications.exam-alerts');
+}</code></pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- Flux de données -->
+        <section id="flow" class="bg-white rounded-2xl shadow-lg p-8 mb-8">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-3">
+                <span class="bg-purple-100 p-2 rounded-lg"><i class="fas fa-project-diagram text-purple-600"></i></span>
+                Flux de Données
+            </h2>
+
+            <!-- Push Notification Flow -->
+            <div class="mb-8">
+                <h3 class="text-xl font-semibold text-gray-700 mb-4">Flux de Notification Push</h3>
+                <div class="bg-gray-50 rounded-xl p-6">
+                    <div class="flex flex-col md:flex-row items-center justify-between gap-4">
+                        <div class="text-center">
+                            <div class="bg-blue-500 text-white p-4 rounded-xl mb-2">
+                                <i class="fas fa-server text-2xl"></i>
+                            </div>
+                            <p class="font-medium">API Laravel</p>
+                            <p class="text-xs text-gray-500">NotificationService</p>
+                        </div>
+                        <i class="fas fa-arrow-right text-2xl text-gray-400 hidden md:block"></i>
+                        <i class="fas fa-arrow-down text-2xl text-gray-400 md:hidden"></i>
+                        <div class="text-center">
+                            <div class="bg-red-500 text-white p-4 rounded-xl mb-2">
+                                <i class="fab fa-google text-2xl"></i>
+                            </div>
+                            <p class="font-medium">Firebase FCM</p>
+                            <p class="text-xs text-gray-500">Push Delivery</p>
+                        </div>
+                        <i class="fas fa-arrow-right text-2xl text-gray-400 hidden md:block"></i>
+                        <i class="fas fa-arrow-down text-2xl text-gray-400 md:hidden"></i>
+                        <div class="text-center">
+                            <div class="bg-green-500 text-white p-4 rounded-xl mb-2">
+                                <i class="fas fa-mobile-alt text-2xl"></i>
+                            </div>
+                            <p class="font-medium">App Flutter</p>
+                            <p class="text-xs text-gray-500">NotificationService</p>
+                        </div>
+                        <i class="fas fa-arrow-right text-2xl text-gray-400 hidden md:block"></i>
+                        <i class="fas fa-arrow-down text-2xl text-gray-400 md:hidden"></i>
+                        <div class="text-center">
+                            <div class="bg-purple-500 text-white p-4 rounded-xl mb-2">
+                                <i class="fas fa-user text-2xl"></i>
+                            </div>
+                            <p class="font-medium">Utilisateur</p>
+                            <p class="text-xs text-gray-500">Notification UI</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Handling States -->
+            <div>
+                <h3 class="text-xl font-semibold text-gray-700 mb-4">États de réception (App Flutter)</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="bg-green-50 border border-green-200 rounded-xl p-4">
+                        <h4 class="font-bold text-green-700 mb-2">
+                            <i class="fas fa-eye mr-2"></i>Foreground
+                        </h4>
+                        <p class="text-sm text-gray-600">
+                            L'app est ouverte et active. Le message FCM est reçu et une notification locale est affichée.
+                        </p>
+                        <code class="block mt-2 text-xs bg-white p-2 rounded">showLocalNotification()</code>
+                    </div>
+                    <div class="bg-blue-50 border border-blue-200 rounded-xl p-4">
+                        <h4 class="font-bold text-blue-700 mb-2">
+                            <i class="fas fa-moon mr-2"></i>Background
+                        </h4>
+                        <p class="text-sm text-gray-600">
+                            L'app est en arrière-plan. Le handler background traite le message.
+                        </p>
+                        <code class="block mt-2 text-xs bg-white p-2 rounded">_firebaseMessagingBackgroundHandler()</code>
+                    </div>
+                    <div class="bg-purple-50 border border-purple-200 rounded-xl p-4">
+                        <h4 class="font-bold text-purple-700 mb-2">
+                            <i class="fas fa-power-off mr-2"></i>Terminated
+                        </h4>
+                        <p class="text-sm text-gray-600">
+                            L'app est fermée. Le message est stocké et récupéré au démarrage.
+                        </p>
+                        <code class="block mt-2 text-xs bg-white p-2 rounded">getInitialMessage()</code>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- API Endpoints -->
+        <section id="api" class="bg-white rounded-2xl shadow-lg p-8 mb-8">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-3">
+                <span class="bg-red-100 p-2 rounded-lg"><i class="fas fa-code text-red-600"></i></span>
+                Endpoints API
+            </h2>
+
+            <!-- User Endpoints -->
+            <div class="mb-8">
+                <h3 class="text-xl font-semibold text-gray-700 mb-4">Endpoints Utilisateur</h3>
+                <p class="text-gray-600 mb-4">Base URL: <code class="bg-gray-100 px-2 py-1 rounded">/api/v1/notifications</code></p>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead class="bg-gray-100">
+                            <tr>
+                                <th class="px-4 py-3 text-left">Méthode</th>
+                                <th class="px-4 py-3 text-left">Endpoint</th>
+                                <th class="px-4 py-3 text-left">Description</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-200">
+                            <tr>
+                                <td class="px-4 py-3"><span class="bg-green-100 text-green-800 px-2 py-1 rounded text-sm font-mono">GET</span></td>
+                                <td class="px-4 py-3 font-mono text-sm">/notifications</td>
+                                <td class="px-4 py-3">Liste paginée des notifications</td>
+                            </tr>
+                            <tr>
+                                <td class="px-4 py-3"><span class="bg-green-100 text-green-800 px-2 py-1 rounded text-sm font-mono">GET</span></td>
+                                <td class="px-4 py-3 font-mono text-sm">/notifications/unread-count</td>
+                                <td class="px-4 py-3">Nombre de notifications non lues</td>
+                            </tr>
+                            <tr>
+                                <td class="px-4 py-3"><span class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-sm font-mono">POST</span></td>
+                                <td class="px-4 py-3 font-mono text-sm">/notifications/{id}/read</td>
+                                <td class="px-4 py-3">Marquer comme lue</td>
+                            </tr>
+                            <tr>
+                                <td class="px-4 py-3"><span class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-sm font-mono">POST</span></td>
+                                <td class="px-4 py-3 font-mono text-sm">/notifications/read-all</td>
+                                <td class="px-4 py-3">Marquer toutes comme lues</td>
+                            </tr>
+                            <tr>
+                                <td class="px-4 py-3"><span class="bg-red-100 text-red-800 px-2 py-1 rounded text-sm font-mono">DELETE</span></td>
+                                <td class="px-4 py-3 font-mono text-sm">/notifications/{id}</td>
+                                <td class="px-4 py-3">Supprimer une notification</td>
+                            </tr>
+                            <tr>
+                                <td class="px-4 py-3"><span class="bg-green-100 text-green-800 px-2 py-1 rounded text-sm font-mono">GET</span></td>
+                                <td class="px-4 py-3 font-mono text-sm">/notifications/settings</td>
+                                <td class="px-4 py-3">Obtenir les préférences</td>
+                            </tr>
+                            <tr>
+                                <td class="px-4 py-3"><span class="bg-amber-100 text-amber-800 px-2 py-1 rounded text-sm font-mono">PUT</span></td>
+                                <td class="px-4 py-3 font-mono text-sm">/notifications/settings</td>
+                                <td class="px-4 py-3">Mettre à jour les préférences</td>
+                            </tr>
+                            <tr>
+                                <td class="px-4 py-3"><span class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-sm font-mono">POST</span></td>
+                                <td class="px-4 py-3 font-mono text-sm">/notifications/register-device</td>
+                                <td class="px-4 py-3">Enregistrer token FCM</td>
+                            </tr>
+                            <tr>
+                                <td class="px-4 py-3"><span class="bg-red-100 text-red-800 px-2 py-1 rounded text-sm font-mono">DELETE</span></td>
+                                <td class="px-4 py-3 font-mono text-sm">/notifications/unregister-device</td>
+                                <td class="px-4 py-3">Désenregistrer appareil</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Admin Endpoints -->
+            <div>
+                <h3 class="text-xl font-semibold text-gray-700 mb-4">Endpoints Admin</h3>
+                <p class="text-gray-600 mb-4">Base URL: <code class="bg-gray-100 px-2 py-1 rounded">/admin/notifications</code></p>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead class="bg-gray-100">
+                            <tr>
+                                <th class="px-4 py-3 text-left">Méthode</th>
+                                <th class="px-4 py-3 text-left">Endpoint</th>
+                                <th class="px-4 py-3 text-left">Description</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-200">
+                            <tr>
+                                <td class="px-4 py-3"><span class="bg-green-100 text-green-800 px-2 py-1 rounded text-sm font-mono">GET</span></td>
+                                <td class="px-4 py-3 font-mono text-sm">/notifications</td>
+                                <td class="px-4 py-3">Dashboard admin</td>
+                            </tr>
+                            <tr>
+                                <td class="px-4 py-3"><span class="bg-green-100 text-green-800 px-2 py-1 rounded text-sm font-mono">GET</span></td>
+                                <td class="px-4 py-3 font-mono text-sm">/notifications/statistics</td>
+                                <td class="px-4 py-3">Statistiques système</td>
+                            </tr>
+                            <tr>
+                                <td class="px-4 py-3"><span class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-sm font-mono">POST</span></td>
+                                <td class="px-4 py-3 font-mono text-sm">/notifications/test</td>
+                                <td class="px-4 py-3">Envoyer notification test</td>
+                            </tr>
+                            <tr>
+                                <td class="px-4 py-3"><span class="bg-green-100 text-green-800 px-2 py-1 rounded text-sm font-mono">GET</span></td>
+                                <td class="px-4 py-3 font-mono text-sm">/notifications/broadcast</td>
+                                <td class="px-4 py-3">Page de broadcast</td>
+                            </tr>
+                            <tr>
+                                <td class="px-4 py-3"><span class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-sm font-mono">POST</span></td>
+                                <td class="px-4 py-3 font-mono text-sm">/notifications/broadcast/send</td>
+                                <td class="px-4 py-3">Envoyer broadcast</td>
+                            </tr>
+                            <tr>
+                                <td class="px-4 py-3"><span class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-sm font-mono">POST</span></td>
+                                <td class="px-4 py-3 font-mono text-sm">/notifications/configuration/test-fcm</td>
+                                <td class="px-4 py-3">Tester connexion FCM</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- Deep Linking -->
+        <section id="mobile" class="bg-white rounded-2xl shadow-lg p-8 mb-8">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-3">
+                <span class="bg-green-100 p-2 rounded-lg"><i class="fas fa-mobile-alt text-green-600"></i></span>
+                App Mobile & Deep Linking
+            </h2>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div>
+                    <h3 class="text-xl font-semibold text-gray-700 mb-4">Deep Links Supportés</h3>
+                    <div class="bg-gray-50 rounded-xl overflow-hidden">
+                        <table class="w-full">
+                            <thead class="bg-gray-100">
+                                <tr>
+                                    <th class="px-4 py-3 text-left">Action Type</th>
+                                    <th class="px-4 py-3 text-left">Deep Link</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-200">
+                                <tr>
+                                    <td class="px-4 py-3 font-mono text-sm">open_session</td>
+                                    <td class="px-4 py-3 font-mono text-sm text-blue-600">memobac://planner/session/{id}</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-4 py-3 font-mono text-sm">open_exam</td>
+                                    <td class="px-4 py-3 font-mono text-sm text-blue-600">memobac://planner/exam/{id}</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-4 py-3 font-mono text-sm">open_quiz</td>
+                                    <td class="px-4 py-3 font-mono text-sm text-blue-600">memobac://quiz/{id}</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-4 py-3 font-mono text-sm">open_course</td>
+                                    <td class="px-4 py-3 font-mono text-sm text-blue-600">memobac://courses/{id}</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-4 py-3 font-mono text-sm">open_achievements</td>
+                                    <td class="px-4 py-3 font-mono text-sm text-blue-600">memobac://profile/achievements</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-4 py-3 font-mono text-sm">open_stats</td>
+                                    <td class="px-4 py-3 font-mono text-sm text-blue-600">memobac://profile/statistics</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div>
+                    <h3 class="text-xl font-semibold text-gray-700 mb-4">Fichiers Clés (Flutter)</h3>
+                    <div class="space-y-3">
+                        <div class="bg-blue-50 rounded-lg p-4">
+                            <p class="font-mono text-sm text-blue-800">lib/core/services/notification_service.dart</p>
+                            <p class="text-sm text-gray-600 mt-1">Gestion FCM + notifications locales</p>
+                        </div>
+                        <div class="bg-green-50 rounded-lg p-4">
+                            <p class="font-mono text-sm text-green-800">lib/core/services/fcm_token_service.dart</p>
+                            <p class="text-sm text-gray-600 mt-1">Enregistrement token FCM</p>
+                        </div>
+                        <div class="bg-purple-50 rounded-lg p-4">
+                            <p class="font-mono text-sm text-purple-800">lib/features/notifications/domain/entities/notification_entity.dart</p>
+                            <p class="text-sm text-gray-600 mt-1">Modèle + enum des types</p>
+                        </div>
+                        <div class="bg-amber-50 rounded-lg p-4">
+                            <p class="font-mono text-sm text-amber-800">lib/features/notifications/presentation/bloc/notifications_bloc.dart</p>
+                            <p class="text-sm text-gray-600 mt-1">State management</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Troubleshooting -->
+        <section id="troubleshooting" class="bg-white rounded-2xl shadow-lg p-8 mb-8">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-3">
+                <span class="bg-red-100 p-2 rounded-lg"><i class="fas fa-wrench text-red-600"></i></span>
+                Dépannage
+            </h2>
+
+            <div class="space-y-6">
+                <!-- Problem 1 -->
+                <div class="border border-gray-200 rounded-xl overflow-hidden">
+                    <div class="bg-red-50 px-6 py-4 flex items-center gap-3">
+                        <i class="fas fa-exclamation-circle text-red-500"></i>
+                        <h3 class="font-semibold text-gray-800">Les notifications ne sont pas envoyées</h3>
+                    </div>
+                    <div class="px-6 py-4">
+                        <p class="text-gray-600 mb-3">Vérifiez les points suivants :</p>
+                        <ul class="list-disc list-inside space-y-2 text-gray-600">
+                            <li>Le fichier <code>firebase-credentials.json</code> existe dans <code>storage/app/</code></li>
+                            <li>La variable <code>FIREBASE_PROJECT_ID</code> est définie dans <code>.env</code></li>
+                            <li>Le scheduler Laravel est actif (cron configuré)</li>
+                            <li>Les queues sont en cours d'exécution : <code>php artisan queue:work</code></li>
+                        </ul>
+                        <div class="code-block mt-4">
+                            <code>php artisan notifications:process --batch-size=10 -v</code>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Problem 2 -->
+                <div class="border border-gray-200 rounded-xl overflow-hidden">
+                    <div class="bg-amber-50 px-6 py-4 flex items-center gap-3">
+                        <i class="fas fa-exclamation-triangle text-amber-500"></i>
+                        <h3 class="font-semibold text-gray-800">Token FCM invalide ou expiré</h3>
+                    </div>
+                    <div class="px-6 py-4">
+                        <p class="text-gray-600 mb-3">Les tokens FCM peuvent devenir invalides. Le système désactive automatiquement les tokens invalides.</p>
+                        <p class="text-gray-600 mb-3">Pour nettoyer manuellement :</p>
+                        <div class="code-block">
+                            <code>// Via Admin: POST /admin/notifications/configuration/clean-tokens</code>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Problem 3 -->
+                <div class="border border-gray-200 rounded-xl overflow-hidden">
+                    <div class="bg-blue-50 px-6 py-4 flex items-center gap-3">
+                        <i class="fas fa-info-circle text-blue-500"></i>
+                        <h3 class="font-semibold text-gray-800">Les notifications sont en "pending" mais jamais envoyées</h3>
+                    </div>
+                    <div class="px-6 py-4">
+                        <p class="text-gray-600 mb-3">Assurez-vous que la commande de traitement est exécutée :</p>
+                        <div class="code-block mb-3">
+                            <code>php artisan schedule:list</code>
+                        </div>
+                        <p class="text-gray-600">Vérifiez que <code>notifications.process-scheduled</code> apparaît dans la liste.</p>
+                    </div>
+                </div>
+
+                <!-- Problem 4 -->
+                <div class="border border-gray-200 rounded-xl overflow-hidden">
+                    <div class="bg-green-50 px-6 py-4 flex items-center gap-3">
+                        <i class="fas fa-check-circle text-green-500"></i>
+                        <h3 class="font-semibold text-gray-800">Tester la connexion FCM</h3>
+                    </div>
+                    <div class="px-6 py-4">
+                        <p class="text-gray-600 mb-3">Utilisez le panel admin pour tester :</p>
+                        <ol class="list-decimal list-inside space-y-2 text-gray-600">
+                            <li>Allez dans <strong>Admin → Notifications → Configuration</strong></li>
+                            <li>Cliquez sur <strong>"Tester connexion FCM"</strong></li>
+                            <li>Si réussi, envoyez une notification test à un utilisateur</li>
+                        </ol>
+                    </div>
+                </div>
+
+                <!-- Problem 5 - Local Notifications -->
+                <div class="border border-gray-200 rounded-xl overflow-hidden">
+                    <div class="bg-teal-50 px-6 py-4 flex items-center gap-3">
+                        <i class="fas fa-mobile-alt text-teal-500"></i>
+                        <h3 class="font-semibold text-gray-800">Les notifications locales (session reminders) ne s'affichent pas</h3>
+                    </div>
+                    <div class="px-6 py-4">
+                        <p class="text-gray-600 mb-3">Vérifiez les points suivants sur l'appareil Flutter :</p>
+                        <ul class="list-disc list-inside space-y-2 text-gray-600">
+                            <li>Permissions de notification accordées à l'application</li>
+                            <li>La session a le statut <code class="bg-gray-200 px-1 rounded">scheduled</code></li>
+                            <li>L'heure de notification n'est pas dans le passé</li>
+                            <li>Limite de 64 notifications Android non dépassée</li>
+                        </ul>
+                        <div class="code-block mt-4">
+<pre><code>// Vérifier les mappings en Flutter (debug)
+final mappings = await _notificationIdManager.getAllMappings();
+debugPrint('Notifications programmées: ${mappings.length}');</code></pre>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Problem 6 - Sync Issues -->
+                <div class="border border-gray-200 rounded-xl overflow-hidden">
+                    <div class="bg-purple-50 px-6 py-4 flex items-center gap-3">
+                        <i class="fas fa-sync text-purple-500"></i>
+                        <h3 class="font-semibold text-gray-800">Les notifications locales sont désynchronisées avec les sessions</h3>
+                    </div>
+                    <div class="px-6 py-4">
+                        <p class="text-gray-600 mb-3">Utilisez la méthode de synchronisation :</p>
+                        <div class="code-block mb-3">
+<pre><code class="language-dart">// Synchroniser les notifications avec les sessions actives
+await sessionNotificationService.syncScheduledNotifications(
+  activeSessions,  // Liste des sessions actives
+  15,              // Rappel 15 min avant
+);
+
+// Nettoyer les notifications passées
+await sessionNotificationService.cleanupPastNotifications();</code></pre>
+                        </div>
+                        <p class="text-gray-600">
+                            Cette méthode annule les notifications orphelines et reprogramme les manquantes.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="text-center text-gray-500 text-sm">
+            <p>Documentation générée pour MemoBac - Système de Notifications</p>
+            <p class="mt-2">Version 1.0 - Décembre 2025</p>
+        </footer>
+    </div>
+</body>
+</html>

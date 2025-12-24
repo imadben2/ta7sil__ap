@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configuration Firebase - Guide Complet</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+
+        header {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        header p {
+            font-size: 1.2em;
+            opacity: 0.95;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .alert {
+            background: #fff3cd;
+            border-left: 5px solid #ffc107;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+
+        .alert.info {
+            background: #d1ecf1;
+            border-left-color: #0dcaf0;
+        }
+
+        .alert.success {
+            background: #d1e7dd;
+            border-left-color: #198754;
+        }
+
+        .alert.danger {
+            background: #f8d7da;
+            border-left-color: #dc3545;
+        }
+
+        .step {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 30px;
+            margin: 30px 0;
+            border-left: 5px solid #667eea;
+        }
+
+        .step h2 {
+            color: #667eea;
+            font-size: 1.8em;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+
+        .step-number {
+            background: #667eea;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+
+        .step h3 {
+            color: #495057;
+            margin: 20px 0 10px 0;
+            font-size: 1.3em;
+        }
+
+        .step ul {
+            margin-left: 20px;
+            margin-top: 10px;
+        }
+
+        .step li {
+            margin: 10px 0;
+        }
+
+        code {
+            background: #282c34;
+            color: #61dafb;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+
+        pre {
+            background: #282c34;
+            color: #abb2bf;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 15px 0;
+            border: 1px solid #3e4451;
+        }
+
+        pre code {
+            background: none;
+            padding: 0;
+            color: inherit;
+        }
+
+        .screenshot-placeholder {
+            background: linear-gradient(135deg, #e0e7ff 0%, #cfe2ff 100%);
+            border: 3px dashed #667eea;
+            border-radius: 10px;
+            padding: 60px 20px;
+            text-align: center;
+            margin: 20px 0;
+            color: #667eea;
+            font-size: 1.1em;
+            font-weight: bold;
+        }
+
+        .screenshot-placeholder::before {
+            content: "📸 ";
+            font-size: 2em;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .command-box {
+            background: #1e1e1e;
+            color: #4ec9b0;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .command-box::before {
+            content: "$ ";
+            color: #c586c0;
+            margin-right: 10px;
+        }
+
+        .file-structure {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+        }
+
+        .file-structure .folder {
+            color: #f59e0b;
+            font-weight: bold;
+        }
+
+        .file-structure .file {
+            color: #3b82f6;
+            margin-left: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        th {
+            background: #667eea;
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        tr:hover {
+            background: #f8f9fa;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 12px 30px;
+            background: #667eea;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            margin: 10px 5px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .btn:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn.secondary {
+            background: #6c757d;
+        }
+
+        .btn.secondary:hover {
+            background: #5a6268;
+        }
+
+        footer {
+            background: #2d3748;
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .troubleshooting {
+            background: #fff3cd;
+            border-radius: 10px;
+            padding: 25px;
+            margin: 20px 0;
+        }
+
+        .troubleshooting h3 {
+            color: #856404;
+            margin-bottom: 15px;
+        }
+
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+
+            .btn {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🔥 Configuration Firebase</h1>
+            <p>Guide complet pour intégrer Firebase dans votre application Flutter</p>
+        </header>
+
+        <div class="content">
+            <div class="alert info">
+                <strong>ℹ️ Note importante :</strong> Ce guide vous aidera à configurer Firebase Cloud Messaging (FCM) et Firebase Core dans votre application MEMO. Le processus prend environ 15-20 minutes.
+            </div>
+
+            <!-- ÉTAPE 1 -->
+            <div class="step">
+                <h2><span class="step-number">1</span>Créer un projet Firebase</h2>
+
+                <h3>Accéder à la console Firebase</h3>
+                <ul>
+                    <li>Ouvrez votre navigateur et allez sur <a href="https://console.firebase.google.com/" target="_blank">https://console.firebase.google.com/</a></li>
+                    <li>Connectez-vous avec votre compte Google</li>
+                    <li>Cliquez sur <strong>"Ajouter un projet"</strong> ou <strong>"Add project"</strong></li>
+                </ul>
+
+                <div class="screenshot-placeholder">
+                    Console Firebase - Page d'accueil<br>
+                    Bouton "Ajouter un projet" visible en haut à gauche
+                </div>
+
+                <h3>Configurer le projet</h3>
+                <ol>
+                    <li><strong>Nom du projet :</strong> Entrez "memo-app" ou "MEMO BAC"</li>
+                    <li><strong>Google Analytics :</strong> Activez ou désactivez selon vos besoins (recommandé : activé)</li>
+                    <li>Si activé, sélectionnez ou créez un compte Analytics</li>
+                    <li>Cliquez sur <strong>"Créer le projet"</strong></li>
+                    <li>Attendez quelques secondes pendant la création</li>
+                </ol>
+
+                <div class="screenshot-placeholder">
+                    Formulaire de création de projet Firebase<br>
+                    Champs : Nom du projet, Google Analytics
+                </div>
+            </div>
+
+            <!-- ÉTAPE 2 -->
+            <div class="step">
+                <h2><span class="step-number">2</span>Ajouter l'application Android</h2>
+
+                <h3>Enregistrer l'application</h3>
+                <ul>
+                    <li>Dans la console Firebase, cliquez sur l'icône <strong>Android</strong> (symbole Android)</li>
+                    <li>Remplissez les informations suivantes :</li>
+                </ul>
+
+                <table>
+                    <tr>
+                        <th>Champ</th>
+                        <th>Valeur</th>
+                        <th>Description</th>
+                    </tr>
+                    <tr>
+                        <td><strong>Package name</strong></td>
+                        <td><code>com.example.memo_app</code></td>
+                        <td>Nom du package Android (vérifiez dans AndroidManifest.xml)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>App nickname</strong></td>
+                        <td><code>MEMO App</code></td>
+                        <td>Nom convivial (optionnel)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>SHA-1</strong></td>
+                        <td>Votre clé SHA-1</td>
+                        <td>Nécessaire pour certaines fonctionnalités (optionnel pour FCM)</td>
+                    </tr>
+                </table>
+
+                <div class="alert info">
+                    <strong>💡 Astuce :</strong> Pour obtenir votre SHA-1, exécutez cette commande dans le terminal :
+                    <div class="command-box">keytool -list -v -keystore ~/.android/debug.keystore -alias androiddebugkey -storepass android -keypass android</div>
+                </div>
+
+                <div class="screenshot-placeholder">
+                    Formulaire d'enregistrement de l'application Android<br>
+                    Champs remplis avec le package name
+                </div>
+
+                <h3>Télécharger google-services.json</h3>
+                <ul>
+                    <li>Cliquez sur <strong>"Télécharger google-services.json"</strong></li>
+                    <li>Enregistrez le fichier sur votre ordinateur</li>
+                    <li><strong>Important :</strong> Copiez ce fichier dans le dossier :
+                        <div class="command-box">d:\ta7sil\memo_app\android\app\</div>
+                    </li>
+                    <li>Remplacez l'ancien fichier placeholder s'il existe</li>
+                </ul>
+
+                <div class="screenshot-placeholder">
+                    Bouton de téléchargement google-services.json<br>
+                    Interface de téléchargement du fichier de configuration
+                </div>
+            </div>
+
+            <!-- ÉTAPE 3 -->
+            <div class="step">
+                <h2><span class="step-number">3</span>Configurer Firebase SDK dans Android</h2>
+
+                <h3>Modifier build.gradle (niveau projet)</h3>
+                <p>Ouvrez <code>android/build.gradle</code> et ajoutez :</p>
+
+                <pre><code>buildscript {
+    repositories {
+        google()
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:7.3.0'
+        classpath 'com.google.gms:google-services:4.3.15'  // ← Ajoutez cette ligne
+    }
+}</code></pre>
+
+                <h3>Modifier build.gradle (niveau app)</h3>
+                <p>Ouvrez <code>android/app/build.gradle</code> et ajoutez à la fin du fichier :</p>
+
+                <pre><code>apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+apply plugin: 'com.google.gms.google-services'  // ← Ajoutez cette ligne
+
+android {
+    // ... votre configuration existante
+}</code></pre>
+
+                <h3>Structure des fichiers</h3>
+                <div class="file-structure">
+                    <div class="folder">📁 android/</div>
+                    <div class="file">├── 📄 build.gradle (modifié)</div>
+                    <div class="folder">    ├── 📁 app/</div>
+                    <div class="file">    │   ├── 📄 build.gradle (modifié)</div>
+                    <div class="file">    │   └── 📄 google-services.json (nouveau)</div>
+                </div>
+            </div>
+
+            <!-- ÉTAPE 4 -->
+            <div class="step">
+                <h2><span class="step-number">4</span>Installer FlutterFire CLI</h2>
+
+                <h3>Installation</h3>
+                <p>FlutterFire CLI simplifie la configuration de Firebase dans Flutter :</p>
+
+                <div class="command-box">dart pub global activate flutterfire_cli</div>
+
+                <h3>Vérifier l'installation</h3>
+                <div class="command-box">flutterfire --version</div>
+
+                <div class="alert success">
+                    <strong>✅ Succès :</strong> Si vous voyez un numéro de version, FlutterFire CLI est installé correctement !
+                </div>
+            </div>
+
+            <!-- ÉTAPE 5 -->
+            <div class="step">
+                <h2><span class="step-number">5</span>Configurer Firebase dans Flutter</h2>
+
+                <h3>Exécuter la configuration automatique</h3>
+                <p>Dans le terminal, naviguez vers le dossier de votre projet et exécutez :</p>
+
+                <div class="command-box">cd d:\ta7sil\memo_app</div>
+                <div class="command-box">flutterfire configure</div>
+
+                <h3>Suivre les instructions</h3>
+                <ol>
+                    <li>Sélectionnez votre projet Firebase dans la liste</li>
+                    <li>Choisissez les plateformes : <strong>android</strong> (utilisez les flèches et espace pour sélectionner)</li>
+                    <li>Confirmez les paramètres</li>
+                    <li>Le fichier <code>lib/firebase_options.dart</code> sera créé automatiquement</li>
+                </ol>
+
+                <div class="screenshot-placeholder">
+                    Terminal avec la commande flutterfire configure<br>
+                    Liste des projets Firebase disponibles
+                </div>
+
+                <div class="alert info">
+                    <strong>ℹ️ Résultat :</strong> Cette commande génère automatiquement le fichier <code>firebase_options.dart</code> avec vos vraies clés Firebase (remplaçant le fichier placeholder).
+                </div>
+
+                <h3>Contenu généré (firebase_options.dart)</h3>
+                <pre><code>// Fichier généré automatiquement par FlutterFire CLI
+import 'package:firebase_core/firebase_core.dart';
+
+class DefaultFirebaseOptions {
+  static FirebaseOptions get currentPlatform {
+    // Configuration automatique selon la plateforme
+  }
+
+  static const FirebaseOptions android = FirebaseOptions(
+    apiKey: 'VOTRE_VRAIE_CLE_API',
+    appId: 'VOTRE_VRAI_APP_ID',
+    messagingSenderId: 'VOTRE_SENDER_ID',
+    projectId: 'votre-projet-id',
+    storageBucket: 'votre-projet.appspot.com',
+  );
+}</code></pre>
+            </div>
+
+            <!-- ÉTAPE 6 -->
+            <div class="step">
+                <h2><span class="step-number">6</span>Activer Firebase Cloud Messaging</h2>
+
+                <h3>Dans la console Firebase</h3>
+                <ol>
+                    <li>Allez dans <strong>Build</strong> → <strong>Cloud Messaging</strong> dans le menu latéral</li>
+                    <li>Cliquez sur <strong>"Activer"</strong> ou <strong>"Enable"</strong></li>
+                    <li>Acceptez les conditions d'utilisation</li>
+                </ol>
+
+                <div class="screenshot-placeholder">
+                    Console Firebase - Section Cloud Messaging<br>
+                    Bouton "Activer Cloud Messaging"
+                </div>
+
+                <h3>Configurer les paramètres (optionnel)</h3>
+                <ul>
+                    <li><strong>Clé serveur :</strong> Copiez votre clé serveur (pour envoyer des notifications depuis votre backend Laravel)</li>
+                    <li><strong>ID expéditeur :</strong> Déjà configuré dans firebase_options.dart</li>
+                </ul>
+
+                <div class="alert info">
+                    <strong>💡 Pour Laravel API :</strong> Vous aurez besoin de la clé serveur Firebase pour envoyer des notifications depuis votre API Laravel. Copiez-la et ajoutez-la dans votre fichier <code>.env</code> Laravel :
+                    <pre><code>FIREBASE_SERVER_KEY=votre_cle_serveur_ici</code></pre>
+                </div>
+            </div>
+
+            <!-- ÉTAPE 7 -->
+            <div class="step">
+                <h2><span class="step-number">7</span>Vérifier la configuration</h2>
+
+                <h3>Fichiers à vérifier</h3>
+                <table>
+                    <tr>
+                        <th>Fichier</th>
+                        <th>État</th>
+                        <th>Description</th>
+                    </tr>
+                    <tr>
+                        <td><code>lib/firebase_options.dart</code></td>
+                        <td>✅ Créé</td>
+                        <td>Configuration Firebase générée</td>
+                    </tr>
+                    <tr>
+                        <td><code>android/app/google-services.json</code></td>
+                        <td>✅ Présent</td>
+                        <td>Configuration Android Firebase</td>
+                    </tr>
+                    <tr>
+                        <td><code>lib/main.dart</code></td>
+                        <td>✅ Modifié</td>
+                        <td>Initialisation Firebase ajoutée</td>
+                    </tr>
+                    <tr>
+                        <td><code>android/build.gradle</code></td>
+                        <td>✅ Modifié</td>
+                        <td>Plugin Google Services ajouté</td>
+                    </tr>
+                </table>
+
+                <h3>Tester la configuration</h3>
+                <p>Nettoyez et compilez le projet :</p>
+
+                <div class="command-box">flutter clean</div>
+                <div class="command-box">flutter pub get</div>
+                <div class="command-box">flutter run</div>
+
+                <div class="alert success">
+                    <strong>✅ Succès :</strong> Si l'application démarre sans erreur "[core/no-app]", Firebase est correctement configuré !
+                </div>
+
+                <h3>Logs de succès attendus</h3>
+                <pre><code>I/flutter ( 7991): [main] Firebase initialized successfully
+I/flutter ( 7991): [NotificationService] Initialized successfully
+I/flutter ( 7991): [NotificationService] FCM Token: eX4mpl3T0k3n...</code></pre>
+            </div>
+
+            <!-- DÉPANNAGE -->
+            <div class="troubleshooting">
+                <h3>🔧 Dépannage - Problèmes courants</h3>
+
+                <h4>Erreur : "[core/no-app] No Firebase App"</h4>
+                <ul>
+                    <li>✅ <strong>Solution :</strong> Vérifiez que <code>Firebase.initializeApp()</code> est appelé avant <code>di.init()</code> dans main.dart</li>
+                    <li>✅ <strong>Solution :</strong> Vérifiez que <code>firebase_options.dart</code> existe et contient les vraies valeurs</li>
+                </ul>
+
+                <h4>Erreur : "google-services.json not found"</h4>
+                <ul>
+                    <li>✅ <strong>Solution :</strong> Assurez-vous que le fichier est dans <code>android/app/</code> (pas dans <code>android/</code>)</li>
+                    <li>✅ <strong>Solution :</strong> Exécutez <code>flutter clean</code> puis <code>flutter pub get</code></li>
+                </ul>
+
+                <h4>Erreur : "Plugin not found"</h4>
+                <ul>
+                    <li>✅ <strong>Solution :</strong> Vérifiez que <code>apply plugin: 'com.google.gms.google-services'</code> est présent dans <code>android/app/build.gradle</code></li>
+                    <li>✅ <strong>Solution :</strong> Redémarrez Android Studio si vous l'utilisez</li>
+                </ul>
+
+                <h4>Les notifications ne fonctionnent pas</h4>
+                <ul>
+                    <li>✅ <strong>Solution :</strong> Vérifiez les permissions dans AndroidManifest.xml</li>
+                    <li>✅ <strong>Solution :</strong> Testez sur un appareil physique (pas l'émulateur pour certaines fonctionnalités)</li>
+                    <li>✅ <strong>Solution :</strong> Vérifiez que Cloud Messaging est activé dans la console Firebase</li>
+                </ul>
+            </div>
+
+            <!-- PERMISSIONS ANDROID -->
+            <div class="step">
+                <h2><span class="step-number">8</span>Permissions Android (Vérification)</h2>
+
+                <h3>Vérifier AndroidManifest.xml</h3>
+                <p>Ouvrez <code>android/app/src/main/AndroidManifest.xml</code> et assurez-vous que ces permissions sont présentes :</p>
+
+                <pre><code>&lt;manifest xmlns:android="http://schemas.android.com/apk/res/android"&gt;
+
+    &lt;!-- Permissions pour les notifications --&gt;
+    &lt;uses-permission android:name="android.permission.INTERNET" /&gt;
+    &lt;uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" /&gt;
+    &lt;uses-permission android:name="android.permission.VIBRATE" /&gt;
+    &lt;uses-permission android:name="android.permission.WAKE_LOCK" /&gt;
+    &lt;uses-permission android:name="android.permission.POST_NOTIFICATIONS" /&gt;
+
+    &lt;application&gt;
+        &lt;!-- ... --&gt;
+    &lt;/application&gt;
+&lt;/manifest&gt;</code></pre>
+            </div>
+
+            <!-- TESTER LES NOTIFICATIONS -->
+            <div class="step">
+                <h2><span class="step-number">9</span>Tester les notifications</h2>
+
+                <h3>Test depuis la console Firebase</h3>
+                <ol>
+                    <li>Allez dans <strong>Engage</strong> → <strong>Cloud Messaging</strong></li>
+                    <li>Cliquez sur <strong>"Send your first message"</strong></li>
+                    <li>Remplissez :
+                        <ul>
+                            <li><strong>Titre :</strong> Test MEMO</li>
+                            <li><strong>Texte :</strong> Notification de test</li>
+                        </ul>
+                    </li>
+                    <li>Cliquez sur <strong>"Test on device"</strong></li>
+                    <li>Collez le token FCM de votre appareil (visible dans les logs)</li>
+                    <li>Envoyez la notification</li>
+                </ol>
+
+                <div class="screenshot-placeholder">
+                    Console Firebase - Interface d'envoi de notification test<br>
+                    Formulaire avec titre, texte et bouton "Test on device"
+                </div>
+
+                <h3>Obtenir le FCM Token</h3>
+                <p>Le token s'affiche dans les logs de l'application :</p>
+                <pre><code>I/flutter ( 7991): [NotificationService] FCM Token: dXx4MpL3T0k3n1234567890...</code></pre>
+
+                <div class="alert success">
+                    <strong>✅ Notification reçue ?</strong> Félicitations ! Firebase est entièrement configuré et fonctionnel.
+                </div>
+            </div>
+
+            <!-- INTÉGRATION LARAVEL -->
+            <div class="step">
+                <h2><span class="step-number">10</span>Bonus : Intégration avec Laravel API</h2>
+
+                <h3>Installer le package Laravel</h3>
+                <p>Dans votre projet Laravel (<code>memo_api</code>) :</p>
+
+                <div class="command-box">composer require kreait/firebase-php</div>
+
+                <h3>Télécharger la clé de service</h3>
+                <ol>
+                    <li>Dans la console Firebase, allez dans <strong>Paramètres du projet</strong> (⚙️)</li>
+                    <li>Onglet <strong>"Comptes de service"</strong></li>
+                    <li>Cliquez sur <strong>"Générer une nouvelle clé privée"</strong></li>
+                    <li>Téléchargez le fichier JSON</li>
+                    <li>Placez-le dans <code>memo_api/storage/app/firebase-credentials.json</code></li>
+                </ol>
+
+                <h3>Configuration Laravel (.env)</h3>
+                <pre><code>FIREBASE_CREDENTIALS=storage/app/firebase-credentials.json
+FIREBASE_DATABASE_URL=https://votre-projet.firebaseio.com</code></pre>
+
+                <h3>Exemple d'envoi de notification (Laravel)</h3>
+                <pre><code>&lt;?php
+use Kreait\Firebase\Factory;
+use Kreait\Firebase\Messaging\CloudMessage;
+
+class NotificationService
+{
+    public function sendNotification($fcmToken, $title, $body)
+    {
+        $factory = (new Factory)->withServiceAccount(storage_path('app/firebase-credentials.json'));
+        $messaging = $factory->createMessaging();
+
+        $message = CloudMessage::withTarget('token', $fcmToken)
+            ->withNotification([
+                'title' => $title,
+                'body' => $body,
+            ])
+            ->withData([
+                'type' => 'session_reminder',
+                'route' => '/planner'
+            ]);
+
+        $messaging->send($message);
+    }
+}</code></pre>
+            </div>
+
+            <!-- RÉCAPITULATIF -->
+            <div class="step">
+                <h2>📋 Récapitulatif de la configuration</h2>
+
+                <table>
+                    <tr>
+                        <th>Étape</th>
+                        <th>Action</th>
+                        <th>Statut</th>
+                    </tr>
+                    <tr>
+                        <td>1</td>
+                        <td>Créer projet Firebase</td>
+                        <td>☐</td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td>Ajouter application Android</td>
+                        <td>☐</td>
+                    </tr>
+                    <tr>
+                        <td>3</td>
+                        <td>Télécharger google-services.json</td>
+                        <td>☐</td>
+                    </tr>
+                    <tr>
+                        <td>4</td>
+                        <td>Modifier build.gradle</td>
+                        <td>☐</td>
+                    </tr>
+                    <tr>
+                        <td>5</td>
+                        <td>Installer FlutterFire CLI</td>
+                        <td>☐</td>
+                    </tr>
+                    <tr>
+                        <td>6</td>
+                        <td>Exécuter flutterfire configure</td>
+                        <td>☐</td>
+                    </tr>
+                    <tr>
+                        <td>7</td>
+                        <td>Activer Cloud Messaging</td>
+                        <td>☐</td>
+                    </tr>
+                    <tr>
+                        <td>8</td>
+                        <td>Vérifier les permissions</td>
+                        <td>☐</td>
+                    </tr>
+                    <tr>
+                        <td>9</td>
+                        <td>Tester les notifications</td>
+                        <td>☐</td>
+                    </tr>
+                    <tr>
+                        <td>10</td>
+                        <td>Intégration Laravel (bonus)</td>
+                        <td>☐</td>
+                    </tr>
+                </table>
+            </div>
+
+            <!-- LIENS UTILES -->
+            <div class="alert info">
+                <h3>🔗 Liens utiles</h3>
+                <ul>
+                    <li><a href="https://console.firebase.google.com/" target="_blank">Console Firebase</a></li>
+                    <li><a href="https://firebase.google.com/docs/flutter/setup" target="_blank">Documentation officielle Flutter + Firebase</a></li>
+                    <li><a href="https://firebase.google.com/docs/cloud-messaging" target="_blank">Documentation Cloud Messaging</a></li>
+                    <li><a href="https://firebase.flutter.dev/" target="_blank">FlutterFire</a></li>
+                    <li><a href="https://github.com/firebase/flutterfire/tree/master/packages/firebase_messaging" target="_blank">GitHub - Firebase Messaging</a></li>
+                </ul>
+            </div>
+
+            <div style="text-align: center; margin: 40px 0;">
+                <a href="https://console.firebase.google.com/" class="btn" target="_blank">Ouvrir Console Firebase</a>
+                <a href="#" class="btn secondary" onclick="window.print(); return false;">Imprimer ce guide</a>
+            </div>
+        </div>
+
+        <footer>
+            <p><strong>Guide de configuration Firebase</strong></p>
+            <p>Application MEMO BAC - Version 1.0</p>
+            <p>Dernière mise à jour : Décembre 2025</p>
+        </footer>
+    </div>
+</body>
+</html>

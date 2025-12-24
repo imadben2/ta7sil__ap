@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "756754492688",
+    "project_id": "tahsilapp-a2eed",
+    "storage_bucket": "tahsilapp-a2eed.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:756754492688:android:7d00acf5dbe9a5da048995",
+        "android_client_info": {
+          "package_name": "com.ta7ssil.dzlearning"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAc2pVgWharXqx3KnuQoPuSsPKspi_o1y8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

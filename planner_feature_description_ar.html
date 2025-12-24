@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>وصف ميزة المخطط الدراسي - تطبيق تحصيل</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            line-height: 1.8;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.95;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .section {
+            margin-bottom: 40px;
+        }
+
+        .section h2 {
+            color: #667eea;
+            font-size: 2em;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #667eea;
+        }
+
+        .section h3 {
+            color: #764ba2;
+            font-size: 1.5em;
+            margin-top: 25px;
+            margin-bottom: 15px;
+        }
+
+        .section p {
+            color: #333;
+            font-size: 1.1em;
+            margin-bottom: 15px;
+            text-align: justify;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .feature-card {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .feature-card .icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .feature-card h4 {
+            color: #667eea;
+            font-size: 1.3em;
+            margin-bottom: 10px;
+        }
+
+        .feature-card p {
+            color: #555;
+            font-size: 1em;
+            text-align: right;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            margin: 40px 0;
+            padding: 30px;
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            border-radius: 15px;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .stat-item .number {
+            font-size: 3em;
+            font-weight: bold;
+            color: #764ba2;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .stat-item .label {
+            font-size: 1.1em;
+            color: #555;
+        }
+
+        .algorithm-box {
+            background: #f8f9fa;
+            border-right: 5px solid #667eea;
+            padding: 25px;
+            margin: 25px 0;
+            border-radius: 10px;
+        }
+
+        .algorithm-box h4 {
+            color: #667eea;
+            font-size: 1.3em;
+            margin-bottom: 15px;
+        }
+
+        .algorithm-box ul {
+            list-style-position: inside;
+            color: #555;
+        }
+
+        .algorithm-box li {
+            margin-bottom: 10px;
+            font-size: 1.05em;
+        }
+
+        .highlight {
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border-right: 4px solid #ff6b6b;
+        }
+
+        .highlight strong {
+            color: #764ba2;
+            font-size: 1.2em;
+        }
+
+        .tech-stack {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .tech-badge {
+            background: #667eea;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-size: 1em;
+            font-weight: bold;
+        }
+
+        .footer {
+            background: #2d3748;
+            color: white;
+            text-align: center;
+            padding: 30px;
+            margin-top: 40px;
+        }
+
+        .footer p {
+            color: #cbd5e0;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.8em;
+            }
+
+            .section h2 {
+                font-size: 1.5em;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stats {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎓 المخطط الدراسي الذكي</h1>
+            <p>نظام جدولة متقدم مصمم خصيصاً لطلاب البكالوريا الجزائرية</p>
+        </div>
+
+        <div class="content">
+            <!-- ملخص تنفيذي -->
+            <div class="section">
+                <h2>📋 نظرة عامة</h2>
+                <p>
+                    المخطط الدراسي هو ميزة شاملة ومتطورة تساعد الطلاب على تنظيم وقت دراستهم بذكاء. يستخدم النظام خوارزميات متقدمة لإنشاء جداول دراسية مخصصة تأخذ في الاعتبار معامل المواد، صعوبتها، مواعيد الامتحانات، مستوى الطاقة اليومي، وأوقات الصلاة.
+                </p>
+                <p>
+                    تم تصميم هذا النظام خصيصاً للنظام التعليمي الجزائري مع دعم كامل للمحتوى العربي، المعاملات الدراسية (1-7)، وأوقات الصلاة الإسلامية.
+                </p>
+
+                <div class="stats">
+                    <div class="stat-item">
+                        <span class="number">124+</span>
+                        <span class="label">ملف برمجي</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="number">86</span>
+                        <span class="label">حالة استخدام</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="number">30+</span>
+                        <span class="label">واجهة API</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="number">15</span>
+                        <span class="label">شاشة تفاعلية</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- المميزات الرئيسية -->
+            <div class="section">
+                <h2>⭐ المميزات الرئيسية</h2>
+
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <span class="icon">🧠</span>
+                        <h4>جدولة ذكية</h4>
+                        <p>خوارزمية متقدمة تنشئ جدول دراسي مثالي يراعي الأولويات، مستوى الصعوبة، ومواعيد الامتحانات</p>
+                    </div>
+
+                    <div class="feature-card">
+                        <span class="icon">🔄</span>
+                        <h4>التعلم التكيفي</h4>
+                        <p>يتكيف الجدول تلقائياً حسب نتائج الاختبارات (أقل من 60% = تمارين إضافية + إعادة اختبار)</p>
+                    </div>
+
+                    <div class="feature-card">
+                        <span class="icon">🎮</span>
+                        <h4>نظام التحفيز</h4>
+                        <p>نقاط، إنجازات، سلاسل دراسية لتحفيز الطالب على الاستمرارية</p>
+                    </div>
+
+                    <div class="feature-card">
+                        <span class="icon">📚</span>
+                        <h4>المحتوى المنهجي</h4>
+                        <p>هيكل هرمي للمنهج (وحدة ← فصل ← درس ← موضوع) مع 4 مراحل تعلم</p>
+                    </div>
+
+                    <div class="feature-card">
+                        <span class="icon">🕌</span>
+                        <h4>أوقات الصلاة</h4>
+                        <p>حجز تلقائي لأوقات الصلوات الخمس باستخدام API Aladhan</p>
+                    </div>
+
+                    <div class="feature-card">
+                        <span class="icon">📴</span>
+                        <h4>عمل بدون إنترنت</h4>
+                        <p>يعمل كامل الوظائف بدون اتصال مع مزامنة تلقائية في الخلفية</p>
+                    </div>
+
+                    <div class="feature-card">
+                        <span class="icon">🔁</span>
+                        <h4>المراجعة المتباعدة</h4>
+                        <p>جدولة مراجعات تلقائية بفواصل زمنية علمية (1، 3، 7، 14، 30 يوم)</p>
+                    </div>
+
+                    <div class="feature-card">
+                        <span class="icon">📊</span>
+                        <h4>إحصائيات شاملة</h4>
+                        <p>لوحة تحكم كاملة مع رسومات بيانية لتتبع الأداء والتقدم</p>
+                    </div>
+
+                    <div class="feature-card">
+                        <span class="icon">⏱️</span>
+                        <h4>تقنية Pomodoro</h4>
+                        <p>مؤقت دراسة مدمج مع فترات راحة (25 دقيقة عمل + 5 دقائق راحة)</p>
+                    </div>
+
+                    <div class="feature-card">
+                        <span class="icon">🔔</span>
+                        <h4>التنبيهات الذكية</h4>
+                        <p>تذكيرات للجلسات الدراسية، الامتحانات، وأوقات الصلاة</p>
+                    </div>
+
+                    <div class="feature-card">
+                        <span class="icon">📄</span>
+                        <h4>تصدير PDF</h4>
+                        <p>طباعة الجدول الدراسي بتنسيق جميل باللغة الفرنسية</p>
+                    </div>
+
+                    <div class="feature-card">
+                        <span class="icon">⚡</span>
+                        <h4>إدارة الطاقة</h4>
+                        <p>جدولة المواد الصعبة في أوقات الطاقة العالية (صباح/ظهيرة)</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- الخوارزمية الذكية -->
+            <div class="section">
+                <h2>🤖 الخوارزمية الذكية</h2>
+
+                <h3>حساب الأولوية</h3>
+                <div class="algorithm-box">
+                    <h4>معادلة الأولوية:</h4>
+                    <p style="text-align: center; font-size: 1.3em; font-family: monospace; color: #667eea; font-weight: bold;">
+                        P = (0.38U + 0.22I + 0.18D + 0.12C + 0.10Late + BonusDue) × CatW + BonusLanguageDaily
+                    </p>
+                    <ul>
+                        <li><strong>U (الاستعجال):</strong> 1 / عدد الأيام للامتحان (38%)</li>
+                        <li><strong>I (الأهمية):</strong> درجة الأهمية المحددة من المستخدم (22%)</li>
+                        <li><strong>D (الصعوبة):</strong> مستوى الصعوبة 1-10 (18%)</li>
+                        <li><strong>C (المعامل):</strong> معامل المادة 1-7 (12%)</li>
+                        <li><strong>Late:</strong> جزاء الجلسة المتأخرة (+0.10)</li>
+                        <li><strong>BonusDue:</strong> مكافأة الجلسة المستحقة اليوم (+0.40)</li>
+                        <li><strong>CatW:</strong> وزن الفئة (رياضيات: 1.10، لغات: 0.95)</li>
+                        <li><strong>BonusLanguageDaily:</strong> ضمان جلسة لغة يومية (+0.25)</li>
+                    </ul>
+                </div>
+
+                <h3>قيود الجدولة</h3>
+                <div class="algorithm-box">
+                    <h4>القيود المطبقة:</h4>
+                    <ul>
+                        <li>✅ حد أقصى 1 مادة بمعامل 7 في اليوم</li>
+                        <li>✅ حد أقصى 2-3 مواد صعبة (رياضيات، فيزياء، علوم) في اليوم</li>
+                        <li>✅ منع 3 جلسات متتالية لنفس المادة</li>
+                        <li>✅ منع جلسات متتالية للمواد الصعبة (اختياري)</li>
+                        <li>✅ فجوة زمنية 2-4 ساعات بين جلسات نفس المادة</li>
+                        <li>✅ ضمان جلسة لغة واحدة يومياً</li>
+                        <li>✅ مطابقة مستوى الطاقة (مواد صعبة = طاقة عالية)</li>
+                        <li>✅ استراحة 60 دقيقة عند الوصول للحد الأقصى للمواد الصعبة</li>
+                    </ul>
+                </div>
+
+                <h3>حساب المدة</h3>
+                <div class="algorithm-box">
+                    <h4>معادلة المدة:</h4>
+                    <p style="text-align: center; font-size: 1.2em; font-family: monospace; color: #764ba2; font-weight: bold;">
+                        Duration = BaseDuration × DailyGoalRatio × EnergyFactor
+                    </p>
+                    <ul>
+                        <li><strong>BaseDuration:</strong> المدة الأساسية حسب المعامل (معامل 7 = 90 دقيقة، معامل 1 = 30 دقيقة)</li>
+                        <li><strong>DailyGoalRatio:</strong> نسبة الهدف اليومي (ضغط أو تمديد حسب الهدف)</li>
+                        <li><strong>EnergyFactor:</strong> عامل الطاقة (طاقة عالية للمواد الصعبة: 1.1، طاقة منخفضة: 0.75)</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- التعلم التكيفي -->
+            <div class="section">
+                <h2>🎯 نظام التعلم التكيفي (STEP 3)</h2>
+                <p>
+                    بعد إكمال اختبار موضوع، يقوم النظام بتحليل النتيجة وإضافة جلسات إضافية حسب مستوى الإتقان:
+                </p>
+
+                <div class="algorithm-box">
+                    <h4>النتيجة أقل من 60% (غير متقن):</h4>
+                    <ul>
+                        <li>➕ 2 جلسات تمارين (اليوم التالي ويومين بعد)</li>
+                        <li>➕ 1 إعادة اختبار (بعد 3 أيام)</li>
+                        <li>➕ 1 مراجعة متباعدة إضافية (اليوم التالي)</li>
+                        <li>➕ مراجعات متباعدة عادية (1، 3، 7، 14، 30 يوم)</li>
+                        <li><strong>المجموع:</strong> 9 جلسات جديدة</li>
+                    </ul>
+                </div>
+
+                <div class="algorithm-box">
+                    <h4>النتيجة 60-80% (يحتاج تعزيز):</h4>
+                    <ul>
+                        <li>➕ 1 جلسة تمارين (اليوم التالي)</li>
+                        <li>➕ 1 مراجعة متباعدة (بعد 3 أيام)</li>
+                        <li>➕ مراجعات متباعدة عادية (1، 3، 7، 14، 30 يوم)</li>
+                        <li><strong>المجموع:</strong> 7 جلسات جديدة</li>
+                    </ul>
+                </div>
+
+                <div class="algorithm-box">
+                    <h4>النتيجة 80% أو أكثر (متقن):</h4>
+                    <ul>
+                        <li>➕ مراجعات متباعدة عادية فقط (1، 3، 7، 14، 30 يوم)</li>
+                        <li><strong>المجموع:</strong> 5 مراجعات</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- نظام التحفيز -->
+            <div class="section">
+                <h2>🏆 نظام التحفيز والإنجازات</h2>
+
+                <h3>حساب النقاط</h3>
+                <div class="highlight">
+                    <strong>نقاط قاعدية:</strong> 10 نقاط لكل جلسة مكتملة<br>
+                    <strong>حد أقصى:</strong> 25 نقطة لكل جلسة
+                </div>
+
+                <div class="algorithm-box">
+                    <h4>المكافآت:</h4>
+                    <ul>
+                        <li>✨ إكمال كامل (100%): <strong>+5 نقاط</strong></li>
+                        <li>✨ بدون توقف: <strong>+5 نقاط</strong></li>
+                        <li>✨ بداية في الوقت المحدد: <strong>+3 نقاط</strong></li>
+                        <li>✨ مزاج إيجابي: <strong>+2 نقاط</strong></li>
+                    </ul>
+                </div>
+
+                <h3>فئات الإنجازات</h3>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <span class="icon">📝</span>
+                        <h4>الجلسات</h4>
+                        <p>أول خطوات (1)، طالب مجتهد (10)، أسطورة الدراسة (100)</p>
+                    </div>
+
+                    <div class="feature-card">
+                        <span class="icon">🔥</span>
+                        <h4>السلاسل</h4>
+                        <p>محارب أسبوع (7)، بطل شهر (30)، سيد ربع سنة (90)</p>
+                    </div>
+
+                    <div class="feature-card">
+                        <span class="icon">⭐</span>
+                        <h4>الجلسات المثالية</h4>
+                        <p>الكمالي (20)، لا عيوب (50)، سيد التركيز (100)</p>
+                    </div>
+
+                    <div class="feature-card">
+                        <span class="icon">📚</span>
+                        <h4>إتقان المواد</h4>
+                        <p>بطل مادة (1)، متعدد المواهب (3)، شامل (كل المواد)</p>
+                    </div>
+
+                    <div class="feature-card">
+                        <span class="icon">⏰</span>
+                        <h4>ساعات الدراسة</h4>
+                        <p>نادي 10 ساعات، نادي 50 ساعة، نادي 500 ساعة</p>
+                    </div>
+
+                    <div class="feature-card">
+                        <span class="icon">📝</span>
+                        <h4>الامتحانات</h4>
+                        <p>أول امتحان، نتيجة جيدة (≥70%)، نتيجة ممتازة (≥85%)</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- المحتوى المنهجي -->
+            <div class="section">
+                <h2>📖 المحتوى المنهجي الهرمي</h2>
+                <p>
+                    يدعم النظام هيكل منهجي هرمي كامل يشمل:
+                </p>
+
+                <div class="algorithm-box">
+                    <h4>الهيكل الهرمي:</h4>
+                    <ul>
+                        <li><strong>الوحدة (Unit):</strong> مثل "الجبر"</li>
+                        <li style="margin-right: 20px;"><strong>الفصل (Chapter):</strong> مثل "المعادلات"</li>
+                        <li style="margin-right: 40px;"><strong>الدرس (Lesson):</strong> مثل "المعادلات الخطية"</li>
+                        <li style="margin-right: 60px;"><strong>الموضوع (Topic):</strong> مثل "حل ax + b = 0"</li>
+                    </ul>
+                </div>
+
+                <h3>مراحل التعلم الأربعة</h3>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <span class="icon">1️⃣</span>
+                        <h4>الفهم</h4>
+                        <p>استيعاب المفاهيم الأولية (فيديو، قراءة)</p>
+                    </div>
+
+                    <div class="feature-card">
+                        <span class="icon">2️⃣</span>
+                        <h4>المراجعة</h4>
+                        <p>تعزيز المفاهيم (ملخصات، ملاحظات)</p>
+                    </div>
+
+                    <div class="feature-card">
+                        <span class="icon">3️⃣</span>
+                        <h4>الممارسة النظرية</h4>
+                        <p>تمارين نظرية على المفاهيم</p>
+                    </div>
+
+                    <div class="feature-card">
+                        <span class="icon">4️⃣</span>
+                        <h4>الممارسة التطبيقية</h4>
+                        <p>مسائل تطبيقية وتمارين عملية</p>
+                    </div>
+                </div>
+
+                <div class="highlight">
+                    <strong>🎯 محتوى البكالوريا المميز:</strong> يتم وضع علامة على المواضيع المهمة للبكالوريا مع أولوية أعلى في الجدولة وزيادة تكرار المراجعة.
+                </div>
+            </div>
+
+            <!-- العمل بدون إنترنت -->
+            <div class="section">
+                <h2>📴 العمل بدون إنترنت</h2>
+                <p>
+                    النظام مصمم للعمل الكامل بدون اتصال إنترنت مع مزامنة تلقائية في الخلفية:
+                </p>
+
+                <div class="algorithm-box">
+                    <h4>استراتيجية المزامنة:</h4>
+                    <ul>
+                        <li>📥 <strong>القراءة:</strong> التحقق من الذاكرة المحلية أولاً (استجابة فورية)</li>
+                        <li>📤 <strong>الكتابة:</strong> الحفظ محلياً فوراً + إضافة إلى قائمة المزامنة</li>
+                        <li>🔄 <strong>المزامنة في الخلفية:</strong> كل 5 دقائق عند توفر الإنترنت</li>
+                        <li>♻️ <strong>إعادة المحاولة:</strong> حد أقصى 3 محاولات بفاصل أسي</li>
+                        <li>⚠️ <strong>حل التعارض:</strong> الخادم يربح (آخر كتابة تفوز)</li>
+                    </ul>
+                </div>
+
+                <h3>مؤشرات حالة المزامنة</h3>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <span class="icon">🟢</span>
+                        <h4>متزامن بالكامل</h4>
+                        <p>جميع البيانات محدثة مع الخادم</p>
+                    </div>
+
+                    <div class="feature-card">
+                        <span class="icon">🟡</span>
+                        <h4>جارٍ المزامنة</h4>
+                        <p>عملية المزامنة قيد التنفيذ</p>
+                    </div>
+
+                    <div class="feature-card">
+                        <span class="icon">🟠</span>
+                        <h4>بانتظار المزامنة</h4>
+                        <p>تغييرات محلية تنتظر الاتصال</p>
+                    </div>
+
+                    <div class="feature-card">
+                        <span class="icon">🔴</span>
+                        <h4>فشلت المزامنة</h4>
+                        <p>يحتاج اهتمام يدوي</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- المعمارية التقنية -->
+            <div class="section">
+                <h2>🏗️ المعمارية التقنية</h2>
+
+                <h3>Clean Architecture</h3>
+                <div class="algorithm-box">
+                    <h4>الطبقات الثلاث:</h4>
+                    <ul>
+                        <li><strong>طبقة المجال (Domain):</strong> منطق الأعمال النقي (8 كيانات، 86 حالة استخدام)</li>
+                        <li><strong>طبقة البيانات (Data):</strong> مصادر البيانات، المستودعات، الخدمات</li>
+                        <li><strong>طبقة العرض (Presentation):</strong> BLoC، الشاشات، الواجهات (15 شاشة، 30+ عنصر واجهة)</li>
+                    </ul>
+                </div>
+
+                <h3>التقنيات المستخدمة</h3>
+                <div class="tech-stack">
+                    <span class="tech-badge">Flutter</span>
+                    <span class="tech-badge">Dart</span>
+                    <span class="tech-badge">BLoC Pattern</span>
+                    <span class="tech-badge">Hive (NoSQL)</span>
+                    <span class="tech-badge">Dio (HTTP)</span>
+                    <span class="tech-badge">Laravel</span>
+                    <span class="tech-badge">MySQL</span>
+                    <span class="tech-badge">PHP</span>
+                    <span class="tech-badge">RESTful API</span>
+                    <span class="tech-badge">Aladhan API</span>
+                </div>
+
+                <div class="highlight">
+                    <strong>📊 حجم الميزة:</strong><br>
+                    • 124+ ملف برمجي<br>
+                    • 86 حالة استخدام<br>
+                    • 15 شاشة تفاعلية<br>
+                    • 30+ واجهة API<br>
+                    • ~15,000 سطر برمجي
+                </div>
+            </div>
+
+            <!-- واجهات API -->
+            <div class="section">
+                <h2>🔌 واجهات API الرئيسية</h2>
+
+                <div class="algorithm-box">
+                    <h4>إدارة الجدول:</h4>
+                    <ul>
+                        <li><code>POST /api/v1/planner/schedules/generate</code> - إنشاء جدول دراسي</li>
+                        <li><code>GET /api/v1/planner/schedules/{id}</code> - الحصول على الجدول</li>
+                        <li><code>POST /api/v1/planner/schedules/{id}/activate</code> - تفعيل الجدول</li>
+                        <li><code>DELETE /api/v1/planner/schedules/{id}</code> - حذف الجدول</li>
+                    </ul>
+                </div>
+
+                <div class="algorithm-box">
+                    <h4>إدارة الجلسات:</h4>
+                    <ul>
+                        <li><code>GET /api/v1/planner/sessions/today</code> - جلسات اليوم</li>
+                        <li><code>POST /api/v1/planner/sessions/{id}/start</code> - بدء الجلسة</li>
+                        <li><code>POST /api/v1/planner/sessions/{id}/complete</code> - إكمال الجلسة</li>
+                        <li><code>POST /api/v1/planner/sessions/{id}/skip</code> - تخطي الجلسة</li>
+                    </ul>
+                </div>
+
+                <div class="algorithm-box">
+                    <h4>الإحصائيات والتحفيز:</h4>
+                    <ul>
+                        <li><code>GET /api/v1/planner/dashboard</code> - لوحة التحكم</li>
+                        <li><code>GET /api/v1/planner/points/history</code> - سجل النقاط</li>
+                        <li><code>GET /api/v1/planner/achievements</code> - الإنجازات</li>
+                        <li><code>GET /api/v1/sessions/statistics</code> - إحصائيات مفصلة</li>
+                    </ul>
+                </div>
+
+                <div class="algorithm-box">
+                    <h4>المحتوى المنهجي:</h4>
+                    <ul>
+                        <li><code>GET /api/curriculum</code> - الهيكل الكامل</li>
+                        <li><code>GET /api/curriculum/subject/{id}</code> - منهج مادة</li>
+                        <li><code>POST /api/curriculum/content/{id}/progress</code> - تحديث التقدم</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- الشاشات -->
+            <div class="section">
+                <h2>📱 الشاشات التفاعلية</h2>
+
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <span class="icon">🏠</span>
+                        <h4>الشاشة الرئيسية</h4>
+                        <p>نظرة عامة على الجدول مع 3 تبويبات (اليوم، الأسبوع، الجدول الكامل)</p>
+                    </div>
+
+                    <div class="feature-card">
+                        <span class="icon">📅</span>
+                        <h4>عرض اليوم</h4>
+                        <p>خط زمني لجلسات اليوم مع بطاقات تفاعلية</p>
+                    </div>
+
+                    <div class="feature-card">
+                        <span class="icon">📆</span>
+                        <h4>عرض الأسبوع</h4>
+                        <p>شبكة تقويمية لجلسات الأسبوع</p>
+                    </div>
+
+                    <div class="feature-card">
+                        <span class="icon">▶️</span>
+                        <h4>شاشة الجلسة النشطة</h4>
+                        <p>مؤقت Pomodoro مع عرض المحتوى</p>
+                    </div>
+
+                    <div class="feature-card">
+                        <span class="icon">📊</span>
+                        <h4>لوحة الإحصائيات</h4>
+                        <p>رسوم بيانية شاملة للأداء</p>
+                    </div>
+
+                    <div class="feature-card">
+                        <span class="icon">🏆</span>
+                        <h4>شاشة الإنجازات</h4>
+                        <p>عرض جميع الإنجازات المفتوحة والمقفلة</p>
+                    </div>
+
+                    <div class="feature-card">
+                        <span class="icon">📝</span>
+                        <h4>سجل الجلسات</h4>
+                        <p>تاريخ كامل للجلسات مع فلاتر</p>
+                    </div>
+
+                    <div class="feature-card">
+                        <span class="icon">⚙️</span>
+                        <h4>إعدادات المخطط</h4>
+                        <p>تخصيص كامل للخوارزمية والأوقات</p>
+                    </div>
+
+                    <div class="feature-card">
+                        <span class="icon">📖</span>
+                        <h4>تفاصيل الجلسة</h4>
+                        <p>معلومات مفصلة عن الجلسة والمحتوى</p>
+                    </div>
+
+                    <div class="feature-card">
+                        <span class="icon">🧙</span>
+                        <h4>معالج الجدول</h4>
+                        <p>خطوات إنشاء جدول بسيطة</p>
+                    </div>
+
+                    <div class="feature-card">
+                        <span class="icon">📝</span>
+                        <h4>إدارة الامتحانات</h4>
+                        <p>تقويم الامتحانات وتسجيل النتائج</p>
+                    </div>
+
+                    <div class="feature-card">
+                        <span class="icon">🔄</span>
+                        <h4>إعدادات المزامنة</h4>
+                        <p>التحكم في المزامنة التلقائية</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- الخلاصة -->
+            <div class="section">
+                <h2>✅ الخلاصة</h2>
+                <p>
+                    المخطط الدراسي هو نظام متكامل وجاهز للإنتاج يجمع بين:
+                </p>
+
+                <div class="highlight">
+                    <strong>✨ المميزات الرئيسية:</strong><br><br>
+                    ✅ خوارزمية جدولة ذكية بقيود متعددة<br>
+                    ✅ تعلم تكيفي حسب نتائج الاختبارات<br>
+                    ✅ نظام تحفيز شامل (نقاط، إنجازات، سلاسل)<br>
+                    ✅ محتوى منهجي هرمي بـ 4 مراحل تعلم<br>
+                    ✅ مراجعة متباعدة بفواصل علمية<br>
+                    ✅ عمل كامل بدون إنترنت<br>
+                    ✅ تكامل أوقات الصلاة للطلاب المسلمين<br>
+                    ✅ معمارية نظيفة (Clean Architecture)<br>
+                    ✅ 30+ واجهة API<br>
+                    ✅ 15 شاشة تفاعلية<br>
+                    ✅ وثائق شاملة ومحدثة<br><br>
+                    <strong>🎯 مصمم خصيصاً للنظام التعليمي الجزائري</strong>
+                </div>
+
+                <div class="stats">
+                    <div class="stat-item">
+                        <span class="number">⭐⭐⭐⭐⭐</span>
+                        <span class="label">جودة الكود</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="number">✅</span>
+                        <span class="label">جاهز للإنتاج</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="number">🚀</span>
+                        <span class="label">أداء عالي</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="number">📱</span>
+                        <span class="label">متجاوب تماماً</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <h3>تطبيق تحصيل - المخطط الدراسي الذكي</h3>
+            <p>تاريخ التحليل: 18 ديسمبر 2025</p>
+            <p>مصمم خصيصاً لطلاب البكالوريا الجزائرية</p>
+        </div>
+    </div>
+</body>
+</html>
