@@ -7,8 +7,8 @@ class ApiConstants {
 
   // Base URL - Update this for production
   // 10.0.2.2 is the Android emulator's alias for localhost
-  //static const String baseUrl = 'https://tahssil.site/api';
-  static const String baseUrl = 'http://10.0.2.2:8084/api';
+  static const String baseUrl = 'https://tahssil.site/api';
+  //static const String baseUrl = 'http://10.0.2.2:8084/api';
 
   // Version Check Endpoint
   static const String versionCheck = '/app/version-check';
