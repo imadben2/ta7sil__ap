@@ -4,7 +4,6 @@ import '../../../core/network/network_info.dart';
 
 // Data Sources
 import '../data/datasources/courses_remote_datasource.dart';
-import '../data/datasources/courses_local_datasource.dart';
 
 // Repositories
 import '../data/repositories/courses_repository_impl.dart';
@@ -50,17 +49,11 @@ Future<void> initCoursesInjection() async {
     () => CoursesRemoteDataSourceImpl(dio: getIt<Dio>()),
   );
 
-  // Local Data Source
-  getIt.registerLazySingleton<CoursesLocalDataSource>(
-    () => CoursesLocalDataSourceImpl(),
-  );
-
   // ========== Repositories ==========
 
   getIt.registerLazySingleton<CoursesRepository>(
     () => CoursesRepositoryImpl(
       remoteDataSource: getIt<CoursesRemoteDataSource>(),
-      localDataSource: getIt<CoursesLocalDataSource>(),
       networkInfo: getIt<NetworkInfo>(),
     ),
   );
@@ -68,7 +61,6 @@ Future<void> initCoursesInjection() async {
   getIt.registerLazySingleton<SubscriptionRepository>(
     () => SubscriptionRepositoryImpl(
       remoteDataSource: getIt<CoursesRemoteDataSource>(),
-      localDataSource: getIt<CoursesLocalDataSource>(),
       networkInfo: getIt<NetworkInfo>(),
     ),
   );

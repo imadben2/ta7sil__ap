@@ -708,6 +708,63 @@
                     </div>
                 </div>
 
+                <!-- Storage Link -->
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+                    <div class="bg-gradient-to-r from-cyan-500 to-cyan-600 px-6 py-4">
+                        <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                            <i class="fas fa-link"></i>
+                            رابط التخزين (Storage Link)
+                        </h2>
+                    </div>
+
+                    <div class="p-6 space-y-4">
+                        <div class="bg-cyan-50 border border-cyan-200 rounded-xl p-4 mb-4">
+                            <div class="flex items-start gap-3">
+                                <i class="fas fa-info-circle text-cyan-600 text-xl mt-1"></i>
+                                <div>
+                                    <h4 class="font-bold text-cyan-800 mb-1">ما هو رابط التخزين؟</h4>
+                                    <p class="text-sm text-cyan-700">
+                                        رابط التخزين يربط مجلد <code class="bg-cyan-100 px-1 rounded">storage/app/public</code> بمجلد <code class="bg-cyan-100 px-1 rounded">public/storage</code>
+                                        لإتاحة الوصول للملفات (الصور، الفيديوهات، إلخ) عبر الويب.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="storage-link-status" class="p-4 rounded-xl border-2">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-3">
+                                    <div id="storage-status-icon" class="w-12 h-12 rounded-lg flex items-center justify-center">
+                                        <i class="fas fa-spinner fa-spin text-xl text-gray-400"></i>
+                                    </div>
+                                    <div>
+                                        <p id="storage-status-text" class="font-bold text-gray-900">جاري التحقق...</p>
+                                        <p id="storage-status-desc" class="text-sm text-gray-600">التحقق من حالة رابط التخزين</p>
+                                    </div>
+                                </div>
+                                <button type="button" id="storage-link-btn" onclick="createStorageLink()" disabled
+                                        class="px-4 py-2 bg-cyan-600 hover:bg-cyan-700 text-white rounded-lg font-bold transition-all disabled:opacity-50 disabled:cursor-not-allowed">
+                                    <i class="fas fa-link ml-1"></i>
+                                    إنشاء الرابط
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="bg-amber-50 border border-amber-200 rounded-xl p-4">
+                            <div class="flex items-start gap-3">
+                                <i class="fas fa-exclamation-triangle text-amber-600 text-xl mt-1"></i>
+                                <div>
+                                    <h4 class="font-bold text-amber-800 mb-1">ملاحظة للخوادم</h4>
+                                    <p class="text-sm text-amber-700">
+                                        في بعض الخوادم (مثل shared hosting)، قد لا تعمل الروابط الرمزية.
+                                        في هذه الحالة، يمكنك نسخ الملفات يدوياً أو تغيير إعدادات <code class="bg-amber-100 px-1 rounded">filesystems.php</code>.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Data & Storage -->
                 <div class="bg-white rounded-xl shadow-lg overflow-hidden">
                     <div class="bg-gradient-to-r from-teal-500 to-teal-600 px-6 py-4">
@@ -869,6 +926,103 @@ if (timezoneSelect) {
         }
     });
 }
+
+// Storage Link Functions
+function checkStorageLink() {
+    fetch('{{ route("admin.storage.check") }}')
+        .then(response => response.json())
+        .then(data => {
+            updateStorageLinkUI(data.exists, data.message);
+        })
+        .catch(error => {
+            updateStorageLinkUI(false, 'حدث خطأ أثناء التحقق');
+        });
+}
+
+function updateStorageLinkUI(exists, message) {
+    const statusDiv = document.getElementById('storage-link-status');
+    const statusIcon = document.getElementById('storage-status-icon');
+    const statusText = document.getElementById('storage-status-text');
+    const statusDesc = document.getElementById('storage-status-desc');
+    const btn = document.getElementById('storage-link-btn');
+
+    if (exists) {
+        statusDiv.classList.remove('border-red-200', 'bg-red-50', 'border-gray-200');
+        statusDiv.classList.add('border-green-200', 'bg-green-50');
+        statusIcon.innerHTML = '<i class="fas fa-check-circle text-2xl text-green-600"></i>';
+        statusIcon.classList.remove('bg-red-100', 'bg-gray-100');
+        statusIcon.classList.add('bg-green-100');
+        statusText.textContent = 'رابط التخزين نشط';
+        statusText.classList.remove('text-red-600');
+        statusText.classList.add('text-green-600');
+        statusDesc.textContent = message || 'الرابط يعمل بشكل صحيح';
+        btn.textContent = 'إعادة إنشاء';
+        btn.innerHTML = '<i class="fas fa-redo ml-1"></i> إعادة إنشاء';
+        btn.classList.remove('bg-cyan-600', 'hover:bg-cyan-700');
+        btn.classList.add('bg-gray-500', 'hover:bg-gray-600');
+    } else {
+        statusDiv.classList.remove('border-green-200', 'bg-green-50', 'border-gray-200');
+        statusDiv.classList.add('border-red-200', 'bg-red-50');
+        statusIcon.innerHTML = '<i class="fas fa-exclamation-circle text-2xl text-red-600"></i>';
+        statusIcon.classList.remove('bg-green-100', 'bg-gray-100');
+        statusIcon.classList.add('bg-red-100');
+        statusText.textContent = 'رابط التخزين غير موجود';
+        statusText.classList.remove('text-green-600');
+        statusText.classList.add('text-red-600');
+        statusDesc.textContent = message || 'الملفات لن تظهر بشكل صحيح';
+        btn.innerHTML = '<i class="fas fa-link ml-1"></i> إنشاء الرابط';
+        btn.classList.remove('bg-gray-500', 'hover:bg-gray-600');
+        btn.classList.add('bg-cyan-600', 'hover:bg-cyan-700');
+    }
+    btn.disabled = false;
+}
+
+function createStorageLink() {
+    const btn = document.getElementById('storage-link-btn');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin ml-1"></i> جاري الإنشاء...';
+
+    fetch('{{ route("admin.storage.link") }}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            updateStorageLinkUI(true, data.message);
+            showToast('success', data.message);
+        } else {
+            updateStorageLinkUI(false, data.message);
+            showToast('error', data.message);
+        }
+    })
+    .catch(error => {
+        updateStorageLinkUI(false, 'حدث خطأ أثناء إنشاء الرابط');
+        showToast('error', 'حدث خطأ أثناء إنشاء الرابط');
+    });
+}
+
+function showToast(type, message) {
+    const toast = document.createElement('div');
+    toast.className = `fixed bottom-4 left-4 px-6 py-3 rounded-xl shadow-lg z-50 flex items-center gap-3 transform transition-all duration-300 ${type === 'success' ? 'bg-green-600' : 'bg-red-600'} text-white`;
+    toast.innerHTML = `
+        <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i>
+        <span>${message}</span>
+    `;
+    document.body.appendChild(toast);
+    setTimeout(() => {
+        toast.classList.add('opacity-0', 'translate-y-2');
+        setTimeout(() => toast.remove(), 300);
+    }, 3000);
+}
+
+// Check storage link on page load
+document.addEventListener('DOMContentLoaded', function() {
+    checkStorageLink();
+});
 </script>
 @endpush
 @endsection

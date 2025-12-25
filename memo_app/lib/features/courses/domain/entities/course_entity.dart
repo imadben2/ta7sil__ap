@@ -15,6 +15,14 @@ class CourseEntity extends Equatable {
   final String? thumbnailUrl;
   final String? trailerVideoUrl;
 
+  // Short Description
+  final String? shortDescriptionAr;
+
+  // Learning Content
+  final List<String>? whatYouWillLearn;
+  final List<String>? requirements;
+  final List<String>? targetAudience;
+
   // Pricing
   final int priceDzd;
   final int? originalPriceDzd; // السعر الأصلي قبل الخصم
@@ -35,6 +43,7 @@ class CourseEntity extends Equatable {
   // Status
   final bool isPublished;
   final bool isFeatured;
+  final bool certificateAvailable;
 
   // Engagement
   final int viewCount;
@@ -66,6 +75,10 @@ class CourseEntity extends Equatable {
     this.descriptionFr,
     this.thumbnailUrl,
     this.trailerVideoUrl,
+    this.shortDescriptionAr,
+    this.whatYouWillLearn,
+    this.requirements,
+    this.targetAudience,
     required this.priceDzd,
     this.originalPriceDzd,
     this.discountPercentage,
@@ -79,6 +92,7 @@ class CourseEntity extends Equatable {
     required this.totalDurationMinutes,
     this.isPublished = true,
     this.isFeatured = false,
+    this.certificateAvailable = true,
     this.viewCount = 0,
     this.enrollmentCount = 0,
     this.averageRating = 0.0,
@@ -201,6 +215,10 @@ class CourseEntity extends Equatable {
     String? descriptionFr,
     String? thumbnailUrl,
     String? trailerVideoUrl,
+    String? shortDescriptionAr,
+    List<String>? whatYouWillLearn,
+    List<String>? requirements,
+    List<String>? targetAudience,
     int? priceDzd,
     int? originalPriceDzd,
     double? discountPercentage,
@@ -214,6 +232,7 @@ class CourseEntity extends Equatable {
     int? totalDurationMinutes,
     bool? isPublished,
     bool? isFeatured,
+    bool? certificateAvailable,
     int? viewCount,
     int? enrollmentCount,
     double? averageRating,
@@ -237,6 +256,10 @@ class CourseEntity extends Equatable {
       descriptionFr: descriptionFr ?? this.descriptionFr,
       thumbnailUrl: thumbnailUrl ?? this.thumbnailUrl,
       trailerVideoUrl: trailerVideoUrl ?? this.trailerVideoUrl,
+      shortDescriptionAr: shortDescriptionAr ?? this.shortDescriptionAr,
+      whatYouWillLearn: whatYouWillLearn ?? this.whatYouWillLearn,
+      requirements: requirements ?? this.requirements,
+      targetAudience: targetAudience ?? this.targetAudience,
       priceDzd: priceDzd ?? this.priceDzd,
       originalPriceDzd: originalPriceDzd ?? this.originalPriceDzd,
       discountPercentage: discountPercentage ?? this.discountPercentage,
@@ -250,6 +273,7 @@ class CourseEntity extends Equatable {
       totalDurationMinutes: totalDurationMinutes ?? this.totalDurationMinutes,
       isPublished: isPublished ?? this.isPublished,
       isFeatured: isFeatured ?? this.isFeatured,
+      certificateAvailable: certificateAvailable ?? this.certificateAvailable,
       viewCount: viewCount ?? this.viewCount,
       enrollmentCount: enrollmentCount ?? this.enrollmentCount,
       averageRating: averageRating ?? this.averageRating,
@@ -276,6 +300,10 @@ class CourseEntity extends Equatable {
     descriptionFr,
     thumbnailUrl,
     trailerVideoUrl,
+    shortDescriptionAr,
+    whatYouWillLearn,
+    requirements,
+    targetAudience,
     priceDzd,
     originalPriceDzd,
     discountPercentage,
@@ -289,6 +317,7 @@ class CourseEntity extends Equatable {
     totalDurationMinutes,
     isPublished,
     isFeatured,
+    certificateAvailable,
     viewCount,
     enrollmentCount,
     averageRating,

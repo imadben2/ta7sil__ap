@@ -229,17 +229,25 @@ class PlannerLocalDataSourceImpl implements PlannerLocalDataSource {
   // Planner Settings
   @override
   Future<void> cacheSettings(PlannerSettings settings) async {
+    debugPrint('[LocalDataSource] cacheSettings: userId=${settings.userId}');
     await _settingsBox.put(settings.userId, settings);
+    await _settingsBox.flush(); // Ensure persistence
+    debugPrint('[LocalDataSource] cacheSettings: flushed to disk');
   }
 
   @override
   Future<PlannerSettings?> getCachedSettings(String userId) async {
-    return _settingsBox.get(userId) as PlannerSettings?;
+    final settings = _settingsBox.get(userId) as PlannerSettings?;
+    debugPrint('[LocalDataSource] getCachedSettings: userId=$userId, found=${settings != null}');
+    return settings;
   }
 
   @override
   Future<void> updateSettings(PlannerSettings settings) async {
+    debugPrint('[LocalDataSource] updateSettings: userId=${settings.userId}');
     await _settingsBox.put(settings.userId, settings);
+    await _settingsBox.flush(); // Ensure persistence
+    debugPrint('[LocalDataSource] updateSettings: flushed to disk');
   }
 
   // Prayer Times

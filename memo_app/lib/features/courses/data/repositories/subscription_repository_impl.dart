@@ -7,17 +7,14 @@ import '../../domain/entities/subscription_package_entity.dart';
 import '../../domain/entities/user_subscription_entity.dart';
 import '../../domain/repositories/subscription_repository.dart';
 import '../../domain/usecases/validate_subscription_code_usecase.dart';
-import '../datasources/courses_local_datasource.dart';
 import '../datasources/courses_remote_datasource.dart';
 
 class SubscriptionRepositoryImpl implements SubscriptionRepository {
   final CoursesRemoteDataSource remoteDataSource;
-  final CoursesLocalDataSource localDataSource;
   final NetworkInfo networkInfo;
 
   SubscriptionRepositoryImpl({
     required this.remoteDataSource,
-    required this.localDataSource,
     required this.networkInfo,
   });
 
@@ -94,33 +91,18 @@ class SubscriptionRepositoryImpl implements SubscriptionRepository {
   Future<Either<Failure, List<SubscriptionPackageEntity>>> getPackages({
     bool? activeOnly,
   }) async {
-    // Check network first - always try to get fresh data
-    if (await networkInfo.isConnected) {
-      try {
-        final packages = await remoteDataSource.getPackages(
-          activeOnly: activeOnly,
-        );
-        if (packages.isNotEmpty) {
-          await localDataSource.cachePackages(packages);
-        }
-        return Right(packages.map((p) => p.toEntity()).toList());
-      } on Exception catch (e) {
-        // If remote fails, try cache as fallback
-        final cachedPackages = await localDataSource.getCachedPackages();
-        if (cachedPackages != null && cachedPackages.isNotEmpty) {
-          return Right(cachedPackages.map((p) => p.toEntity()).toList());
-        }
-        return Left(_handleException(e));
-      }
+    if (!await networkInfo.isConnected) {
+      return const Left(NetworkFailure('لا يوجد اتصال بالإنترنت'));
     }
 
-    // No network - try cache
-    final cachedPackages = await localDataSource.getCachedPackages();
-    if (cachedPackages != null && cachedPackages.isNotEmpty) {
-      return Right(cachedPackages.map((p) => p.toEntity()).toList());
+    try {
+      final packages = await remoteDataSource.getPackages(
+        activeOnly: activeOnly,
+      );
+      return Right(packages.map((p) => p.toEntity()).toList());
+    } on Exception catch (e) {
+      return Left(_handleException(e));
     }
-
-    return const Left(NetworkFailure('لا يوجد اتصال بالإنترنت'));
   }
 
   @override
@@ -209,12 +191,8 @@ class SubscriptionRepositoryImpl implements SubscriptionRepository {
 
   @override
   Future<Either<Failure, void>> clearCache() async {
-    try {
-      await localDataSource.clearCache();
-      return const Right(null);
-    } on Exception catch (e) {
-      return Left(CacheFailure(e.toString()));
-    }
+    // No cache to clear - using direct API
+    return const Right(null);
   }
 
   // ========== Helper Methods ==========

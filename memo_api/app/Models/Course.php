@@ -18,6 +18,9 @@ class Course extends Model
         'slug',
         'description_ar',
         'short_description_ar',
+        'what_you_will_learn',
+        'requirements',
+        'target_audience',
         'thumbnail_url',
         'trailer_video_url',
         'trailer_video_type',
@@ -38,6 +41,7 @@ class Course extends Model
         'is_published',
         'published_at',
         'is_featured',
+        'certificate_available',
         'view_count',
         'enrollment_count',
         'average_rating',
@@ -52,6 +56,9 @@ class Course extends Model
 
     protected $casts = [
         'tags' => 'array',
+        'what_you_will_learn' => 'array',
+        'requirements' => 'array',
+        'target_audience' => 'array',
         'price_dzd' => 'integer',
         'is_free' => 'boolean',
         'requires_subscription' => 'boolean',
@@ -62,12 +69,32 @@ class Course extends Model
         'is_published' => 'boolean',
         'published_at' => 'datetime',
         'is_featured' => 'boolean',
+        'certificate_available' => 'boolean',
         'view_count' => 'integer',
         'enrollment_count' => 'integer',
         'average_rating' => 'decimal:2',
         'total_reviews' => 'integer',
         'deleted_at' => 'datetime',
     ];
+
+    protected $appends = ['thumbnail_full_url'];
+
+    /**
+     * Get full URL for thumbnail
+     */
+    public function getThumbnailFullUrlAttribute(): ?string
+    {
+        if (!$this->thumbnail_url) {
+            return null;
+        }
+
+        // If already a full URL, return as-is
+        if (str_starts_with($this->thumbnail_url, 'http://') || str_starts_with($this->thumbnail_url, 'https://')) {
+            return $this->thumbnail_url;
+        }
+
+        return asset('storage/' . $this->thumbnail_url);
+    }
 
     // Relationships
     public function subject(): BelongsTo

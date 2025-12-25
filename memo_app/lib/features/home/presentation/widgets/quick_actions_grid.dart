@@ -243,27 +243,33 @@ class _QuickActionButtonState extends State<_QuickActionButton>
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      widget.action.label,
-                      style: const TextStyle(
-                        fontFamily: 'Cairo',
-                        fontSize: 13,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF1E293B),
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    if (widget.action.subtitle != null)
-                      Text(
-                        widget.action.subtitle!,
-                        style: TextStyle(
+                    FittedBox(
+                      fit: BoxFit.scaleDown,
+                      alignment: AlignmentDirectional.centerStart,
+                      child: Text(
+                        widget.action.label,
+                        style: const TextStyle(
                           fontFamily: 'Cairo',
-                          fontSize: 11,
-                          color: Colors.grey[500],
+                          fontSize: 13,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF1E293B),
                         ),
                         maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    if (widget.action.subtitle != null)
+                      FittedBox(
+                        fit: BoxFit.scaleDown,
+                        alignment: AlignmentDirectional.centerStart,
+                        child: Text(
+                          widget.action.subtitle!,
+                          style: TextStyle(
+                            fontFamily: 'Cairo',
+                            fontSize: 11,
+                            color: Colors.grey[500],
+                          ),
+                          maxLines: 1,
+                        ),
                       ),
                   ],
                 ),

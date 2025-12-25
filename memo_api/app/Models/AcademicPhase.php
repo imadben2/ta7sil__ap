@@ -14,6 +14,11 @@ class AcademicPhase extends Model
         'name_ar',
         'slug',
         'order',
+        'is_active',
+    ];
+
+    protected $casts = [
+        'is_active' => 'boolean',
     ];
 
     /**

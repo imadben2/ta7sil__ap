@@ -116,6 +116,22 @@
 
                         <div>
                             <label class="block text-sm font-bold text-gray-700 mb-2 flex items-center gap-2">
+                                <i class="fas fa-file-alt text-blue-500 text-xs"></i>
+                                وصف مختصر *
+                            </label>
+                            <textarea name="short_description_ar" rows="2" required maxlength="200"
+                                      class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all @error('short_description_ar') border-red-500 @enderror">{{ old('short_description_ar', $course->short_description_ar) }}</textarea>
+                            <p class="text-xs text-gray-500 mt-1">الحد الأقصى 200 حرف</p>
+                            @error('short_description_ar')
+                                <p class="text-red-500 text-sm mt-1 flex items-center gap-1">
+                                    <i class="fas fa-exclamation-circle"></i>
+                                    {{ $message }}
+                                </p>
+                            @enderror
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-2 flex items-center gap-2">
                                 <i class="fas fa-align-right text-blue-500 text-xs"></i>
                                 الوصف الكامل *
                             </label>
@@ -148,58 +164,98 @@
 
                             <div>
                                 <label class="block text-sm font-bold text-gray-700 mb-2 flex items-center gap-2">
+                                    <i class="fas fa-signal text-blue-500 text-xs"></i>
+                                    المستوى *
+                                </label>
+                                <select name="level" required
+                                        class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all @error('level') border-red-500 @enderror">
+                                    <option value="beginner" {{ old('level', $course->level) == 'beginner' ? 'selected' : '' }}>مبتدئ</option>
+                                    <option value="intermediate" {{ old('level', $course->level) == 'intermediate' ? 'selected' : '' }}>متوسط</option>
+                                    <option value="advanced" {{ old('level', $course->level) == 'advanced' ? 'selected' : '' }}>متقدم</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-bold text-gray-700 mb-2 flex items-center gap-2">
                                     <i class="fas fa-calendar-days text-blue-500 text-xs"></i>
                                     المدة (بالأيام) *
                                 </label>
                                 <input type="number" name="duration_days" value="{{ old('duration_days', $course->duration_days ?? 30) }}" min="1" required
                                        class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all">
                             </div>
+
+                            <div>
+                                <label class="block text-sm font-bold text-gray-700 mb-2 flex items-center gap-2">
+                                    <i class="fas fa-chalkboard-teacher text-blue-500 text-xs"></i>
+                                    اسم المدرس *
+                                </label>
+                                <input type="text" name="instructor_name" value="{{ old('instructor_name', $course->instructor_name) }}" required
+                                       class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all @error('instructor_name') border-red-500 @enderror">
+                                @error('instructor_name')
+                                    <p class="text-red-500 text-sm mt-1 flex items-center gap-1">
+                                        <i class="fas fa-exclamation-circle"></i>
+                                        {{ $message }}
+                                    </p>
+                                @enderror
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Course Content -->
-                <div class="bg-white rounded-xl shadow-lg p-6 border-r-4 border-green-500 hover:shadow-xl transition-shadow">
+                <!-- Course Content Section -->
+                <div class="bg-white rounded-xl shadow-lg p-6 border-r-4 border-purple-500 hover:shadow-xl transition-shadow">
                     <div class="flex items-center gap-3 mb-6">
-                        <div class="w-10 h-10 bg-gradient-to-br from-green-500 to-green-600 rounded-lg flex items-center justify-center text-white">
-                            <i class="fas fa-list-check"></i>
+                        <div class="w-10 h-10 bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg flex items-center justify-center text-white">
+                            <i class="fas fa-graduation-cap"></i>
                         </div>
-                        <h3 class="text-xl font-bold text-gray-900">محتوى الدورة</h3>
+                        <h3 class="text-xl font-bold text-gray-900">محتوى الدورة التعليمي</h3>
                     </div>
 
                     <div class="space-y-5">
-                        <div class="bg-green-50 border-2 border-green-200 rounded-xl p-4">
+                        <div>
                             <label class="block text-sm font-bold text-gray-700 mb-2 flex items-center gap-2">
-                                <i class="fas fa-lightbulb text-green-500"></i>
-                                ما ستتعلمه في هذه الدورة
+                                <i class="fas fa-lightbulb text-yellow-500 text-xs"></i>
+                                ما ستتعلمه (سطر واحد لكل نقطة)
                             </label>
                             <textarea name="what_you_will_learn" rows="5" placeholder="أدخل كل نقطة في سطر منفصل"
-                                      class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all">{{ old('what_you_will_learn', $course->what_you_will_learn) }}</textarea>
-                            <p class="text-xs text-gray-500 mt-2 flex items-center gap-1">
-                                <i class="fas fa-info-circle"></i>
-                                مثال: فهم المفاهيم الأساسية، إتقان التطبيقات العملية
-                            </p>
+                                      class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all">{{ old('what_you_will_learn', is_array($course->what_you_will_learn) ? implode("\n", $course->what_you_will_learn) : '') }}</textarea>
+                            <p class="text-xs text-gray-500 mt-1">مثال: فهم المفاهيم الأساسية بشكل عميق ومفصّل</p>
                         </div>
 
-                        <div class="bg-blue-50 border-2 border-blue-200 rounded-xl p-4">
+                        <div>
                             <label class="block text-sm font-bold text-gray-700 mb-2 flex items-center gap-2">
-                                <i class="fas fa-clipboard-list text-blue-500"></i>
-                                المتطلبات الأساسية
+                                <i class="fas fa-clipboard-check text-orange-500 text-xs"></i>
+                                المتطلبات الأساسية (سطر واحد لكل نقطة)
                             </label>
                             <textarea name="requirements" rows="4" placeholder="أدخل كل نقطة في سطر منفصل"
-                                      class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all">{{ old('requirements', $course->requirements) }}</textarea>
+                                      class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all">{{ old('requirements', is_array($course->requirements) ? implode("\n", $course->requirements) : '') }}</textarea>
+                            <p class="text-xs text-gray-500 mt-1">مثال: معرفة أساسية بالمادة</p>
                         </div>
 
-                        <div class="bg-purple-50 border-2 border-purple-200 rounded-xl p-4">
+                        <div>
                             <label class="block text-sm font-bold text-gray-700 mb-2 flex items-center gap-2">
-                                <i class="fas fa-user-graduate text-purple-500"></i>
-                                لمن هذه الدورة
+                                <i class="fas fa-users text-blue-500 text-xs"></i>
+                                لمن هذه الدورة (سطر واحد لكل نقطة)
                             </label>
                             <textarea name="target_audience" rows="4" placeholder="أدخل كل نقطة في سطر منفصل"
-                                      class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all">{{ old('target_audience', $course->target_audience) }}</textarea>
+                                      class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all">{{ old('target_audience', is_array($course->target_audience) ? implode("\n", $course->target_audience) : '') }}</textarea>
+                            <p class="text-xs text-gray-500 mt-1">مثال: طلاب السنة الثالثة ثانوي</p>
+                        </div>
+
+                        <div class="flex items-center bg-green-50 border-2 border-green-200 rounded-xl p-4">
+                            <input type="checkbox" name="certificate_available" id="certificate_available" value="1"
+                                   {{ old('certificate_available', $course->certificate_available ?? true) ? 'checked' : '' }}
+                                   class="w-5 h-5 text-green-600 border-gray-300 rounded focus:ring-green-500">
+                            <label for="certificate_available" class="mr-3 text-sm font-bold text-gray-700 flex items-center gap-2">
+                                <i class="fas fa-certificate text-green-500"></i>
+                                شهادة إتمام متاحة
+                            </label>
                         </div>
                     </div>
                 </div>
+
             </div>
 
             <!-- Sidebar -->
@@ -315,22 +371,12 @@
                         </div>
 
                         <div class="flex items-center bg-yellow-50 border-2 border-yellow-200 rounded-xl p-4 hover:bg-yellow-100 transition-colors cursor-pointer">
-                            <input type="checkbox" name="featured" id="featured" value="1"
-                                   {{ old('featured', $course->featured) ? 'checked' : '' }}
+                            <input type="checkbox" name="is_featured" id="is_featured" value="1"
+                                   {{ old('is_featured', $course->is_featured) ? 'checked' : '' }}
                                    class="w-5 h-5 text-yellow-600 border-gray-300 rounded focus:ring-yellow-500">
-                            <label for="featured" class="mr-3 text-sm font-bold text-gray-700 flex items-center gap-2 cursor-pointer">
+                            <label for="is_featured" class="mr-3 text-sm font-bold text-gray-700 flex items-center gap-2 cursor-pointer">
                                 <i class="fas fa-star text-yellow-500"></i>
                                 دورة مميزة
-                            </label>
-                        </div>
-
-                        <div class="flex items-center bg-blue-50 border-2 border-blue-200 rounded-xl p-4 hover:bg-blue-100 transition-colors cursor-pointer">
-                            <input type="checkbox" name="certificate_available" id="certificate_available" value="1"
-                                   {{ old('certificate_available', $course->certificate_available ?? 1) ? 'checked' : '' }}
-                                   class="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
-                            <label for="certificate_available" class="mr-3 text-sm font-bold text-gray-700 flex items-center gap-2 cursor-pointer">
-                                <i class="fas fa-certificate text-blue-500"></i>
-                                توفير شهادة إتمام
                             </label>
                         </div>
                     </div>
@@ -344,7 +390,7 @@
                         </div>
                         <h3 class="text-xl font-bold text-gray-900">الوسوم</h3>
                     </div>
-                    <input type="text" name="tags" value="{{ old('tags', $course->tags) }}" placeholder="برمجة, تصميم, تطوير"
+                    <input type="text" name="tags" value="{{ old('tags', is_array($course->tags) ? implode(', ', $course->tags) : $course->tags) }}" placeholder="برمجة, تصميم, تطوير"
                            class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500">
                     <p class="text-xs text-gray-500 mt-2 flex items-center gap-1">
                         <i class="fas fa-info-circle"></i>

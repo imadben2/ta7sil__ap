@@ -62,6 +62,23 @@
                     @enderror
                     <p class="mt-1 text-xs text-gray-500">الترتيب يحدد كيفية ظهور المرحلة في القوائم (0 = أول)</p>
                 </div>
+
+                <!-- Is Active -->
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">
+                        الحالة
+                    </label>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox"
+                               name="is_active"
+                               value="1"
+                               class="sr-only peer"
+                               {{ old('is_active', true) ? 'checked' : '' }}>
+                        <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-purple-300 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-600"></div>
+                        <span class="ms-3 text-sm font-medium text-gray-700">مفعّلة</span>
+                    </label>
+                    <p class="mt-1 text-xs text-gray-500">المراحل المعطلة لن تظهر في التطبيق</p>
+                </div>
             </div>
 
             <!-- Submit Buttons -->

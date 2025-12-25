@@ -481,6 +481,14 @@ class _CourseDetailPageState extends State<CourseDetailPage>
   }
 
   Widget _buildOverviewTab() {
+    // Get learning items from API or use defaults
+    final whatYouWillLearn = _course!.whatYouWillLearn ?? [
+      'فهم المفاهيم الأساسية بشكل عميق ومفصّل',
+      'تطبيق المعرفة في حل المسائل والتمارين',
+      'الاستعداد الجيد للامتحانات بثقة',
+      'تطوير مهارات التفكير النقدي والتحليلي',
+    ];
+
     return SingleChildScrollView(
       padding: const EdgeInsets.fromLTRB(20, 20, 20, 120),
       physics: const BouncingScrollPhysics(),
@@ -502,14 +510,29 @@ class _CourseDetailPageState extends State<CourseDetailPage>
           ),
           const SizedBox(height: 24),
 
-          _buildSectionTitle('ماذا ستتعلم'),
-          const SizedBox(height: 12),
-          _buildLearningItem('فهم المفاهيم الأساسية بشكل عميق ومفصّل'),
-          _buildLearningItem('تطبيق المعرفة في حل المسائل والتمارين'),
-          _buildLearningItem('الاستعداد الجيد للامتحانات بثقة'),
-          _buildLearningItem('تطوير مهارات التفكير النقدي والتحليلي'),
+          // What you will learn section - dynamic from API
+          if (whatYouWillLearn.isNotEmpty) ...[
+            _buildSectionTitle('ماذا ستتعلم'),
+            const SizedBox(height: 12),
+            ...whatYouWillLearn.map((item) => _buildLearningItem(item)),
+            const SizedBox(height: 24),
+          ],
 
-          const SizedBox(height: 24),
+          // Requirements section - if available from API
+          if (_course!.requirements != null && _course!.requirements!.isNotEmpty) ...[
+            _buildSectionTitle('المتطلبات الأساسية'),
+            const SizedBox(height: 12),
+            ..._course!.requirements!.map((item) => _buildRequirementItem(item)),
+            const SizedBox(height: 24),
+          ],
+
+          // Target audience section - if available from API
+          if (_course!.targetAudience != null && _course!.targetAudience!.isNotEmpty) ...[
+            _buildSectionTitle('لمن هذه الدورة'),
+            const SizedBox(height: 12),
+            ..._course!.targetAudience!.map((item) => _buildTargetAudienceItem(item)),
+            const SizedBox(height: 24),
+          ],
 
           _buildSectionTitle('مميزات الدورة'),
           const SizedBox(height: 12),
@@ -520,7 +543,8 @@ class _CourseDetailPageState extends State<CourseDetailPage>
               _buildFeatureChip(Icons.play_circle_outline_rounded, '${_course!.totalLessons} فيديو'),
               _buildFeatureChip(Icons.smartphone_rounded, 'متاح على الجوال'),
               _buildFeatureChip(Icons.all_inclusive_rounded, 'وصول دائم'),
-              _buildFeatureChip(Icons.workspace_premium_rounded, 'شهادة إتمام'),
+              if (_course!.certificateAvailable)
+                _buildFeatureChip(Icons.workspace_premium_rounded, 'شهادة إتمام'),
             ],
           ),
         ],
@@ -571,6 +595,70 @@ class _CourseDetailPageState extends State<CourseDetailPage>
               borderRadius: BorderRadius.circular(6),
             ),
             child: const Icon(Icons.check_rounded, color: Color(0xFF059669), size: 12),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              text,
+              style: const TextStyle(
+                fontFamily: 'Cairo',
+                fontSize: 13,
+                color: _textSecondary,
+                height: 1.5,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildRequirementItem(String text) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            margin: const EdgeInsets.only(top: 4),
+            padding: const EdgeInsets.all(4),
+            decoration: BoxDecoration(
+              color: const Color(0xFFF59E0B).withOpacity(0.1),
+              borderRadius: BorderRadius.circular(6),
+            ),
+            child: const Icon(Icons.info_outline_rounded, color: Color(0xFFF59E0B), size: 12),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              text,
+              style: const TextStyle(
+                fontFamily: 'Cairo',
+                fontSize: 13,
+                color: _textSecondary,
+                height: 1.5,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTargetAudienceItem(String text) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            margin: const EdgeInsets.only(top: 4),
+            padding: const EdgeInsets.all(4),
+            decoration: BoxDecoration(
+              color: _primaryPurple.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(6),
+            ),
+            child: const Icon(Icons.person_outline_rounded, color: _primaryPurple, size: 12),
           ),
           const SizedBox(width: 10),
           Expanded(

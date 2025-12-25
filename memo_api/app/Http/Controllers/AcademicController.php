@@ -17,7 +17,8 @@ class AcademicController extends Controller
      */
     public function getPhases()
     {
-        $phases = AcademicPhase::with(['academicYears', 'academicStreams'])
+        $phases = AcademicPhase::where('is_active', true)
+            ->with(['academicYears', 'academicStreams'])
             ->orderBy('order')
             ->get();
 

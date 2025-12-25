@@ -67,10 +67,11 @@ class AcademicStreamController extends Controller
             'name_ar' => 'required|string|max:255',
             'description_ar' => 'nullable|string',
             'order' => 'required|integer|min:0',
-            'is_active' => 'boolean',
+            'is_active' => 'nullable|boolean',
         ]);
 
         $validated['slug'] = Str::slug($validated['name_ar']);
+        $validated['is_active'] = $request->boolean('is_active', true);
 
         AcademicStream::create($validated);
 
@@ -115,10 +116,11 @@ class AcademicStreamController extends Controller
             'name_ar' => 'required|string|max:255',
             'description_ar' => 'nullable|string',
             'order' => 'required|integer|min:0',
-            'is_active' => 'boolean',
+            'is_active' => 'nullable|boolean',
         ]);
 
         $validated['slug'] = Str::slug($validated['name_ar']);
+        $validated['is_active'] = $request->has('is_active');
 
         $academicStream->update($validated);
 

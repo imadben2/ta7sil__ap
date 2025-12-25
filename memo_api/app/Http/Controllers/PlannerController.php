@@ -698,17 +698,49 @@ class PlannerController extends Controller
     public function updateSettings(Request $request)
     {
         $validated = $request->validate([
+            // Study time window
             'study_days' => 'nullable|array',
             'study_start_time' => 'nullable|date_format:H:i',
             'study_end_time' => 'nullable|date_format:H:i',
-            'session_duration' => 'nullable|integer|min:15|max:180',
-            'short_break' => 'nullable|integer|min:5|max:30',
-            'long_break' => 'nullable|integer|min:15|max:60',
-            'pomodoros_before_long_break' => 'nullable|integer|min:2|max:8',
+            // Sleep schedule
+            'sleep_start_time' => 'nullable|date_format:H:i',
+            'sleep_end_time' => 'nullable|date_format:H:i',
+            // Exercise settings
+            'exercise_enabled' => 'nullable|boolean',
+            'exercise_days' => 'nullable|array',
+            'exercise_time' => 'nullable|date_format:H:i',
+            'exercise_duration_minutes' => 'nullable|integer|min:5|max:180',
+            // Energy levels (1-10 scale)
             'morning_energy_level' => 'nullable|integer|min:0|max:10',
             'afternoon_energy_level' => 'nullable|integer|min:0|max:10',
             'evening_energy_level' => 'nullable|integer|min:0|max:10',
             'night_energy_level' => 'nullable|integer|min:0|max:10',
+            // Pomodoro settings
+            'use_pomodoro' => 'nullable|boolean',
+            'pomodoro_duration' => 'nullable|integer|min:15|max:120',
+            'short_break' => 'nullable|integer|min:5|max:30',
+            'long_break' => 'nullable|integer|min:15|max:60',
+            'pomodoros_before_long_break' => 'nullable|integer|min:2|max:8',
+            // Prayer settings
+            'enable_prayer_times' => 'nullable|boolean',
+            'city_for_prayer' => 'nullable|string|max:100',
+            'prayer_duration_minutes' => 'nullable|integer|min:5|max:60',
+            // Auto features
+            'auto_reschedule_missed' => 'nullable|boolean',
+            'adapt_to_performance_enabled' => 'nullable|boolean',
+            // Priority weights
+            'coefficient_weight' => 'nullable|integer|min:0|max:100',
+            'exam_proximity_weight' => 'nullable|integer|min:0|max:100',
+            'difficulty_weight' => 'nullable|integer|min:0|max:100',
+            'inactivity_weight' => 'nullable|integer|min:0|max:100',
+            'performance_gap_weight' => 'nullable|integer|min:0|max:100',
+            // Limits
+            'max_study_hours_per_day' => 'nullable|integer|min:1|max:16',
+            'min_break_between_sessions' => 'nullable|integer|min:5|max:60',
+            'session_duration_minutes' => 'nullable|integer|min:15|max:180',
+            // Coefficient durations
+            'coefficient_durations' => 'nullable|array',
+            'coefficient_durations.*' => 'nullable|integer|min:15|max:180',
         ]);
 
         $user = $request->user();

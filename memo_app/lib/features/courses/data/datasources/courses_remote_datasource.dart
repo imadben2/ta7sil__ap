@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import '../models/certificate_model.dart';
 import '../models/course_lesson_model.dart';
 import '../models/course_model.dart';
@@ -128,6 +129,14 @@ class CoursesRemoteDataSourceImpl implements CoursesRemoteDataSource {
 
       final response = await dio.get('/v1/courses', queryParameters: queryParams);
 
+      // Log API response for courses list
+      debugPrint('╔══════════════════════════════════════════════════════════════');
+      debugPrint('║ 📚 GET COURSES API RESPONSE');
+      debugPrint('╠══════════════════════════════════════════════════════════════');
+      debugPrint('║ Status: ${response.statusCode}');
+      debugPrint('║ Full Response: ${response.data}');
+      debugPrint('╚══════════════════════════════════════════════════════════════');
+
       if (response.statusCode == 200) {
         final data = response.data['data'];
         List<dynamic> coursesList = [];
@@ -136,6 +145,11 @@ class CoursesRemoteDataSourceImpl implements CoursesRemoteDataSource {
           coursesList = data;
         } else if (data is Map && data.containsKey('data')) {
           coursesList = data['data'] as List;
+        }
+
+        // Log each course's thumbnail info
+        for (var course in coursesList) {
+          debugPrint('║ Course: ${course['title_ar']} | thumbnail_url: ${course['thumbnail_url']} | thumbnail_full_url: ${course['thumbnail_full_url']}');
         }
 
         return coursesList.map((json) {
@@ -159,9 +173,21 @@ class CoursesRemoteDataSourceImpl implements CoursesRemoteDataSource {
         queryParameters: {'limit': limit},
       );
 
+      // Log API response for featured courses
+      debugPrint('╔══════════════════════════════════════════════════════════════');
+      debugPrint('║ ⭐ FEATURED COURSES API RESPONSE');
+      debugPrint('╠══════════════════════════════════════════════════════════════');
+      debugPrint('║ Status: ${response.statusCode}');
+      debugPrint('║ Full Response: ${response.data}');
+      debugPrint('╚══════════════════════════════════════════════════════════════');
+
       if (response.statusCode == 200) {
         final data = response.data['data'];
         if (data is List) {
+          // Log each featured course's thumbnail info
+          for (var course in data) {
+            debugPrint('║ ⭐ Featured: ${course['title_ar']} | thumbnail_url: ${course['thumbnail_url']} | thumbnail_full_url: ${course['thumbnail_full_url']}');
+          }
           return data.map((json) {
             final courseData = Map<String, dynamic>.from(json as Map);
             _ensureRequiredFields(courseData);
@@ -182,6 +208,15 @@ class CoursesRemoteDataSourceImpl implements CoursesRemoteDataSource {
     try {
       final response = await dio.get('/v1/courses/$courseId');
 
+      // Log full API response for debugging
+      debugPrint('╔══════════════════════════════════════════════════════════════');
+      debugPrint('║ 📚 COURSE DETAILS API RESPONSE (Course ID: $courseId)');
+      debugPrint('╠══════════════════════════════════════════════════════════════');
+      debugPrint('║ Status Code: ${response.statusCode}');
+      debugPrint('║ Full Response Data:');
+      debugPrint('║ ${response.data}');
+      debugPrint('╚══════════════════════════════════════════════════════════════');
+
       if (response.statusCode == 200) {
         final data = response.data['data'];
         if (data == null) {
@@ -192,6 +227,18 @@ class CoursesRemoteDataSourceImpl implements CoursesRemoteDataSource {
         final courseData = data['course'] != null
             ? Map<String, dynamic>.from(data['course'] as Map)
             : Map<String, dynamic>.from(data as Map);
+
+        // Log parsed course data
+        debugPrint('╔══════════════════════════════════════════════════════════════');
+        debugPrint('║ 🎯 PARSED COURSE DATA:');
+        debugPrint('║ thumbnail_url: ${courseData['thumbnail_url']}');
+        debugPrint('║ thumbnail_full_url: ${courseData['thumbnail_full_url']}');
+        debugPrint('║ title_ar: ${courseData['title_ar']}');
+        debugPrint('║ price_dzd: ${courseData['price_dzd']}');
+        debugPrint('║ is_featured: ${courseData['is_featured']}');
+        debugPrint('║ modules_count: ${courseData['modules_count']}');
+        debugPrint('║ lessons_count: ${courseData['lessons_count']}');
+        debugPrint('╚══════════════════════════════════════════════════════════════');
 
         _ensureRequiredFields(courseData);
         return CourseModel.fromJson(courseData);

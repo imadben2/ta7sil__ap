@@ -47,8 +47,10 @@ class AcademicYearController extends Controller
             'name_ar' => 'required|string|max:255',
             'level_number' => 'required|integer|min:1',
             'order' => 'required|integer|min:0',
-            'is_active' => 'boolean',
+            'is_active' => 'nullable|boolean',
         ]);
+
+        $validated['is_active'] = $request->boolean('is_active', true);
 
         AcademicYear::create($validated);
 
@@ -93,8 +95,10 @@ class AcademicYearController extends Controller
             'name_ar' => 'required|string|max:255',
             'level_number' => 'required|integer|min:1',
             'order' => 'required|integer|min:0',
-            'is_active' => 'boolean',
+            'is_active' => 'nullable|boolean',
         ]);
+
+        $validated['is_active'] = $request->has('is_active');
 
         $academicYear->update($validated);
 

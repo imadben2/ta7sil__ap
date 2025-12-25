@@ -253,20 +253,12 @@ class _LoginPageState extends State<LoginPage>
                             children: [
                               SizedBox(height: AppDesignTokens.spacingXL),
 
-                              // Logo Container with modern design
+                              // Logo Container with app logo image
                               Center(
                                 child: Container(
                                   width: 120,
                                   height: 120,
                                   decoration: BoxDecoration(
-                                    gradient: LinearGradient(
-                                      begin: Alignment.topRight,
-                                      end: Alignment.bottomLeft,
-                                      colors: [
-                                        AppColors.primary,
-                                        AppColors.primaryDark,
-                                      ],
-                                    ),
                                     borderRadius: BorderRadius.circular(
                                       AppDesignTokens.borderRadiusLarge,
                                     ),
@@ -280,10 +272,16 @@ class _LoginPageState extends State<LoginPage>
                                       ),
                                     ],
                                   ),
-                                  child: const Icon(
-                                    Icons.school_rounded,
-                                    size: 60,
-                                    color: Colors.white,
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(
+                                      AppDesignTokens.borderRadiusLarge,
+                                    ),
+                                    child: Image.asset(
+                                      'assets/logo/logo.png',
+                                      width: 120,
+                                      height: 120,
+                                      fit: BoxFit.cover,
+                                    ),
                                   ),
                                 ),
                               ),

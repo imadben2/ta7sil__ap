@@ -37,9 +37,11 @@ class AcademicPhaseController extends Controller
         $validated = $request->validate([
             'name_ar' => 'required|string|max:255|unique:academic_phases,name_ar',
             'order' => 'required|integer|min:0',
+            'is_active' => 'nullable|boolean',
         ]);
 
         $validated['slug'] = Str::slug($validated['name_ar']);
+        $validated['is_active'] = $request->boolean('is_active', true);
 
         AcademicPhase::create($validated);
 
@@ -77,14 +79,30 @@ class AcademicPhaseController extends Controller
         $validated = $request->validate([
             'name_ar' => 'required|string|max:255|unique:academic_phases,name_ar,' . $academicPhase->id,
             'order' => 'required|integer|min:0',
+            'is_active' => 'nullable|boolean',
         ]);
 
         $validated['slug'] = Str::slug($validated['name_ar']);
+        $validated['is_active'] = $request->has('is_active');
 
         $academicPhase->update($validated);
 
         return redirect()->route('admin.academic-phases.index')
             ->with('success', 'تم تحديث المرحلة بنجاح');
+    }
+
+    /**
+     * Toggle the active status of the academic phase.
+     */
+    public function toggleStatus(AcademicPhase $academicPhase)
+    {
+        $academicPhase->update([
+            'is_active' => !$academicPhase->is_active,
+        ]);
+
+        $status = $academicPhase->is_active ? 'تفعيل' : 'تعطيل';
+        return redirect()->route('admin.academic-phases.index')
+            ->with('success', "تم {$status} المرحلة بنجاح");
     }
 
     /**

@@ -87,35 +87,105 @@
     <!-- Packages Grid -->
     <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
         @forelse($packages as $package)
-            <div class="bg-white rounded-xl shadow-md overflow-hidden border-2 border-gray-100">
-                <!-- Package Header -->
-                <div class="bg-gradient-to-r from-purple-500 to-pink-500 p-6 text-white">
-                    <div class="flex justify-between items-start mb-3">
-                        <div class="flex-1">
-                            <h3 class="text-2xl font-bold mb-2">{{ $package->name_ar }}</h3>
-                            <p class="text-purple-100 text-sm flex items-center gap-2">
-                                <i class="fas fa-layer-group"></i>
-                                {{ $package->courses->count() }} دورة تعليمية
-                            </p>
+            <div class="bg-white rounded-xl shadow-md overflow-hidden border-2 border-gray-100 hover:shadow-lg transition-shadow duration-300 {{ $package->is_featured ? 'ring-2 ring-yellow-400' : '' }}">
+                <!-- Package Header with Image Support -->
+                <div class="relative">
+                    @if($package->image_url)
+                        <!-- Image Header -->
+                        <div class="h-48 overflow-hidden relative">
+                            <img src="{{ asset('storage/' . $package->image_url) }}" alt="{{ $package->name_ar }}" class="w-full h-full object-cover">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent"></div>
+                            <!-- Content overlay for image -->
+                            <div class="absolute bottom-0 left-0 right-0 p-6 text-white">
+                                <div class="flex justify-between items-start mb-3">
+                                    <div class="flex-1">
+                                        <h3 class="text-2xl font-bold mb-2">{{ $package->name_ar }}</h3>
+                                        <p class="text-gray-200 text-sm flex items-center gap-2">
+                                            <i class="fas fa-layer-group"></i>
+                                            {{ $package->courses->count() }} دورة تعليمية
+                                        </p>
+                                    </div>
+                                    <div class="flex flex-col gap-2 items-end">
+                                        @if($package->is_active)
+                                            <span class="px-3 py-1.5 text-xs font-bold rounded-full bg-green-500 text-white shadow-lg flex items-center gap-1">
+                                                <i class="fas fa-check-circle"></i>
+                                                نشطة
+                                            </span>
+                                        @else
+                                            <span class="px-3 py-1.5 text-xs font-bold rounded-full bg-gray-500 text-white shadow-lg flex items-center gap-1">
+                                                <i class="fas fa-times-circle"></i>
+                                                معطلة
+                                            </span>
+                                        @endif
+                                        @if($package->sort_order > 0)
+                                            <span class="px-2 py-1 text-xs font-medium rounded bg-white/20 text-white">
+                                                <i class="fas fa-sort-numeric-up"></i> {{ $package->sort_order }}
+                                            </span>
+                                        @endif
+                                    </div>
+                                </div>
+                                <!-- Badges Row -->
+                                <div class="flex flex-wrap gap-2">
+                                    @if($package->is_featured)
+                                        <div class="inline-flex items-center gap-1 px-3 py-1 bg-yellow-400 text-yellow-900 rounded-full text-xs font-bold">
+                                            <i class="fas fa-star"></i>
+                                            باقة مميزة
+                                        </div>
+                                    @endif
+                                    @if($package->badge_text)
+                                        <div class="inline-flex items-center gap-1 px-3 py-1 bg-red-500 text-white rounded-full text-xs font-bold">
+                                            <i class="fas fa-tag"></i>
+                                            {{ $package->badge_text }}
+                                        </div>
+                                    @endif
+                                </div>
+                            </div>
                         </div>
-                        @if($package->is_active)
-                            <span class="px-3 py-1.5 text-xs font-bold rounded-full bg-green-500 text-white shadow-lg flex items-center gap-1">
-                                <i class="fas fa-check-circle"></i>
-                                نشطة
-                            </span>
-                        @else
-                            <span class="px-3 py-1.5 text-xs font-bold rounded-full bg-gray-500 text-white shadow-lg flex items-center gap-1">
-                                <i class="fas fa-times-circle"></i>
-                                معطلة
-                            </span>
-                        @endif
-                    </div>
-
-                    <!-- Featured Badge -->
-                    @if($package->is_featured)
-                        <div class="inline-flex items-center gap-1 px-3 py-1 bg-yellow-400 text-yellow-900 rounded-full text-xs font-bold">
-                            <i class="fas fa-star"></i>
-                            باقة مميزة
+                    @else
+                        <!-- Gradient Header (default) -->
+                        <div class="p-6 text-white" style="background: {{ $package->background_color ?? 'linear-gradient(to right, #8b5cf6, #ec4899)' }};">
+                            <div class="flex justify-between items-start mb-3">
+                                <div class="flex-1">
+                                    <h3 class="text-2xl font-bold mb-2">{{ $package->name_ar }}</h3>
+                                    <p class="text-purple-100 text-sm flex items-center gap-2">
+                                        <i class="fas fa-layer-group"></i>
+                                        {{ $package->courses->count() }} دورة تعليمية
+                                    </p>
+                                </div>
+                                <div class="flex flex-col gap-2 items-end">
+                                    @if($package->is_active)
+                                        <span class="px-3 py-1.5 text-xs font-bold rounded-full bg-green-500 text-white shadow-lg flex items-center gap-1">
+                                            <i class="fas fa-check-circle"></i>
+                                            نشطة
+                                        </span>
+                                    @else
+                                        <span class="px-3 py-1.5 text-xs font-bold rounded-full bg-gray-500 text-white shadow-lg flex items-center gap-1">
+                                            <i class="fas fa-times-circle"></i>
+                                            معطلة
+                                        </span>
+                                    @endif
+                                    @if($package->sort_order > 0)
+                                        <span class="px-2 py-1 text-xs font-medium rounded bg-white/20 text-white">
+                                            <i class="fas fa-sort-numeric-up"></i> {{ $package->sort_order }}
+                                        </span>
+                                    @endif
+                                </div>
+                            </div>
+                            <!-- Badges Row -->
+                            <div class="flex flex-wrap gap-2">
+                                @if($package->is_featured)
+                                    <div class="inline-flex items-center gap-1 px-3 py-1 bg-yellow-400 text-yellow-900 rounded-full text-xs font-bold">
+                                        <i class="fas fa-star"></i>
+                                        باقة مميزة
+                                    </div>
+                                @endif
+                                @if($package->badge_text)
+                                    <div class="inline-flex items-center gap-1 px-3 py-1 bg-red-500 text-white rounded-full text-xs font-bold">
+                                        <i class="fas fa-tag"></i>
+                                        {{ $package->badge_text }}
+                                    </div>
+                                @endif
+                            </div>
                         </div>
                     @endif
                 </div>

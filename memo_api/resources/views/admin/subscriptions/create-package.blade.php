@@ -51,7 +51,7 @@
         </div>
     </div>
 
-    <form action="{{ route('admin.subscriptions.packages.store') }}" method="POST">
+    <form action="{{ route('admin.subscriptions.packages.store') }}" method="POST" enctype="multipart/form-data">
         @csrf
 
         <!-- Basic Information Card -->
@@ -273,6 +273,108 @@
             </div>
         </div>
 
+        <!-- Customization Card -->
+        <div class="bg-white rounded-xl shadow-md overflow-hidden">
+            <div class="bg-gradient-to-r from-cyan-500 to-cyan-600 px-6 py-4">
+                <h3 class="text-xl font-bold text-white flex items-center gap-2">
+                    <i class="fas fa-palette"></i>
+                    التخصيص والمظهر
+                </h3>
+            </div>
+            <div class="p-6 space-y-4">
+                <p class="text-sm text-gray-600 mb-4 bg-cyan-50 p-3 rounded-lg border border-cyan-200 flex items-center gap-2">
+                    <i class="fas fa-info-circle text-cyan-600"></i>
+                    خصص مظهر الباقة في التطبيق (صورة، شارة، لون الخلفية)
+                </p>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Image Upload -->
+                    <div class="md:col-span-2">
+                        <label class="block text-sm font-bold text-gray-700 mb-2 flex items-center gap-2">
+                            <i class="fas fa-image text-cyan-600"></i>
+                            صورة الباقة (اختياري)
+                        </label>
+                        <div class="flex items-center gap-4">
+                            <div id="image-preview" class="w-32 h-32 bg-gray-100 rounded-xl border-2 border-dashed border-gray-300 flex items-center justify-center overflow-hidden">
+                                <i class="fas fa-image text-gray-400 text-3xl"></i>
+                            </div>
+                            <div class="flex-1">
+                                <input type="file" name="image" id="image" accept="image/*"
+                                       class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 @error('image') border-red-500 @enderror"
+                                       onchange="previewImage(this)">
+                                <p class="text-xs text-gray-500 mt-1">الحجم الأقصى: 2MB | الصيغ: JPG, PNG, GIF, WEBP</p>
+                                @error('image')
+                                    <p class="text-red-500 text-sm mt-1 flex items-center gap-1">
+                                        <i class="fas fa-exclamation-circle"></i>
+                                        {{ $message }}
+                                    </p>
+                                @enderror
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Badge Text -->
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-2 flex items-center gap-2">
+                            <i class="fas fa-tag text-cyan-600"></i>
+                            نص الشارة (اختياري)
+                        </label>
+                        <input type="text" name="badge_text" value="{{ old('badge_text') }}"
+                               class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 @error('badge_text') border-red-500 @enderror"
+                               placeholder="مثال: الأكثر شعبية، خصم 20%">
+                        @error('badge_text')
+                            <p class="text-red-500 text-sm mt-1 flex items-center gap-1">
+                                <i class="fas fa-exclamation-circle"></i>
+                                {{ $message }}
+                            </p>
+                        @enderror
+                    </div>
+
+                    <!-- Background Color -->
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-2 flex items-center gap-2">
+                            <i class="fas fa-fill-drip text-cyan-600"></i>
+                            لون الخلفية (اختياري)
+                        </label>
+                        <div class="flex items-center gap-3">
+                            <input type="color" name="background_color" id="background_color" value="{{ old('background_color', '#3B82F6') }}"
+                                   class="w-16 h-12 rounded-lg border-2 border-gray-300 cursor-pointer">
+                            <input type="text" id="background_color_text" value="{{ old('background_color', '#3B82F6') }}"
+                                   class="flex-1 px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500"
+                                   placeholder="#3B82F6" pattern="^#[A-Fa-f0-9]{6}$">
+                            <button type="button" onclick="clearBackgroundColor()" class="px-3 py-3 bg-gray-100 hover:bg-gray-200 rounded-lg text-gray-600">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        @error('background_color')
+                            <p class="text-red-500 text-sm mt-1 flex items-center gap-1">
+                                <i class="fas fa-exclamation-circle"></i>
+                                {{ $message }}
+                            </p>
+                        @enderror
+                    </div>
+
+                    <!-- Sort Order -->
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-2 flex items-center gap-2">
+                            <i class="fas fa-sort-numeric-up text-cyan-600"></i>
+                            ترتيب العرض
+                        </label>
+                        <input type="number" name="sort_order" value="{{ old('sort_order', 0) }}" min="0"
+                               class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 @error('sort_order') border-red-500 @enderror"
+                               placeholder="0">
+                        <p class="text-xs text-gray-500 mt-1">الرقم الأصغر يظهر أولاً</p>
+                        @error('sort_order')
+                            <p class="text-red-500 text-sm mt-1 flex items-center gap-1">
+                                <i class="fas fa-exclamation-circle"></i>
+                                {{ $message }}
+                            </p>
+                        @enderror
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Additional Features Card -->
         <div class="bg-white rounded-xl shadow-md overflow-hidden">
             <div class="bg-gradient-to-r from-pink-500 to-pink-600 px-6 py-4">
@@ -334,6 +436,39 @@
             closeOnSelect: false,
             allowClear: true
         });
+
+        // Sync color picker with text input
+        const colorPicker = document.getElementById('background_color');
+        const colorText = document.getElementById('background_color_text');
+
+        colorPicker.addEventListener('input', function() {
+            colorText.value = this.value;
+        });
+
+        colorText.addEventListener('input', function() {
+            if (/^#[A-Fa-f0-9]{6}$/.test(this.value)) {
+                colorPicker.value = this.value;
+            }
+        });
     });
+
+    // Image preview function
+    function previewImage(input) {
+        const preview = document.getElementById('image-preview');
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                preview.innerHTML = '<img src="' + e.target.result + '" class="w-full h-full object-cover">';
+            }
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+    // Clear background color
+    function clearBackgroundColor() {
+        document.getElementById('background_color').value = '#3B82F6';
+        document.getElementById('background_color_text').value = '';
+        document.querySelector('input[name="background_color"]').value = '';
+    }
 </script>
 @endpush

@@ -832,7 +832,11 @@ Route::prefix('v1')->group(function () {
         Route::prefix('dashboard')->name('dashboard.')->group(function () {
             Route::get('/', [DashboardController::class, 'getDashboard'])->name('index');
 
-            // Flutter-compatible endpoints
+            // OPTIMIZED: Unified endpoint combines 6 API calls into 1
+            // Returns: stats, today_sessions, subjects_progress, featured_courses, sponsors, promos
+            Route::get('/complete', [DashboardController::class, 'getComplete'])->name('complete');
+
+            // Flutter-compatible endpoints (kept for backward compatibility)
             Route::get('/stats', [DashboardController::class, 'getStats'])->name('stats');
             Route::get('/today-sessions', [DashboardController::class, 'getTodaySessions'])->name('todaySessions');
         });

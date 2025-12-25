@@ -332,6 +332,11 @@ class SubscriptionService
                 'price_dzd' => $data['price_dzd'],
                 'duration_days' => $data['duration_days'],
                 'is_active' => $data['is_active'] ?? true,
+                'is_featured' => $data['is_featured'] ?? false,
+                'image_url' => $data['image_url'] ?? null,
+                'badge_text' => $data['badge_text'] ?? null,
+                'background_color' => $data['background_color'] ?? null,
+                'sort_order' => $data['sort_order'] ?? 0,
             ]);
 
             // Attach courses to package
@@ -356,13 +361,32 @@ class SubscriptionService
         DB::beginTransaction();
 
         try {
-            $package->update([
+            $updateData = [
                 'name_ar' => $data['name_ar'] ?? $package->name_ar,
                 'description_ar' => $data['description_ar'] ?? $package->description_ar,
                 'price_dzd' => $data['price_dzd'] ?? $package->price_dzd,
                 'duration_days' => $data['duration_days'] ?? $package->duration_days,
                 'is_active' => $data['is_active'] ?? $package->is_active,
-            ]);
+                'is_featured' => $data['is_featured'] ?? $package->is_featured,
+                'sort_order' => $data['sort_order'] ?? $package->sort_order,
+            ];
+
+            // Handle image_url (can be null for removal)
+            if (array_key_exists('image_url', $data)) {
+                $updateData['image_url'] = $data['image_url'];
+            }
+
+            // Handle badge_text
+            if (array_key_exists('badge_text', $data)) {
+                $updateData['badge_text'] = $data['badge_text'];
+            }
+
+            // Handle background_color
+            if (array_key_exists('background_color', $data)) {
+                $updateData['background_color'] = $data['background_color'];
+            }
+
+            $package->update($updateData);
 
             // Update courses if provided
             if (isset($data['course_ids']) && is_array($data['course_ids'])) {

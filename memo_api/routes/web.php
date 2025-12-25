@@ -89,6 +89,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
 
     // Academic Structure Management
     Route::resource('academic-phases', AcademicPhaseController::class);
+    Route::post('academic-phases/{academicPhase}/toggle-status', [AcademicPhaseController::class, 'toggleStatus'])->name('academic-phases.toggle-status');
     Route::resource('academic-years', AcademicYearController::class);
     Route::resource('academic-streams', AcademicStreamController::class);
 
@@ -166,6 +167,10 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
         Route::get('/', [AdminProfileController::class, 'settings'])->name('index');
         Route::put('/update', [AdminProfileController::class, 'updateSettings'])->name('update');
     });
+
+    // Storage Link Management
+    Route::get('/storage/check', [AdminProfileController::class, 'checkStorageLink'])->name('storage.check');
+    Route::post('/storage/link', [AdminProfileController::class, 'createStorageLink'])->name('storage.link');
 
     // Quiz Management
     Route::prefix('quizzes')->name('quizzes.')->group(function () {

@@ -129,27 +129,44 @@
                 </div>
             </div>
 
-            <!-- Course Content -->
-            <div class="bg-white rounded-lg shadow-sm p-6">
-                <h3 class="text-lg font-semibold text-gray-900 mb-4">محتوى الدورة</h3>
+            <!-- Course Content Section -->
+            <div class="bg-white rounded-xl shadow-lg p-6 border-r-4 border-purple-500 hover:shadow-xl transition-shadow">
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="w-10 h-10 bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg flex items-center justify-center text-white">
+                        <i class="fas fa-graduation-cap"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900">محتوى الدورة التعليمي</h3>
+                </div>
 
-                <div class="space-y-4">
+                <div class="space-y-5">
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">ما ستتعلمه (سطر واحد لكل نقطة)</label>
+                        <label class="block text-sm font-bold text-gray-700 mb-2 flex items-center gap-2">
+                            <i class="fas fa-lightbulb text-yellow-500 text-xs"></i>
+                            ما ستتعلمه (سطر واحد لكل نقطة)
+                        </label>
                         <textarea name="what_you_will_learn" rows="5" placeholder="أدخل كل نقطة في سطر منفصل"
-                                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">{{ old('what_you_will_learn') }}</textarea>
+                                  class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all">{{ old('what_you_will_learn') }}</textarea>
+                        <p class="text-xs text-gray-500 mt-1">مثال: فهم المفاهيم الأساسية بشكل عميق ومفصّل</p>
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">المتطلبات الأساسية</label>
+                        <label class="block text-sm font-bold text-gray-700 mb-2 flex items-center gap-2">
+                            <i class="fas fa-clipboard-check text-orange-500 text-xs"></i>
+                            المتطلبات الأساسية (سطر واحد لكل نقطة)
+                        </label>
                         <textarea name="requirements" rows="4" placeholder="أدخل كل نقطة في سطر منفصل"
-                                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">{{ old('requirements') }}</textarea>
+                                  class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all">{{ old('requirements') }}</textarea>
+                        <p class="text-xs text-gray-500 mt-1">مثال: معرفة أساسية بالمادة</p>
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">لمن هذه الدورة</label>
+                        <label class="block text-sm font-bold text-gray-700 mb-2 flex items-center gap-2">
+                            <i class="fas fa-users text-blue-500 text-xs"></i>
+                            لمن هذه الدورة (سطر واحد لكل نقطة)
+                        </label>
                         <textarea name="target_audience" rows="4" placeholder="أدخل كل نقطة في سطر منفصل"
-                                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">{{ old('target_audience') }}</textarea>
+                                  class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all">{{ old('target_audience') }}</textarea>
+                        <p class="text-xs text-gray-500 mt-1">مثال: طلاب السنة الثالثة ثانوي</p>
                     </div>
                 </div>
             </div>
@@ -225,11 +242,14 @@
                         <label for="featured" class="mr-2 text-sm text-gray-700">دورة مميزة</label>
                     </div>
 
-                    <div class="flex items-center">
+                    <div class="flex items-center bg-green-50 border border-green-200 rounded-lg p-3 hover:bg-green-100 transition-colors cursor-pointer">
                         <input type="checkbox" name="certificate_available" id="certificate_available" value="1"
                                {{ old('certificate_available', 1) ? 'checked' : '' }}
-                               class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
-                        <label for="certificate_available" class="mr-2 text-sm text-gray-700">توفير شهادة إتمام</label>
+                               class="w-5 h-5 text-green-600 border-gray-300 rounded focus:ring-green-500">
+                        <label for="certificate_available" class="mr-3 text-sm font-bold text-gray-700 flex items-center gap-2 cursor-pointer">
+                            <i class="fas fa-certificate text-green-500"></i>
+                            شهادة إتمام متاحة
+                        </label>
                     </div>
                 </div>
             </div>

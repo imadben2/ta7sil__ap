@@ -8,7 +8,7 @@ class ApiConstants {
   // Base URL - Update this for production
   // 10.0.2.2 is the Android emulator's alias for localhost
   static const String baseUrl = 'https://tahssil.site/api';
-  //static const String baseUrl = 'http://10.0.2.2:8084/api';
+  // static const String baseUrl = 'http://10.0.2.2:8084/api';
 
   // Version Check Endpoint
   static const String versionCheck = '/app/version-check';
@@ -151,6 +151,9 @@ class ApiConstants {
 
   // Dashboard Endpoints
   static const String dashboard = '/v1/dashboard';
+  /// OPTIMIZED: Unified endpoint - combines 6 API calls into 1
+  /// Returns: stats, today_sessions, subjects_progress, featured_courses, sponsors, promos
+  static const String dashboardComplete = '/v1/dashboard/complete';
   static const String dashboardStats = '/v1/dashboard/stats';
   static const String dashboardTodaySchedule = '/v1/dashboard/today';
   static const String todaySessions = '/v1/dashboard/today-sessions';

@@ -1,10 +1,34 @@
+import 'package:flutter/foundation.dart';
 import '../../../../core/network/dio_client.dart';
 import '../../../../core/constants/api_constants.dart';
 import '../models/stats_model.dart';
 import '../models/study_session_model.dart';
 import '../models/subject_progress_model.dart';
 
+/// Complete dashboard data from unified endpoint
+class CompleteDashboardData {
+  final StatsModel stats;
+  final List<StudySessionModel> todaySessions;
+  final List<SubjectProgressModel> subjectsProgress;
+  final List<Map<String, dynamic>> featuredCourses;
+  final List<Map<String, dynamic>> sponsors;
+  final List<Map<String, dynamic>> promos;
+
+  CompleteDashboardData({
+    required this.stats,
+    required this.todaySessions,
+    required this.subjectsProgress,
+    required this.featuredCourses,
+    required this.sponsors,
+    required this.promos,
+  });
+}
+
 abstract class HomeRemoteDataSource {
+  /// OPTIMIZED: Fetch all dashboard data in a single API call
+  Future<CompleteDashboardData> getCompleteDashboard();
+
+  // Legacy methods (kept for backward compatibility)
   Future<StatsModel> getStats();
   Future<List<StudySessionModel>> getTodaySessions();
   Future<List<SubjectProgressModel>> getSubjectsProgress();
@@ -18,6 +42,88 @@ class HomeRemoteDataSourceImpl implements HomeRemoteDataSource {
   final DioClient client;
 
   HomeRemoteDataSourceImpl({required this.client});
+
+  /// OPTIMIZED: Fetch all dashboard data in a single API call
+  /// This replaces 6 separate API calls with 1 unified call
+  @override
+  Future<CompleteDashboardData> getCompleteDashboard() async {
+    debugPrint('🚀 HOME_DATASOURCE: Fetching COMPLETE dashboard from unified endpoint');
+
+    try {
+      final response = await client.get(ApiConstants.dashboardComplete);
+      final data = response.data['data'];
+
+      // Parse stats
+      final stats = StatsModel.fromJson(data['stats']);
+
+      // Parse today's sessions
+      final List<dynamic> sessionsData = data['today_sessions'] ?? [];
+      final todaySessions = sessionsData
+          .map((json) => StudySessionModel.fromJson(json))
+          .toList();
+
+      // Parse subjects progress
+      final List<dynamic> subjectsData = data['subjects_progress'] ?? [];
+      final subjectsProgress = subjectsData.map((json) {
+        final coefficientValue = json['coefficient'];
+        final coefficient = coefficientValue is int
+            ? coefficientValue.toDouble()
+            : coefficientValue is double
+                ? coefficientValue
+                : 1.0;
+
+        return SubjectProgressModel(
+          id: json['id'] as int,
+          name: json['name'] as String,
+          nameAr: json['name'] as String,
+          color: json['color'] as String? ?? '#4CAF50',
+          coefficient: coefficient,
+          totalLessons: json['total_lessons'] as int? ?? 0,
+          completedLessons: json['completed_lessons'] as int? ?? 0,
+          totalQuizzes: 0,
+          completedQuizzes: 0,
+          averageScore: 0.0,
+          nextExamDate: null,
+          iconEmoji: _getIconForSubject(json['icon'] as String?),
+        );
+      }).toList();
+
+      // Parse featured courses (raw data for courses bloc)
+      final List<dynamic> coursesData = data['featured_courses'] ?? [];
+      final featuredCourses = coursesData
+          .map((json) => Map<String, dynamic>.from(json as Map))
+          .toList();
+
+      // Parse sponsors
+      final List<dynamic> sponsorsData = data['sponsors'] ?? [];
+      final sponsors = sponsorsData
+          .map((json) => Map<String, dynamic>.from(json as Map))
+          .toList();
+
+      // Parse promos
+      final List<dynamic> promosData = data['promos'] ?? [];
+      final promos = promosData
+          .map((json) => Map<String, dynamic>.from(json as Map))
+          .toList();
+
+      debugPrint('✅ HOME_DATASOURCE: Complete dashboard loaded - '
+          '${todaySessions.length} sessions, '
+          '${subjectsProgress.length} subjects, '
+          '${featuredCourses.length} courses');
+
+      return CompleteDashboardData(
+        stats: stats,
+        todaySessions: todaySessions,
+        subjectsProgress: subjectsProgress,
+        featuredCourses: featuredCourses,
+        sponsors: sponsors,
+        promos: promos,
+      );
+    } catch (e) {
+      debugPrint('❌ HOME_DATASOURCE: Error fetching complete dashboard: $e');
+      rethrow;
+    }
+  }
 
   @override
   Future<StatsModel> getStats() async {

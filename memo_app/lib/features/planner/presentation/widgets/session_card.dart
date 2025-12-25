@@ -472,7 +472,10 @@ class SessionCard extends StatelessWidget {
               _showStartSessionDialog(context);
             },
             icon: const Icon(Icons.play_arrow, size: 18),
-            label: const Text('بدء', style: TextStyle(fontFamily: 'Cairo')),
+            label: const FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Text('بدء', style: TextStyle(fontFamily: 'Cairo')),
+            ),
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.emerald500,
               foregroundColor: Colors.white,
@@ -490,7 +493,10 @@ class SessionCard extends StatelessWidget {
               _showSkipDialog(context);
             },
             icon: const Icon(Icons.skip_next, size: 18),
-            label: const Text('تخطي', style: TextStyle(fontFamily: 'Cairo')),
+            label: const FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Text('تخطي', style: TextStyle(fontFamily: 'Cairo')),
+            ),
           ),
         ),
       );
@@ -508,7 +514,10 @@ class SessionCard extends StatelessWidget {
               );
             },
             icon: const Icon(Icons.pause, size: 18),
-            label: const Text('إيقاف', style: TextStyle(fontFamily: 'Cairo')),
+            label: const FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Text('إيقاف', style: TextStyle(fontFamily: 'Cairo')),
+            ),
             style: OutlinedButton.styleFrom(
               foregroundColor: Colors.orange,
               side: const BorderSide(color: Colors.orange),
@@ -529,7 +538,10 @@ class SessionCard extends StatelessWidget {
               );
             },
             icon: const Icon(Icons.check_circle, size: 18),
-            label: const Text('إتمام', style: TextStyle(fontFamily: 'Cairo')),
+            label: const FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Text('إتمام', style: TextStyle(fontFamily: 'Cairo')),
+            ),
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.blue500,
               foregroundColor: Colors.white,
@@ -550,7 +562,10 @@ class SessionCard extends StatelessWidget {
               );
             },
             icon: const Icon(Icons.play_arrow, size: 18),
-            label: const Text('استئناف', style: TextStyle(fontFamily: 'Cairo')),
+            label: const FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Text('استئناف', style: TextStyle(fontFamily: 'Cairo')),
+            ),
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.emerald500,
               foregroundColor: Colors.white,
@@ -569,7 +584,10 @@ class SessionCard extends StatelessWidget {
               _showSkipDialog(context);
             },
             icon: const Icon(Icons.skip_next, size: 18),
-            label: const Text('تخطي', style: TextStyle(fontFamily: 'Cairo')),
+            label: const FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Text('تخطي', style: TextStyle(fontFamily: 'Cairo')),
+            ),
           ),
         ),
       );
@@ -586,7 +604,10 @@ class SessionCard extends StatelessWidget {
               _showRescheduleDialog(context);
             },
             icon: const Icon(Icons.refresh_rounded, size: 18),
-            label: const Text('إعادة جدولة', style: TextStyle(fontFamily: 'Cairo')),
+            label: const FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Text('إعادة جدولة', style: TextStyle(fontFamily: 'Cairo')),
+            ),
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.primary,
               foregroundColor: Colors.white,

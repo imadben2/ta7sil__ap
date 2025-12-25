@@ -21,6 +21,20 @@ class SubscriptionPackageModel {
   @JsonKey(name: 'updated_at')
   final DateTime? updatedAt;
 
+  // Customization fields
+  @JsonKey(name: 'image_url')
+  final String? imageUrl;
+  @JsonKey(name: 'image_full_url')
+  final String? imageFullUrl;
+  @JsonKey(name: 'badge_text')
+  final String? badgeText;
+  @JsonKey(name: 'background_color')
+  final String? backgroundColor;
+  @JsonKey(name: 'is_featured', defaultValue: false)
+  final bool isFeatured;
+  @JsonKey(name: 'sort_order', defaultValue: 0)
+  final int sortOrder;
+
   const SubscriptionPackageModel({
     required this.id,
     required this.nameAr,
@@ -30,6 +44,12 @@ class SubscriptionPackageModel {
     this.isActive = true,
     this.createdAt,
     this.updatedAt,
+    this.imageUrl,
+    this.imageFullUrl,
+    this.badgeText,
+    this.backgroundColor,
+    this.isFeatured = false,
+    this.sortOrder = 0,
   });
 
   factory SubscriptionPackageModel.fromJson(Map<String, dynamic> json) =>
@@ -55,6 +75,12 @@ class SubscriptionPackageModel {
       includedCourseNames: null,
       totalCourses: 0,
       originalPriceDzd: null,
+      imageUrl: imageUrl,
+      imageFullUrl: imageFullUrl,
+      badgeText: badgeText,
+      backgroundColor: backgroundColor,
+      isFeatured: isFeatured,
+      sortOrder: sortOrder,
     );
   }
 
@@ -70,6 +96,12 @@ class SubscriptionPackageModel {
       isActive: entity.isActive,
       createdAt: entity.createdAt,
       updatedAt: entity.updatedAt,
+      imageUrl: entity.imageUrl,
+      imageFullUrl: entity.imageFullUrl,
+      badgeText: entity.badgeText,
+      backgroundColor: entity.backgroundColor,
+      isFeatured: entity.isFeatured,
+      sortOrder: entity.sortOrder,
     );
   }
 }

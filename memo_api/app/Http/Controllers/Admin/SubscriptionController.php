@@ -9,6 +9,7 @@ use App\Models\SubscriptionPackage;
 use App\Models\User;
 use App\Services\SubscriptionService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Yajra\DataTables\Facades\DataTables;
 
 class SubscriptionController extends Controller
@@ -259,6 +260,9 @@ class SubscriptionController extends Controller
             $query->where('is_active', $request->is_active);
         }
 
+        // Order by sort_order then by id
+        $query->orderBy('sort_order', 'asc')->orderBy('id', 'desc');
+
         $packages = $query->paginate(20);
 
         return view('admin.subscriptions.packages', compact('packages'));
@@ -285,11 +289,26 @@ class SubscriptionController extends Controller
             'price_dzd' => 'required|integer|min:0',
             'duration_days' => 'required|integer|min:1',
             'is_active' => 'boolean',
+            'is_featured' => 'boolean',
             'course_ids' => 'required|array|min:1',
             'course_ids.*' => 'exists:courses,id',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+            'badge_text' => 'nullable|string|max:100',
+            'background_color' => 'nullable|string|regex:/^#[A-Fa-f0-9]{6}$/',
+            'sort_order' => 'nullable|integer|min:0',
         ]);
 
         try {
+            // Handle image upload
+            if ($request->hasFile('image')) {
+                $validated['image_url'] = $request->file('image')->store('package_images', 'public');
+            }
+
+            // Set default values
+            $validated['is_active'] = $request->boolean('is_active');
+            $validated['is_featured'] = $request->boolean('is_featured');
+            $validated['sort_order'] = $validated['sort_order'] ?? 0;
+
             $package = $this->subscriptionService->createPackage($validated);
 
             return redirect()
@@ -324,11 +343,36 @@ class SubscriptionController extends Controller
             'price_dzd' => 'required|integer|min:0',
             'duration_days' => 'required|integer|min:1',
             'is_active' => 'boolean',
+            'is_featured' => 'boolean',
             'course_ids' => 'required|array|min:1',
             'course_ids.*' => 'exists:courses,id',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+            'badge_text' => 'nullable|string|max:100',
+            'background_color' => 'nullable|string|regex:/^#[A-Fa-f0-9]{6}$/',
+            'sort_order' => 'nullable|integer|min:0',
+            'remove_image' => 'boolean',
         ]);
 
         try {
+            // Handle image removal
+            if ($request->boolean('remove_image') && $package->image_url) {
+                Storage::disk('public')->delete($package->image_url);
+                $validated['image_url'] = null;
+            }
+            // Handle new image upload
+            elseif ($request->hasFile('image')) {
+                // Delete old image if exists
+                if ($package->image_url) {
+                    Storage::disk('public')->delete($package->image_url);
+                }
+                $validated['image_url'] = $request->file('image')->store('package_images', 'public');
+            }
+
+            // Set boolean values
+            $validated['is_active'] = $request->boolean('is_active');
+            $validated['is_featured'] = $request->boolean('is_featured');
+            $validated['sort_order'] = $validated['sort_order'] ?? 0;
+
             $package = $this->subscriptionService->updatePackage($package, $validated);
 
             return redirect()
@@ -347,6 +391,11 @@ class SubscriptionController extends Controller
     public function destroyPackage(SubscriptionPackage $package)
     {
         try {
+            // Delete package image if exists
+            if ($package->image_url) {
+                Storage::disk('public')->delete($package->image_url);
+            }
+
             $this->subscriptionService->deletePackage($package);
 
             return redirect()

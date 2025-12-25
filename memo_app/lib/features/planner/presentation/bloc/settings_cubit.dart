@@ -47,11 +47,11 @@ class SettingsCubit extends Cubit<SettingsState> {
     );
   }
 
-  /// Update study hours
-  Future<void> updateStudyHours({
+  /// Update study hours (local only - call saveSettings to persist)
+  void updateStudyHours({
     required TimeOfDay startTime,
     required TimeOfDay endTime,
-  }) async {
+  }) {
     if (!state.hasSettings) return;
 
     final updatedSettings = state.settings!.copyWith(
@@ -59,14 +59,14 @@ class SettingsCubit extends Cubit<SettingsState> {
       studyEndTime: endTime,
     );
 
-    await _saveSettings(updatedSettings, 'تم تحديث ساعات الدراسة');
+    emit(state.updatedLocally(updatedSettings));
   }
 
-  /// Update sleep schedule
-  Future<void> updateSleepSchedule({
+  /// Update sleep schedule (local only - call saveSettings to persist)
+  void updateSleepSchedule({
     required TimeOfDay startTime,
     required TimeOfDay endTime,
-  }) async {
+  }) {
     if (!state.hasSettings) return;
 
     final updatedSettings = state.settings!.copyWith(
@@ -74,16 +74,16 @@ class SettingsCubit extends Cubit<SettingsState> {
       sleepEndTime: endTime,
     );
 
-    await _saveSettings(updatedSettings, 'تم تحديث جدول النوم');
+    emit(state.updatedLocally(updatedSettings));
   }
 
-  /// Update energy levels
-  Future<void> updateEnergyLevels({
+  /// Update energy levels (local only - call saveSettings to persist)
+  void updateEnergyLevels({
     int? morning,
     int? afternoon,
     int? evening,
     int? night,
-  }) async {
+  }) {
     if (!state.hasSettings) return;
 
     final updatedSettings = state.settings!.copyWith(
@@ -93,30 +93,27 @@ class SettingsCubit extends Cubit<SettingsState> {
       nightEnergyLevel: night,
     );
 
-    await _saveSettings(updatedSettings, 'تم تحديث مستويات الطاقة');
+    emit(state.updatedLocally(updatedSettings));
   }
 
-  /// Toggle Pomodoro technique
-  Future<void> togglePomodoro(bool enabled) async {
+  /// Toggle Pomodoro technique (local only - call saveSettings to persist)
+  void togglePomodoro(bool enabled) {
     if (!state.hasSettings) return;
 
     final updatedSettings = state.settings!.copyWith(
       usePomodoroTechnique: enabled,
     );
 
-    await _saveSettings(
-      updatedSettings,
-      enabled ? 'تم تفعيل تقنية بومودورو' : 'تم تعطيل تقنية بومودورو',
-    );
+    emit(state.updatedLocally(updatedSettings));
   }
 
-  /// Update Pomodoro durations
-  Future<void> updatePomodoroDurations({
+  /// Update Pomodoro durations (local only - call saveSettings to persist)
+  void updatePomodoroDurations({
     int? workMinutes,
     int? shortBreakMinutes,
     int? longBreakMinutes,
     int? pomodorosBeforeLongBreak,
-  }) async {
+  }) {
     if (!state.hasSettings) return;
 
     final updatedSettings = state.settings!.copyWith(
@@ -126,28 +123,25 @@ class SettingsCubit extends Cubit<SettingsState> {
       pomodorosBeforeLongBreak: pomodorosBeforeLongBreak,
     );
 
-    await _saveSettings(updatedSettings, 'تم تحديث إعدادات بومودورو');
+    emit(state.updatedLocally(updatedSettings));
   }
 
-  /// Toggle prayer times
-  Future<void> togglePrayerTimes(bool enabled) async {
+  /// Toggle prayer times (local only - call saveSettings to persist)
+  void togglePrayerTimes(bool enabled) {
     if (!state.hasSettings) return;
 
     final updatedSettings = state.settings!.copyWith(
       enablePrayerTimes: enabled,
     );
 
-    await _saveSettings(
-      updatedSettings,
-      enabled ? 'تم تفعيل أوقات الصلاة' : 'تم تعطيل أوقات الصلاة',
-    );
+    emit(state.updatedLocally(updatedSettings));
   }
 
-  /// Update prayer settings
-  Future<void> updatePrayerSettings({
+  /// Update prayer settings (local only - call saveSettings to persist)
+  void updatePrayerSettings({
     String? city,
     int? durationMinutes,
-  }) async {
+  }) {
     if (!state.hasSettings) return;
 
     final updatedSettings = state.settings!.copyWith(
@@ -155,34 +149,25 @@ class SettingsCubit extends Cubit<SettingsState> {
       prayerDurationMinutes: durationMinutes,
     );
 
-    await _saveSettings(updatedSettings, 'تم تحديث إعدادات الصلاة');
+    emit(state.updatedLocally(updatedSettings));
   }
 
-  /// Toggle exercise
-  Future<void> toggleExercise(bool enabled) async {
+  /// Toggle exercise (local only - call saveSettings to persist)
+  void toggleExercise(bool enabled) {
     if (!state.hasSettings) return;
 
     final updatedSettings = state.settings!.copyWith(exerciseEnabled: enabled);
 
-    await _saveSettings(
-      updatedSettings,
-      enabled ? 'تم تفعيل التمارين الرياضية' : 'تم تعطيل التمارين الرياضية',
-    );
+    emit(state.updatedLocally(updatedSettings));
   }
 
-  /// Update exercise settings
-  Future<void> updateExerciseSettings({
+  /// Update exercise settings (local only - call saveSettings to persist)
+  void updateExerciseSettings({
     List<int>? days,
     TimeOfDay? time,
     int? durationMinutes,
-  }) async {
+  }) {
     if (!state.hasSettings) return;
-
-    print('[SettingsCubit] updateExerciseSettings called:');
-    print('  - days: $days');
-    print('  - time: $time');
-    print('  - durationMinutes: $durationMinutes');
-    print('  - Current exerciseDurationMinutes: ${state.settings!.exerciseDurationMinutes}');
 
     final updatedSettings = state.settings!.copyWith(
       exerciseDays: days,
@@ -190,19 +175,17 @@ class SettingsCubit extends Cubit<SettingsState> {
       exerciseDurationMinutes: durationMinutes,
     );
 
-    print('[SettingsCubit] Updated exerciseDurationMinutes: ${updatedSettings.exerciseDurationMinutes}');
-
-    await _saveSettings(updatedSettings, 'تم تحديث إعدادات التمارين');
+    emit(state.updatedLocally(updatedSettings));
   }
 
-  /// Update priority algorithm weights
-  Future<void> updatePriorityWeights({
+  /// Update priority algorithm weights (local only - call saveSettings to persist)
+  void updatePriorityWeights({
     int? coefficient,
     int? examProximity,
     int? difficulty,
     int? inactivity,
     int? performanceGap,
-  }) async {
+  }) {
     if (!state.hasSettings) return;
 
     final updatedSettings = state.settings!.copyWith(
@@ -213,14 +196,14 @@ class SettingsCubit extends Cubit<SettingsState> {
       performanceGapWeight: performanceGap,
     );
 
-    await _saveSettings(updatedSettings, 'تم تحديث أوزان الأولويات');
+    emit(state.updatedLocally(updatedSettings));
   }
 
-  /// Update adaptation settings
-  Future<void> updateAdaptationSettings({
+  /// Update adaptation settings (local only - call saveSettings to persist)
+  void updateAdaptationSettings({
     bool? autoReschedule,
     bool? adaptToPerformance,
-  }) async {
+  }) {
     if (!state.hasSettings) return;
 
     final updatedSettings = state.settings!.copyWith(
@@ -228,14 +211,14 @@ class SettingsCubit extends Cubit<SettingsState> {
       adaptToPerformanceEnabled: adaptToPerformance,
     );
 
-    await _saveSettings(updatedSettings, 'تم تحديث إعدادات التكيف');
+    emit(state.updatedLocally(updatedSettings));
   }
 
-  /// Update limits
-  Future<void> updateLimits({
+  /// Update limits (local only - call saveSettings to persist)
+  void updateLimits({
     int? maxStudyHoursPerDay,
     int? minBreakBetweenSessions,
-  }) async {
+  }) {
     if (!state.hasSettings) return;
 
     final updatedSettings = state.settings!.copyWith(
@@ -243,12 +226,12 @@ class SettingsCubit extends Cubit<SettingsState> {
       minBreakBetweenSessions: minBreakBetweenSessions,
     );
 
-    await _saveSettings(updatedSettings, 'تم تحديث الحدود');
+    emit(state.updatedLocally(updatedSettings));
   }
 
-  /// Update max study hours per day
-  Future<void> updateMaxStudyHours(int hours) async {
-    await updateLimits(maxStudyHoursPerDay: hours);
+  /// Update max study hours per day (local only - call saveSettings to persist)
+  void updateMaxStudyHours(int hours) {
+    updateLimits(maxStudyHoursPerDay: hours);
   }
 
   /// Toggle session reminders
@@ -277,7 +260,7 @@ class SettingsCubit extends Cubit<SettingsState> {
       }
     }
 
-    await _saveSettings(
+    await _saveToApi(
       updatedSettings,
       enabled ? 'تم تفعيل تذكيرات الجلسات' : 'تم تعطيل تذكيرات الجلسات',
     );
@@ -304,7 +287,7 @@ class SettingsCubit extends Cubit<SettingsState> {
       }
     }
 
-    await _saveSettings(
+    await _saveToApi(
       updatedSettings,
       'تم تحديث وقت التذكير إلى $minutes دقيقة قبل الجلسة',
     );
@@ -337,46 +320,33 @@ class SettingsCubit extends Cubit<SettingsState> {
     return upcomingSessions.take(limit).toList();
   }
 
-  /// Update view mode
-  Future<void> updateViewMode(String viewMode) async {
+  /// Update view mode (local only - call saveSettings to persist)
+  void updateViewMode(String viewMode) {
     if (!state.hasSettings) return;
 
     final updatedSettings = state.settings!.copyWith(
       viewMode: viewMode,
     );
 
-    final modeLabels = {
-      'list': 'قائمة',
-      'grid': 'شبكة',
-      'calendar': 'تقويم',
-      'timeline': 'خط زمني',
-    };
-
-    await _saveSettings(
-      updatedSettings,
-      'تم تغيير وضع العرض إلى ${modeLabels[viewMode] ?? viewMode}',
-    );
+    emit(state.updatedLocally(updatedSettings));
   }
 
-  /// Update selected subject IDs for schedule generation
-  Future<void> updateSelectedSubjectIds(List<String> subjectIds) async {
+  /// Update selected subject IDs for schedule generation (local only - call saveSettings to persist)
+  void updateSelectedSubjectIds(List<String> subjectIds) {
     if (!state.hasSettings) return;
 
     final updatedSettings = state.settings!.copyWith(
       selectedSubjectIds: subjectIds,
     );
 
-    await _saveSettings(
-      updatedSettings,
-      'تم حفظ اختيار المواد (${subjectIds.length} ${subjectIds.length == 1 ? 'مادة' : 'مواد'})',
-    );
+    emit(state.updatedLocally(updatedSettings));
   }
 
-  /// Update session duration for a specific coefficient
-  Future<void> updateCoefficientDuration({
+  /// Update session duration for a specific coefficient (local only - call saveSettings to persist)
+  void updateCoefficientDuration({
     required int coefficient,
     required int durationMinutes,
-  }) async {
+  }) {
     if (!state.hasSettings) return;
 
     final updatedDurations = Map<int, int>.from(state.settings!.coefficientDurations);
@@ -386,11 +356,11 @@ class SettingsCubit extends Cubit<SettingsState> {
       coefficientDurations: updatedDurations,
     );
 
-    await _saveSettings(updatedSettings, 'تم تحديث مدة الجلسة للمعامل $coefficient');
+    emit(state.updatedLocally(updatedSettings));
   }
 
-  /// Reset a specific coefficient duration to default
-  Future<void> resetCoefficientDuration(int coefficient) async {
+  /// Reset a specific coefficient duration to default (local only - call saveSettings to persist)
+  void resetCoefficientDuration(int coefficient) {
     if (!state.hasSettings) return;
 
     // Get default duration for this coefficient
@@ -412,14 +382,11 @@ class SettingsCubit extends Cubit<SettingsState> {
       coefficientDurations: updatedDurations,
     );
 
-    await _saveSettings(
-      updatedSettings,
-      'تم إعادة تعيين مدة المعامل $coefficient إلى القيمة الافتراضية ($defaultDuration دقيقة)',
-    );
+    emit(state.updatedLocally(updatedSettings));
   }
 
-  /// Reset all coefficient durations to defaults
-  Future<void> resetAllCoefficientDurations() async {
+  /// Reset all coefficient durations to defaults (local only - call saveSettings to persist)
+  void resetAllCoefficientDurations() {
     if (!state.hasSettings) return;
 
     final defaultSettings = PlannerSettings(
@@ -434,14 +401,11 @@ class SettingsCubit extends Cubit<SettingsState> {
       coefficientDurations: defaultSettings.coefficientDurations,
     );
 
-    await _saveSettings(
-      updatedSettings,
-      'تم إعادة تعيين جميع مدد المعاملات إلى القيم الافتراضية',
-    );
+    emit(state.updatedLocally(updatedSettings));
   }
 
-  /// Reset settings to defaults
-  Future<void> resetToDefaults() async {
+  /// Reset settings to defaults (local only - call saveSettings to persist)
+  void resetToDefaults() {
     if (!state.hasSettings) return;
 
     // Create default settings with same userId
@@ -453,21 +417,24 @@ class SettingsCubit extends Cubit<SettingsState> {
       sleepEndTime: const TimeOfDay(hour: 7, minute: 0),
     );
 
-    await _saveSettings(
-      defaultSettings,
-      'تم إعادة تعيين الإعدادات إلى الافتراضية',
-    );
+    emit(state.updatedLocally(defaultSettings));
   }
 
-  /// Internal method to save settings
-  Future<void> _saveSettings(
+  /// Save all pending settings changes to the API
+  /// Call this when user clicks "حفظ الإعدادات" button
+  Future<void> saveSettings() async {
+    if (!state.hasSettings) return;
+    if (!state.hasUnsavedChanges) return;
+
+    await _saveToApi(state.settings!, 'تم حفظ الإعدادات بنجاح');
+  }
+
+  /// Internal method to save settings to API
+  Future<void> _saveToApi(
     PlannerSettings settings,
     String successMessage,
   ) async {
-    print('[SettingsCubit] _saveSettings called');
-    print('[SettingsCubit] Settings to save:');
-    print('  - exerciseEnabled: ${settings.exerciseEnabled}');
-    print('  - exerciseDurationMinutes: ${settings.exerciseDurationMinutes}');
+    debugPrint('[SettingsCubit] _saveToApi called');
 
     emit(state.saving());
 
@@ -475,7 +442,7 @@ class SettingsCubit extends Cubit<SettingsState> {
 
     result.fold(
       (failure) {
-        print('[SettingsCubit] ✗ Save failed: ${failure.message}');
+        debugPrint('[SettingsCubit] ✗ Save failed: ${failure.message}');
         emit(
           state.error(
             'فشل في حفظ الإعدادات: ${failure.message}',
@@ -484,10 +451,15 @@ class SettingsCubit extends Cubit<SettingsState> {
         );
       },
       (_) {
-        print('[SettingsCubit] ✓ Save successful: $successMessage');
+        debugPrint('[SettingsCubit] ✓ Save successful: $successMessage');
         emit(state.saved(settings, successMessage));
       },
     );
+  }
+
+  /// Discard unsaved changes and reload from server
+  Future<void> discardChanges() async {
+    await loadSettings();
   }
 
   /// Refresh settings (reload from repository)

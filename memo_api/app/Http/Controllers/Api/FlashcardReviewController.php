@@ -27,6 +27,7 @@ class FlashcardReviewController extends Controller
     /**
      * Get cards due for review
      * GET /api/v1/flashcards/due
+     * OPTIMIZED: Pre-loads user progress to avoid N+1 queries
      */
     public function getDueCards(Request $request): JsonResponse
     {
@@ -37,9 +38,21 @@ class FlashcardReviewController extends Controller
         $dueCards = $this->spacedRepetitionService->getDueCards($user, $deckId, $limit);
         $newCards = $this->spacedRepetitionService->getNewCards($user, $deckId, 20);
 
-        // Format cards
-        $formatCard = function ($card) use ($user) {
-            $progress = $card->userProgress()->where('user_id', $user->id)->first();
+        // OPTIMIZATION: Eager load user progress for all cards at once
+        // This prevents N+1 queries (was 1 query per card, now just 1 query total)
+        $allCardIds = $dueCards->pluck('id')->merge($newCards->pluck('id'))->unique()->toArray();
+
+        $userProgressMap = [];
+        if (!empty($allCardIds)) {
+            $userProgressMap = \App\Models\UserFlashcardProgress::where('user_id', $user->id)
+                ->whereIn('flashcard_id', $allCardIds)
+                ->get()
+                ->keyBy('flashcard_id');
+        }
+
+        // Format cards using pre-fetched progress (NO queries in loop)
+        $formatCard = function ($card) use ($userProgressMap) {
+            $progress = $userProgressMap->get($card->id);
 
             return [
                 'id' => $card->id,

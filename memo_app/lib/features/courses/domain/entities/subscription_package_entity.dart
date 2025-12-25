@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:flutter/material.dart';
 
 /// Subscription Package Entity - يمثل باقة اشتراك (مجموعة دورات)
 class SubscriptionPackageEntity extends Equatable {
@@ -20,6 +21,14 @@ class SubscriptionPackageEntity extends Equatable {
   final int? totalCourses;
   final int? originalPriceDzd;
 
+  // Customization fields
+  final String? imageUrl;
+  final String? imageFullUrl;
+  final String? badgeText;
+  final String? backgroundColor;
+  final bool isFeatured;
+  final int sortOrder;
+
   const SubscriptionPackageEntity({
     required this.id,
     required this.nameAr,
@@ -36,7 +45,30 @@ class SubscriptionPackageEntity extends Equatable {
     this.includedCourseNames,
     this.totalCourses,
     this.originalPriceDzd,
+    this.imageUrl,
+    this.imageFullUrl,
+    this.badgeText,
+    this.backgroundColor,
+    this.isFeatured = false,
+    this.sortOrder = 0,
   });
+
+  /// Check if package has an image
+  bool get hasImage => imageFullUrl != null && imageFullUrl!.isNotEmpty;
+
+  /// Parse background color from hex string
+  Color? get backgroundColorValue {
+    if (backgroundColor == null || backgroundColor!.isEmpty) return null;
+    try {
+      String hex = backgroundColor!.replaceFirst('#', '');
+      if (hex.length == 6) {
+        return Color(int.parse('FF$hex', radix: 16));
+      }
+      return null;
+    } catch (e) {
+      return null;
+    }
+  }
 
   /// المدة بالأشهر
   int get durationMonths => (durationDays / 30).round();
@@ -105,7 +137,7 @@ class SubscriptionPackageEntity extends Equatable {
   }
 
   /// Compatibility getters
-  bool get isPopular => false; // Not stored in entity
+  bool get isPopular => isFeatured; // Use isFeatured as isPopular
   int get finalPrice => priceDzd;
   List<String>? get features => includedCourseNames;
 
@@ -125,6 +157,12 @@ class SubscriptionPackageEntity extends Equatable {
     List<String>? includedCourseNames,
     int? totalCourses,
     int? originalPriceDzd,
+    String? imageUrl,
+    String? imageFullUrl,
+    String? badgeText,
+    String? backgroundColor,
+    bool? isFeatured,
+    int? sortOrder,
   }) {
     return SubscriptionPackageEntity(
       id: id ?? this.id,
@@ -142,6 +180,12 @@ class SubscriptionPackageEntity extends Equatable {
       includedCourseNames: includedCourseNames ?? this.includedCourseNames,
       totalCourses: totalCourses ?? this.totalCourses,
       originalPriceDzd: originalPriceDzd ?? this.originalPriceDzd,
+      imageUrl: imageUrl ?? this.imageUrl,
+      imageFullUrl: imageFullUrl ?? this.imageFullUrl,
+      badgeText: badgeText ?? this.badgeText,
+      backgroundColor: backgroundColor ?? this.backgroundColor,
+      isFeatured: isFeatured ?? this.isFeatured,
+      sortOrder: sortOrder ?? this.sortOrder,
     );
   }
 
@@ -162,5 +206,11 @@ class SubscriptionPackageEntity extends Equatable {
     includedCourseNames,
     totalCourses,
     originalPriceDzd,
+    imageUrl,
+    imageFullUrl,
+    badgeText,
+    backgroundColor,
+    isFeatured,
+    sortOrder,
   ];
 }

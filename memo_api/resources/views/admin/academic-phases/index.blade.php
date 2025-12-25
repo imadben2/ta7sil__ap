@@ -66,6 +66,7 @@
                         <tr>
                             <th class="px-6 py-4 text-right text-xs font-bold text-gray-700 uppercase tracking-wider">الترتيب</th>
                             <th class="px-6 py-4 text-right text-xs font-bold text-gray-700 uppercase tracking-wider">اسم المرحلة</th>
+                            <th class="px-6 py-4 text-right text-xs font-bold text-gray-700 uppercase tracking-wider">الحالة</th>
                             <th class="px-6 py-4 text-right text-xs font-bold text-gray-700 uppercase tracking-wider">عدد السنوات</th>
                             <th class="px-6 py-4 text-right text-xs font-bold text-gray-700 uppercase tracking-wider">عدد الشعب</th>
                             <th class="px-6 py-4 text-right text-xs font-bold text-gray-700 uppercase tracking-wider">الإجراءات</th>
@@ -73,7 +74,7 @@
                     </thead>
                     <tbody class="divide-y divide-gray-200 bg-white">
                         @foreach($phases as $phase)
-                        <tr class="hover:bg-gray-50 transition-colors">
+                        <tr class="hover:bg-gray-50 transition-colors {{ !$phase->is_active ? 'bg-gray-100 opacity-60' : '' }}">
                             <td class="px-6 py-4">
                                 <span class="inline-flex items-center justify-center w-8 h-8 bg-purple-100 text-purple-700 rounded-full font-bold">
                                     {{ $phase->order }}
@@ -82,6 +83,15 @@
                             <td class="px-6 py-4">
                                 <div class="font-semibold text-gray-900 text-lg">{{ $phase->name_ar }}</div>
                                 <div class="text-sm text-gray-500">{{ $phase->slug }}</div>
+                            </td>
+                            <td class="px-6 py-4">
+                                <form action="{{ route('admin.academic-phases.toggle-status', $phase->id) }}" method="POST" class="inline-block">
+                                    @csrf
+                                    <button type="submit" class="inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold transition-colors {{ $phase->is_active ? 'bg-green-100 text-green-800 hover:bg-green-200' : 'bg-red-100 text-red-800 hover:bg-red-200' }}">
+                                        <i class="fas {{ $phase->is_active ? 'fa-check-circle' : 'fa-times-circle' }} mr-2"></i>
+                                        {{ $phase->is_active ? 'مفعّل' : 'معطّل' }}
+                                    </button>
+                                </form>
                             </td>
                             <td class="px-6 py-4">
                                 <span class="inline-flex items-center px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-semibold">

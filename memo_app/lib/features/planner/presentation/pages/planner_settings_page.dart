@@ -135,20 +135,21 @@ class PlannerSettingsPage extends StatelessWidget {
           builder: (context, state) {
             if (!state.hasSettings) return const SizedBox.shrink();
 
-            return FloatingActionButton.extended(
-              onPressed: () async {
-                // Force reload settings to ensure they're saved
-                await context.read<SettingsCubit>().refreshSettings();
+            // Only show button if there are unsaved changes
+            final hasChanges = state.hasUnsavedChanges;
 
-                if (context.mounted) {
+            return FloatingActionButton.extended(
+              onPressed: state.isSaving ? null : () async {
+                if (!hasChanges) {
+                  // No changes to save
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       content: const Row(
                         children: [
-                          Icon(Icons.check_circle, color: Colors.white),
+                          Icon(Icons.info_outline, color: Colors.white),
                           SizedBox(width: 12),
                           Text(
-                            'تم حفظ الإعدادات بنجاح',
+                            'لا توجد تغييرات للحفظ',
                             style: TextStyle(
                               fontFamily: 'Cairo',
                               fontWeight: FontWeight.bold,
@@ -156,7 +157,7 @@ class PlannerSettingsPage extends StatelessWidget {
                           ),
                         ],
                       ),
-                      backgroundColor: const Color(0xFF10B981),
+                      backgroundColor: const Color(0xFF6366F1),
                       behavior: SnackBarBehavior.floating,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
@@ -165,13 +166,85 @@ class PlannerSettingsPage extends StatelessWidget {
                       duration: const Duration(seconds: 2),
                     ),
                   );
+                  return;
+                }
+
+                // Save settings to API
+                await context.read<SettingsCubit>().saveSettings();
+
+                if (context.mounted) {
+                  final newState = context.read<SettingsCubit>().state;
+                  if (newState.errorMessage != null) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Row(
+                          children: [
+                            const Icon(Icons.error_outline, color: Colors.white),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Text(
+                                newState.errorMessage!,
+                                style: const TextStyle(
+                                  fontFamily: 'Cairo',
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        backgroundColor: const Color(0xFFEF4444),
+                        behavior: SnackBarBehavior.floating,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        margin: const EdgeInsets.all(16),
+                        duration: const Duration(seconds: 3),
+                      ),
+                    );
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: const Row(
+                          children: [
+                            Icon(Icons.check_circle, color: Colors.white),
+                            SizedBox(width: 12),
+                            Text(
+                              'تم حفظ الإعدادات بنجاح',
+                              style: TextStyle(
+                                fontFamily: 'Cairo',
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
+                        backgroundColor: const Color(0xFF10B981),
+                        behavior: SnackBarBehavior.floating,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        margin: const EdgeInsets.all(16),
+                        duration: const Duration(seconds: 2),
+                      ),
+                    );
+                  }
                 }
               },
-              backgroundColor: const Color(0xFF6366F1),
-              icon: const Icon(Icons.save_rounded, color: Colors.white),
-              label: const Text(
-                'حفظ الإعدادات',
-                style: TextStyle(
+              backgroundColor: hasChanges
+                  ? const Color(0xFF6366F1)
+                  : const Color(0xFF9CA3AF),
+              icon: state.isSaving
+                  ? const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                      ),
+                    )
+                  : const Icon(Icons.save_rounded, color: Colors.white),
+              label: Text(
+                state.isSaving ? 'جاري الحفظ...' : 'حفظ الإعدادات',
+                style: const TextStyle(
                   fontFamily: 'Cairo',
                   fontWeight: FontWeight.bold,
                   color: Colors.white,
@@ -1275,22 +1348,30 @@ class PlannerSettingsPage extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
-                      'مدة الجلسة',
-                      style: TextStyle(
-                        fontFamily: 'Cairo',
-                        fontSize: 12,
-                        color: Color(0xFF6B7280),
+                    FittedBox(
+                      fit: BoxFit.scaleDown,
+                      alignment: AlignmentDirectional.centerStart,
+                      child: const Text(
+                        'مدة الجلسة',
+                        style: TextStyle(
+                          fontFamily: 'Cairo',
+                          fontSize: 12,
+                          color: Color(0xFF6B7280),
+                        ),
                       ),
                     ),
                     const SizedBox(height: 4),
-                    Text(
-                      '$duration دقيقة',
-                      style: TextStyle(
-                        fontFamily: 'Cairo',
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: color,
+                    FittedBox(
+                      fit: BoxFit.scaleDown,
+                      alignment: AlignmentDirectional.centerStart,
+                      child: Text(
+                        '$duration دقيقة',
+                        style: TextStyle(
+                          fontFamily: 'Cairo',
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: color,
+                        ),
                       ),
                     ),
                   ],

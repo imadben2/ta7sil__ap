@@ -4,7 +4,7 @@
 @section('page-title', 'تعديل باقة: ' . $package->name_ar)
 
 @section('content')
-<form action="{{ route('admin.subscriptions.packages.update', $package) }}" method="POST" class="max-w-4xl mx-auto space-y-6">
+<form action="{{ route('admin.subscriptions.packages.update', $package) }}" method="POST" class="max-w-4xl mx-auto space-y-6" enctype="multipart/form-data">
     @csrf
     @method('PUT')
 
@@ -143,6 +143,86 @@
             </div>
         </div>
 
+        <!-- Customization -->
+        <div>
+            <h3 class="text-lg font-semibold text-gray-900 mb-4 border-b pb-2">التخصيص والمظهر</h3>
+            <p class="text-sm text-gray-600 mb-3">خصص مظهر الباقة في التطبيق (صورة، شارة، لون الخلفية)</p>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- Image Upload -->
+                <div class="md:col-span-2">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">صورة الباقة (اختياري)</label>
+                    <div class="flex items-center gap-4">
+                        <div id="image-preview" class="w-32 h-32 bg-gray-100 rounded-xl border-2 border-dashed border-gray-300 flex items-center justify-center overflow-hidden">
+                            @if($package->image_url)
+                                <img src="{{ asset('storage/' . $package->image_url) }}" class="w-full h-full object-cover">
+                            @else
+                                <i class="fas fa-image text-gray-400 text-3xl"></i>
+                            @endif
+                        </div>
+                        <div class="flex-1">
+                            <input type="file" name="image" id="image" accept="image/*"
+                                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 @error('image') border-red-500 @enderror"
+                                   onchange="previewImage(this)">
+                            <p class="text-xs text-gray-500 mt-1">الحجم الأقصى: 2MB | الصيغ: JPG, PNG, GIF, WEBP</p>
+                            @if($package->image_url)
+                                <div class="mt-2">
+                                    <label class="flex items-center text-sm text-red-600 cursor-pointer">
+                                        <input type="checkbox" name="remove_image" value="1" class="ml-2 h-4 w-4 text-red-600 focus:ring-red-500 border-gray-300 rounded">
+                                        حذف الصورة الحالية
+                                    </label>
+                                </div>
+                            @endif
+                            @error('image')
+                                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                            @enderror
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Badge Text -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">نص الشارة (اختياري)</label>
+                    <input type="text" name="badge_text" value="{{ old('badge_text', $package->badge_text) }}"
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 @error('badge_text') border-red-500 @enderror"
+                           placeholder="مثال: الأكثر شعبية، خصم 20%">
+                    @error('badge_text')
+                        <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <!-- Background Color -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">لون الخلفية (اختياري)</label>
+                    <div class="flex items-center gap-3">
+                        <input type="color" name="background_color" id="background_color" value="{{ old('background_color', $package->background_color ?? '#3B82F6') }}"
+                               class="w-16 h-10 rounded-lg border border-gray-300 cursor-pointer">
+                        <input type="text" id="background_color_text" value="{{ old('background_color', $package->background_color ?? '') }}"
+                               class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                               placeholder="#3B82F6" pattern="^#[A-Fa-f0-9]{6}$">
+                        <button type="button" onclick="clearBackgroundColor()" class="px-3 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg text-gray-600">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    @error('background_color')
+                        <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <!-- Sort Order -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">ترتيب العرض</label>
+                    <input type="number" name="sort_order" value="{{ old('sort_order', $package->sort_order ?? 0) }}" min="0"
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 @error('sort_order') border-red-500 @enderror"
+                           placeholder="0">
+                    <p class="text-xs text-gray-500 mt-1">الرقم الأصغر يظهر أولاً</p>
+                    @error('sort_order')
+                        <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
+            </div>
+        </div>
+
         <!-- Additional Features -->
         <div>
             <h3 class="text-lg font-semibold text-gray-900 mb-4 border-b pb-2">المميزات الإضافية (اختياري)</h3>
@@ -192,3 +272,44 @@
     </div>
 </form>
 @endsection
+
+@push('scripts')
+<script>
+    // Sync color picker with text input
+    document.addEventListener('DOMContentLoaded', function() {
+        const colorPicker = document.getElementById('background_color');
+        const colorText = document.getElementById('background_color_text');
+
+        if (colorPicker && colorText) {
+            colorPicker.addEventListener('input', function() {
+                colorText.value = this.value;
+            });
+
+            colorText.addEventListener('input', function() {
+                if (/^#[A-Fa-f0-9]{6}$/.test(this.value)) {
+                    colorPicker.value = this.value;
+                }
+            });
+        }
+    });
+
+    // Image preview function
+    function previewImage(input) {
+        const preview = document.getElementById('image-preview');
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                preview.innerHTML = '<img src="' + e.target.result + '" class="w-full h-full object-cover">';
+            }
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+    // Clear background color
+    function clearBackgroundColor() {
+        document.getElementById('background_color').value = '#3B82F6';
+        document.getElementById('background_color_text').value = '';
+        document.querySelector('input[name="background_color"]').value = '';
+    }
+</script>
+@endpush

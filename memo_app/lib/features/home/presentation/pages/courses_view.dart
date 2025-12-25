@@ -308,7 +308,7 @@ class _CoursesViewState extends State<CoursesView> {
           borderRadius: BorderRadius.circular(24),
           child: Stack(
             children: [
-              // Background Gradient
+              // Background Gradient (shown when no image)
               Container(
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
@@ -319,7 +319,7 @@ class _CoursesViewState extends State<CoursesView> {
                 ),
               ),
 
-              // Image if available
+              // Image if available - full cover
               if (course.thumbnailUrl != null)
                 Positioned.fill(
                   child: CachedNetworkImage(
@@ -330,181 +330,150 @@ class _CoursesViewState extends State<CoursesView> {
                   ),
                 ),
 
-              // Gradient Overlay
-              Positioned.fill(
-                child: Container(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [
-                        Colors.transparent,
-                        gradientColors[1].withValues(alpha: 0.95),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-
-              // Content
-              Positioned(
-                left: 20,
-                right: 20,
-                bottom: 20,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    // Featured Badge
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                      decoration: BoxDecoration(
-                        gradient: const LinearGradient(
-                          colors: [Color(0xFFF59E0B), Color(0xFFEF4444)],
-                        ),
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: const Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            'دورة مميزة',
-                            style: TextStyle(
-                              fontFamily: 'Cairo',
-                              fontSize: 11,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                            ),
-                          ),
-                          SizedBox(width: 4),
-                          Icon(Icons.star_rounded, size: 14, color: Colors.white),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-
-                    // Title
-                    Text(
-                      course.titleAr,
-                      textDirection: TextDirection.rtl,
-                      textAlign: TextAlign.right,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        fontFamily: 'Cairo',
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                        height: 1.3,
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-
-                    // Stats Row
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              // Only show content when NO image
+              if (course.thumbnailUrl == null) ...[
+                // Content (RTL) - only when no image
+                Positioned(
+                  left: 20,
+                  right: 20,
+                  bottom: 20,
+                  child: Directionality(
+                    textDirection: TextDirection.rtl,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // Price
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-                          decoration: BoxDecoration(
+                        // Title
+                        Text(
+                          course.titleAr,
+                          textDirection: TextDirection.rtl,
+                          textAlign: TextAlign.right,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            fontFamily: 'Cairo',
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
                             color: Colors.white,
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Text(
-                            course.isFreeAccess ? 'مجاني' : '${course.priceDzd} دج',
-                            style: TextStyle(
-                              fontFamily: 'Cairo',
-                              fontSize: 13,
-                              fontWeight: FontWeight.bold,
-                              color: course.isFreeAccess
-                                  ? const Color(0xFF10B981)
-                                  : const Color(0xFF667EEA),
-                            ),
+                            height: 1.3,
                           ),
                         ),
+                        const SizedBox(height: 12),
 
-                        // Rating & Lessons
+                        // Stats Row (RTL: Price on right, stats on left)
                         Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                              decoration: BoxDecoration(
-                                color: Colors.white.withValues(alpha: 0.2),
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Text(
-                                    '${course.totalLessons}',
-                                    style: const TextStyle(
-                                      fontFamily: 'Cairo',
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white,
-                                    ),
+                            // Rating & Lessons (left side in RTL)
+                            Row(
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white.withValues(alpha: 0.2),
+                                    borderRadius: BorderRadius.circular(10),
                                   ),
-                                  const SizedBox(width: 4),
-                                  const Icon(Icons.play_lesson_rounded, size: 14, color: Colors.white),
-                                ],
-                              ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      const Icon(Icons.star_rounded, size: 14, color: Color(0xFFFBBF24)),
+                                      const SizedBox(width: 4),
+                                      Text(
+                                        course.averageRating.toStringAsFixed(1),
+                                        style: const TextStyle(
+                                          fontFamily: 'Cairo',
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white.withValues(alpha: 0.2),
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      const Icon(Icons.menu_book_rounded, size: 14, color: Colors.white),
+                                      const SizedBox(width: 4),
+                                      Text(
+                                        '${course.totalLessons}',
+                                        style: const TextStyle(
+                                          fontFamily: 'Cairo',
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
                             ),
-                            const SizedBox(width: 8),
+
+                            // Price (right side in RTL)
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
                               decoration: BoxDecoration(
-                                color: Colors.white.withValues(alpha: 0.2),
-                                borderRadius: BorderRadius.circular(10),
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(12),
                               ),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Text(
-                                    course.averageRating.toStringAsFixed(1),
-                                    style: const TextStyle(
-                                      fontFamily: 'Cairo',
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                  const SizedBox(width: 4),
-                                  const Icon(Icons.star_rounded, size: 14, color: Color(0xFFFBBF24)),
-                                ],
+                              child: Text(
+                                course.isFreeAccess ? 'مجاني' : '${course.priceDzd} دج',
+                                style: TextStyle(
+                                  fontFamily: 'Cairo',
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.bold,
+                                  color: course.isFreeAccess
+                                      ? const Color(0xFF10B981)
+                                      : const Color(0xFF667EEA),
+                                ),
                               ),
                             ),
                           ],
                         ),
                       ],
                     ),
-                  ],
+                  ),
                 ),
-              ),
+              ],
 
-              // Play Button
+              // Featured Badge - small, top right (always shown)
               Positioned(
-                top: 20,
-                left: 20,
+                top: 12,
+                right: 12,
                 child: Container(
-                  width: 50,
-                  height: 50,
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
-                    color: Colors.white,
-                    shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.2),
-                        blurRadius: 12,
+                    gradient: const LinearGradient(
+                      colors: [Color(0xFFF59E0B), Color(0xFFEF4444)],
+                    ),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: const Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.star_rounded, size: 10, color: Colors.white),
+                      SizedBox(width: 3),
+                      Text(
+                        'مميزة',
+                        style: TextStyle(
+                          fontFamily: 'Cairo',
+                          fontSize: 9,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
                       ),
                     ],
                   ),
-                  child: Icon(
-                    Icons.play_arrow_rounded,
-                    color: gradientColors[0],
-                    size: 30,
-                  ),
                 ),
               ),
+
             ],
           ),
         ),
@@ -644,30 +613,6 @@ class _CoursesViewState extends State<CoursesView> {
                           Colors.transparent,
                           gradientColors[1].withValues(alpha: 0.5),
                         ],
-                      ),
-                    ),
-                  ),
-
-                  // Play Icon
-                  Center(
-                    child: Container(
-                      width: 44,
-                      height: 44,
-                      decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.95),
-                        shape: BoxShape.circle,
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.15),
-                            blurRadius: 8,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                      child: Icon(
-                        Icons.play_arrow_rounded,
-                        color: gradientColors[0],
-                        size: 26,
                       ),
                     ),
                   ),

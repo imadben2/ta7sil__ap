@@ -188,6 +188,7 @@ class DashboardController extends Controller
 
     /**
      * Get user's subjects with progress
+     * OPTIMIZED: Uses batch queries instead of N+1 queries per subject
      */
     public function getUserSubjects(User $user)
     {
@@ -201,7 +202,7 @@ class DashboardController extends Controller
             ];
         }
 
-        // Get subjects for the user's academic year and stream (using JSON contains for academic_stream_ids array)
+        // Get subjects for the user's academic year and stream
         $subjects = DB::table('subjects')
             ->where('academic_year_id', $academicProfile->academic_year_id)
             ->where(function ($q) use ($academicProfile) {
@@ -209,80 +210,113 @@ class DashboardController extends Controller
                   ->orWhereNull('academic_stream_ids');
             })
             ->where('is_active', true)
+            ->get();
+
+        if ($subjects->isEmpty()) {
+            return [
+                'subjects' => [],
+                'total_count' => 0,
+            ];
+        }
+
+        $subjectIds = $subjects->pluck('id')->toArray();
+
+        // BATCH QUERY 1: Get all upcoming exams for user's subjects in one query
+        $upcomingExams = DB::table('exam_schedule')
+            ->where('user_id', $user->id)
+            ->whereIn('subject_id', $subjectIds)
+            ->where('exam_date', '>', now())
+            ->orderBy('exam_date')
             ->get()
-            ->map(function ($subject) use ($user) {
+            ->groupBy('subject_id')
+            ->map(fn($exams) => $exams->first()); // Get first (nearest) exam per subject
 
-                // Get upcoming exam if any
-                $upcomingExam = DB::table('exam_schedule')
-                    ->where('user_id', $user->id)
-                    ->where('subject_id', $subject->id)
-                    ->where('exam_date', '>', now())
-                    ->orderBy('exam_date')
-                    ->first();
+        // BATCH QUERY 2: Get total lessons count per subject
+        $totalLessonsCounts = DB::table('contents')
+            ->whereIn('subject_id', $subjectIds)
+            ->where('content_type_id', 1)
+            ->select('subject_id', DB::raw('COUNT(*) as total'))
+            ->groupBy('subject_id')
+            ->pluck('total', 'subject_id');
 
-                $daysToExam = null;
-                if ($upcomingExam) {
-                    $daysToExam = Carbon::parse($upcomingExam->exam_date)->diffInDays(now());
-                }
+        // BATCH QUERY 3: Get completed lessons count per subject for this user
+        $completedLessonsCounts = DB::table('user_content_progress')
+            ->join('contents', 'user_content_progress.content_id', '=', 'contents.id')
+            ->where('user_content_progress.user_id', $user->id)
+            ->whereIn('contents.subject_id', $subjectIds)
+            ->where('user_content_progress.status', 'completed')
+            ->select('contents.subject_id', DB::raw('COUNT(*) as completed'))
+            ->groupBy('contents.subject_id')
+            ->pluck('completed', 'contents.subject_id');
 
-                // Count total lessons and completed for this subject
-                $totalLessons = DB::table('contents')
-                    ->where('subject_id', $subject->id)
-                    ->where('content_type_id', 1) // Assuming type 1 is 'lesson'
-                    ->count();
+        // BATCH QUERY 4: Get quiz attempts count per subject
+        $quizAttemptsCounts = DB::table('quiz_attempts')
+            ->join('quizzes', 'quiz_attempts.quiz_id', '=', 'quizzes.id')
+            ->where('quiz_attempts.user_id', $user->id)
+            ->whereIn('quizzes.subject_id', $subjectIds)
+            ->where('quiz_attempts.status', 'completed')
+            ->select('quizzes.subject_id', DB::raw('COUNT(*) as attempts'))
+            ->groupBy('quizzes.subject_id')
+            ->pluck('attempts', 'quizzes.subject_id');
 
-                $completedLessons = DB::table('user_content_progress')
-                    ->join('contents', 'user_content_progress.content_id', '=', 'contents.id')
-                    ->where('user_content_progress.user_id', $user->id)
-                    ->where('contents.subject_id', $subject->id)
-                    ->where('user_content_progress.status', 'completed')
-                    ->count();
+        // BATCH QUERY 5: Get user subject preferences (favorites, priority)
+        $userSubjects = DB::table('user_subjects')
+            ->where('user_id', $user->id)
+            ->whereIn('subject_id', $subjectIds)
+            ->get()
+            ->keyBy('subject_id');
 
-                $completionPercentage = $totalLessons > 0 ? round(($completedLessons / $totalLessons) * 100) : 0;
+        // Map subjects with pre-fetched data (NO additional queries in loop)
+        $mappedSubjects = $subjects->map(function ($subject) use (
+            $upcomingExams,
+            $totalLessonsCounts,
+            $completedLessonsCounts,
+            $quizAttemptsCounts,
+            $userSubjects
+        ) {
+            $subjectId = $subject->id;
+            $upcomingExam = $upcomingExams->get($subjectId);
+            $totalLessons = $totalLessonsCounts->get($subjectId, 0);
+            $completedLessons = $completedLessonsCounts->get($subjectId, 0);
+            $quizzesTaken = $quizAttemptsCounts->get($subjectId, 0);
+            $userSubject = $userSubjects->get($subjectId);
 
-                // Count quizzes taken
-                $quizzesTaken = QuizAttempt::where('user_id', $user->id)
-                    ->whereHas('quiz', function ($q) use ($subject) {
-                        $q->where('subject_id', $subject->id);
-                    })
-                    ->where('status', 'completed')
-                    ->count();
+            $completionPercentage = $totalLessons > 0 ? round(($completedLessons / $totalLessons) * 100) : 0;
 
-                // Check if user has favorited this subject
-                $userSubject = DB::table('user_subjects')
-                    ->where('user_id', $user->id)
-                    ->where('subject_id', $subject->id)
-                    ->first();
+            $daysToExam = null;
+            if ($upcomingExam) {
+                $daysToExam = Carbon::parse($upcomingExam->exam_date)->diffInDays(now());
+            }
 
-                return [
-                    'id' => $subject->id,
-                    'name' => $subject->name_ar,
-                    'color' => $subject->color ?? '#6B7280',
-                    'icon' => $subject->icon ?? 'book',
-                    'coefficient' => (int) ($subject->coefficient ?? 1),
-                    'total_lessons' => $totalLessons,
-                    'completed_lessons' => $completedLessons,
-                    'completion_percentage' => $completionPercentage,
-                    'quizzes_taken' => $quizzesTaken,
-                    'is_favorite' => (bool) ($userSubject->is_favorite ?? false),
-                    'priority_score' => (int) ($userSubject->priority_score ?? 0),
-                    'exam_info' => $upcomingExam ? [
-                        'has_upcoming_exam' => true,
-                        'days_remaining' => $daysToExam,
-                        'exam_date' => Carbon::parse($upcomingExam->exam_date)->toDateString(),
-                        'is_urgent' => $daysToExam <= 7,
-                    ] : [
-                        'has_upcoming_exam' => false,
-                    ],
-                ];
-            })
-            ->sortByDesc('coefficient')
-            ->values()
-            ->take(8); // Limit to 8 subjects for dashboard
+            return [
+                'id' => $subjectId,
+                'name' => $subject->name_ar,
+                'color' => $subject->color ?? '#6B7280',
+                'icon' => $subject->icon ?? 'book',
+                'coefficient' => (int) ($subject->coefficient ?? 1),
+                'total_lessons' => $totalLessons,
+                'completed_lessons' => $completedLessons,
+                'completion_percentage' => $completionPercentage,
+                'quizzes_taken' => $quizzesTaken,
+                'is_favorite' => (bool) ($userSubject->is_favorite ?? false),
+                'priority_score' => (int) ($userSubject->priority_score ?? 0),
+                'exam_info' => $upcomingExam ? [
+                    'has_upcoming_exam' => true,
+                    'days_remaining' => $daysToExam,
+                    'exam_date' => Carbon::parse($upcomingExam->exam_date)->toDateString(),
+                    'is_urgent' => $daysToExam <= 7,
+                ] : [
+                    'has_upcoming_exam' => false,
+                ],
+            ];
+        })
+        ->sortByDesc('coefficient')
+        ->values()
+        ->take(8);
 
         return [
-            'subjects' => $subjects,
-            'total_count' => $subjects->count(),
+            'subjects' => $mappedSubjects,
+            'total_count' => $mappedSubjects->count(),
         ];
     }
 
@@ -864,5 +898,203 @@ class DashboardController extends Controller
             'missed', 'skipped' => 'missed',
             default => 'pending',
         };
+    }
+
+    // ========== UNIFIED DASHBOARD ENDPOINT ==========
+
+    /**
+     * Get complete dashboard data in a single request
+     * OPTIMIZED: Combines 6 API calls into 1 for the Flutter home page
+     * GET /api/v1/dashboard/complete
+     *
+     * This endpoint returns:
+     * - stats (user stats, streak, points, level)
+     * - today_sessions (today's study sessions)
+     * - subjects_progress (subjects with completion %)
+     * - featured_courses (top 5 courses)
+     * - sponsors (sponsor carousel data)
+     * - promos (promotional items)
+     */
+    public function getComplete(Request $request)
+    {
+        $user = $request->user();
+
+        // Fetch all data in parallel-like manner (PHP doesn't have true parallelism,
+        // but we optimize by using batch queries within each section)
+
+        // 1. Get header stats (already optimized with single query)
+        $headerStats = $this->getHeaderStats($user);
+
+        // 2. Get today's sessions (already optimized with eager loading)
+        $dailyPlanning = $this->getDailyPlanning($user);
+
+        // 3. Get subjects progress (NOW OPTIMIZED with batch queries)
+        $userSubjects = $this->getUserSubjects($user);
+
+        // 4. Get featured courses (limit to 5 for home page)
+        $featuredCourses = $this->getFeaturedCourses(5);
+
+        // 5. Get sponsors
+        $sponsors = $this->getSponsors();
+
+        // 6. Get promos
+        $promos = $this->getPromos();
+
+        // Format response for Flutter compatibility
+        return response()->json([
+            'success' => true,
+            'data' => [
+                // Stats section (Flutter HomeBloc expects this format)
+                'stats' => [
+                    'streak' => $headerStats['streak']['current_days'],
+                    'total_points' => $headerStats['points']['total'],
+                    'level' => $headerStats['level']['current'],
+                    'level_progress' => $headerStats['points']['progress_percentage'],
+                    'points_to_next_level' => $headerStats['points']['points_to_next_level'],
+                    'study_time_today' => $headerStats['study_time_today']['minutes'],
+                    'daily_goal' => $headerStats['study_time_today']['daily_goal_minutes'],
+                    'daily_goal_progress' => $headerStats['study_time_today']['progress_percentage'],
+                ],
+
+                // Today's sessions (Flutter expects this format)
+                'today_sessions' => collect($dailyPlanning['sessions'])->map(function ($session) {
+                    return [
+                        'id' => $session['id'],
+                        'subject_id' => $session['subject']['id'] ?? 0,
+                        'subject_name' => $session['subject']['name'] ?? '',
+                        'subject_color' => $session['subject']['color'] ?? '#6B7280',
+                        'type' => $this->mapSessionType($session['activity_type'] ?? 'study'),
+                        'status' => $this->mapSessionStatus($session['status'] ?? 'scheduled'),
+                        'start_time' => $session['scheduled_start'] ?? now()->toIso8601String(),
+                        'end_time' => $session['scheduled_end'] ?? now()->addHour()->toIso8601String(),
+                        'topic' => $session['topic'] ?? null,
+                        'duration_minutes' => $session['duration_minutes'] ?? 60,
+                    ];
+                })->values(),
+
+                // Subjects progress (top 4 by coefficient)
+                'subjects_progress' => collect($userSubjects['subjects'])->take(4)->map(function ($subject) {
+                    return [
+                        'id' => $subject['id'],
+                        'name' => $subject['name'],
+                        'color' => $subject['color'],
+                        'icon' => $subject['icon'],
+                        'coefficient' => $subject['coefficient'],
+                        'completion_percentage' => $subject['completion_percentage'],
+                        'total_lessons' => $subject['total_lessons'],
+                        'completed_lessons' => $subject['completed_lessons'],
+                    ];
+                })->values(),
+
+                // Featured courses
+                'featured_courses' => $featuredCourses,
+
+                // Sponsors
+                'sponsors' => $sponsors,
+
+                // Promos
+                'promos' => $promos,
+            ],
+            'meta' => [
+                'last_updated' => now()->toIso8601String(),
+                'cache_ttl_seconds' => 300, // 5 minutes suggested cache
+            ],
+        ]);
+    }
+
+    /**
+     * Get featured courses for home page
+     */
+    private function getFeaturedCourses(int $limit = 5): array
+    {
+        $courses = DB::table('courses')
+            ->where('is_published', true)
+            ->orderBy('is_featured', 'desc')
+            ->orderBy('created_at', 'desc')
+            ->limit($limit)
+            ->get();
+
+        return $courses->map(function ($course) {
+            return [
+                'id' => $course->id,
+                'title' => $course->title_ar ?? $course->title,
+                'description' => $course->short_description_ar ?? $course->short_description ?? '',
+                'thumbnail_url' => $course->thumbnail_url,
+                'price' => $course->price ?? 0,
+                'discount_price' => $course->discount_price,
+                'is_featured' => (bool) $course->is_featured,
+                'instructor_name' => $course->instructor_name ?? '',
+                'rating' => $course->average_rating ?? 0,
+                'students_count' => $course->students_count ?? 0,
+            ];
+        })->toArray();
+    }
+
+    /**
+     * Get sponsors for home page carousel
+     */
+    private function getSponsors(): array
+    {
+        $sponsors = DB::table('sponsors')
+            ->where('is_active', true)
+            ->where(function ($q) {
+                $q->whereNull('start_date')
+                  ->orWhere('start_date', '<=', now());
+            })
+            ->where(function ($q) {
+                $q->whereNull('end_date')
+                  ->orWhere('end_date', '>=', now());
+            })
+            ->orderBy('priority', 'desc')
+            ->orderBy('created_at', 'desc')
+            ->limit(10)
+            ->get();
+
+        return $sponsors->map(function ($sponsor) {
+            return [
+                'id' => $sponsor->id,
+                'name' => $sponsor->name,
+                'logo_url' => $sponsor->logo_url,
+                'banner_url' => $sponsor->banner_url,
+                'link_url' => $sponsor->link_url,
+                'description' => $sponsor->description_ar ?? $sponsor->description ?? '',
+            ];
+        })->toArray();
+    }
+
+    /**
+     * Get promotional items for home page
+     */
+    private function getPromos(): array
+    {
+        // Check if promos table exists
+        if (!DB::getSchemaBuilder()->hasTable('promos')) {
+            return [];
+        }
+
+        $promos = DB::table('promos')
+            ->where('is_active', true)
+            ->where(function ($q) {
+                $q->whereNull('start_date')
+                  ->orWhere('start_date', '<=', now());
+            })
+            ->where(function ($q) {
+                $q->whereNull('end_date')
+                  ->orWhere('end_date', '>=', now());
+            })
+            ->orderBy('priority', 'desc')
+            ->limit(5)
+            ->get();
+
+        return $promos->map(function ($promo) {
+            return [
+                'id' => $promo->id,
+                'title' => $promo->title_ar ?? $promo->title ?? '',
+                'description' => $promo->description_ar ?? $promo->description ?? '',
+                'image_url' => $promo->image_url ?? $promo->banner_url ?? '',
+                'link_url' => $promo->link_url ?? '',
+                'type' => $promo->type ?? 'banner',
+            ];
+        })->toArray();
     }
 }

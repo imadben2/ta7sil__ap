@@ -25,7 +25,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     on<SessionMissedRequested>(_onSessionMissedRequested);
     on<StudyTimeUpdateRequested>(_onStudyTimeUpdateRequested);
 
-    // Start auto-refresh timer (every 5 minutes)
+    // Start auto-refresh timer (every 15 minutes - reduced from 5 for optimization)
     _startAutoRefresh();
   }
 
@@ -170,8 +170,10 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   }
 
   /// Start auto-refresh timer
+  /// OPTIMIZED: Changed from 5 minutes to 15 minutes to reduce API calls
+  /// With the unified endpoint, each refresh is now 1 call instead of 6
   void _startAutoRefresh() {
-    _autoRefreshTimer = Timer.periodic(const Duration(minutes: 5), (_) {
+    _autoRefreshTimer = Timer.periodic(const Duration(minutes: 15), (_) {
       if (state is HomeLoaded) {
         add(const DashboardRefreshRequested());
       }

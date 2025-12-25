@@ -121,6 +121,8 @@ class SubscriptionApiController extends Controller
             ->with(['courses' => function ($q) {
                 $q->where('is_published', true);
             }])
+            ->orderBy('sort_order', 'asc')
+            ->orderBy('id', 'desc')
             ->get();
 
         return response()->json([

@@ -10,6 +10,7 @@ class SettingsState extends Equatable {
   final String? errorMessage;
   final Failure? failure;
   final String? successMessage;
+  final bool hasUnsavedChanges;
 
   const SettingsState({
     this.settings,
@@ -18,6 +19,7 @@ class SettingsState extends Equatable {
     this.errorMessage,
     this.failure,
     this.successMessage,
+    this.hasUnsavedChanges = false,
   });
 
   /// Initial state
@@ -52,6 +54,15 @@ class SettingsState extends Equatable {
       isLoading: false,
       isSaving: false,
       successMessage: message,
+      hasUnsavedChanges: false,
+    );
+  }
+
+  /// Updated locally (not saved to API yet)
+  SettingsState updatedLocally(PlannerSettings settings) {
+    return copyWith(
+      settings: settings,
+      hasUnsavedChanges: true,
     );
   }
 
@@ -79,6 +90,7 @@ class SettingsState extends Equatable {
     String? errorMessage,
     Failure? failure,
     String? successMessage,
+    bool? hasUnsavedChanges,
   }) {
     return SettingsState(
       settings: settings ?? this.settings,
@@ -87,6 +99,7 @@ class SettingsState extends Equatable {
       errorMessage: errorMessage,
       failure: failure,
       successMessage: successMessage,
+      hasUnsavedChanges: hasUnsavedChanges ?? this.hasUnsavedChanges,
     );
   }
 
@@ -98,6 +111,7 @@ class SettingsState extends Equatable {
     errorMessage,
     failure,
     successMessage,
+    hasUnsavedChanges,
   ];
 
   // Convenience getter for error message

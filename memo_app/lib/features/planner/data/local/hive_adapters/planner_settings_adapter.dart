@@ -8,12 +8,13 @@ import '../../../domain/entities/planner_settings.dart';
 /// Version history:
 /// - v1: Initial version
 /// - v2: Added gracePeriodMinutes, selectedSubjectIds
+/// - v3: Added all missing fields (notifications, UI prefs, coefficientDurations, etc.)
 class PlannerSettingsAdapter extends TypeAdapter<PlannerSettings> {
   @override
   final int typeId = 11;
 
   // Current schema version
-  static const int _currentVersion = 2;
+  static const int _currentVersion = 3;
 
   @override
   PlannerSettings read(BinaryReader reader) {
@@ -129,6 +130,48 @@ class PlannerSettingsAdapter extends TypeAdapter<PlannerSettings> {
       selectedSubjectIds = (reader.read() as List).cast<String>();
     }
 
+    // Version 3 fields - all the missing ones
+    int historicalPerformanceGapWeight = 10;
+    int pomodoroSessions = 4;
+    bool sessionReminders = true;
+    bool examReminders = true;
+    bool prayerReminders = true;
+    int reminderMinutesBefore = 15;
+    bool darkModeEnabled = false;
+    String languageCode = 'ar';
+    String? viewMode = 'list';
+    bool allowFriday = false;
+    int defaultEnergyLevel = 7;
+    int sessionDurationMinutes = 60;
+    Map<int, int> coefficientDurations = const {
+      7: 90, 6: 80, 5: 75, 4: 60, 3: 50, 2: 40, 1: 30,
+    };
+
+    if (version >= 3) {
+      historicalPerformanceGapWeight = reader.readInt();
+      pomodoroSessions = reader.readInt();
+      sessionReminders = reader.readBool();
+      examReminders = reader.readBool();
+      prayerReminders = reader.readBool();
+      reminderMinutesBefore = reader.readInt();
+      darkModeEnabled = reader.readBool();
+      languageCode = reader.readString();
+      final hasViewMode = reader.readBool();
+      viewMode = hasViewMode ? reader.readString() : null;
+      allowFriday = reader.readBool();
+      defaultEnergyLevel = reader.readInt();
+      sessionDurationMinutes = reader.readInt();
+      // Read coefficientDurations map
+      final durationsLength = reader.readInt();
+      final durations = <int, int>{};
+      for (var i = 0; i < durationsLength; i++) {
+        final key = reader.readInt();
+        final value = reader.readInt();
+        durations[key] = value;
+      }
+      coefficientDurations = durations;
+    }
+
     return PlannerSettings(
       userId: userId,
       studyStartTime: studyStartTime,
@@ -156,12 +199,25 @@ class PlannerSettingsAdapter extends TypeAdapter<PlannerSettings> {
       coefficientWeight: coefficientWeight,
       examProximityWeight: examProximityWeight,
       difficultyWeight: difficultyWeight,
+      historicalPerformanceGapWeight: historicalPerformanceGapWeight,
       inactivityWeight: inactivityWeight,
       performanceGapWeight: performanceGapWeight,
       maxStudyHoursPerDay: maxStudyHoursPerDay,
       minBreakBetweenSessions: minBreakBetweenSessions,
+      pomodoroSessions: pomodoroSessions,
+      sessionReminders: sessionReminders,
+      examReminders: examReminders,
+      prayerReminders: prayerReminders,
+      reminderMinutesBefore: reminderMinutesBefore,
+      darkModeEnabled: darkModeEnabled,
+      languageCode: languageCode,
+      viewMode: viewMode,
+      allowFriday: allowFriday,
+      defaultEnergyLevel: defaultEnergyLevel,
+      sessionDurationMinutes: sessionDurationMinutes,
       gracePeriodMinutes: gracePeriodMinutes,
       selectedSubjectIds: selectedSubjectIds,
+      coefficientDurations: coefficientDurations,
     );
   }
 
@@ -213,5 +269,28 @@ class PlannerSettingsAdapter extends TypeAdapter<PlannerSettings> {
     // Version 2 fields
     writer.writeInt(obj.gracePeriodMinutes);
     writer.write(obj.selectedSubjectIds);
+
+    // Version 3 fields
+    writer.writeInt(obj.historicalPerformanceGapWeight);
+    writer.writeInt(obj.pomodoroSessions);
+    writer.writeBool(obj.sessionReminders);
+    writer.writeBool(obj.examReminders);
+    writer.writeBool(obj.prayerReminders);
+    writer.writeInt(obj.reminderMinutesBefore);
+    writer.writeBool(obj.darkModeEnabled);
+    writer.writeString(obj.languageCode);
+    writer.writeBool(obj.viewMode != null);
+    if (obj.viewMode != null) {
+      writer.writeString(obj.viewMode!);
+    }
+    writer.writeBool(obj.allowFriday);
+    writer.writeInt(obj.defaultEnergyLevel);
+    writer.writeInt(obj.sessionDurationMinutes);
+    // Write coefficientDurations map
+    writer.writeInt(obj.coefficientDurations.length);
+    for (final entry in obj.coefficientDurations.entries) {
+      writer.writeInt(entry.key);
+      writer.writeInt(entry.value);
+    }
   }
 }

@@ -722,30 +722,6 @@ class _ModernCourseCard extends StatelessWidget {
                       ),
                     ),
 
-                  // Play Button
-                  Positioned.fill(
-                    child: Center(
-                      child: Container(
-                        width: 44,
-                        height: 44,
-                        decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.95),
-                          shape: BoxShape.circle,
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.2),
-                              blurRadius: 12,
-                            ),
-                          ],
-                        ),
-                        child: Icon(
-                          Icons.play_arrow_rounded,
-                          color: _getGradientColors()[0],
-                          size: 28,
-                        ),
-                      ),
-                    ),
-                  ),
                 ],
               ),
             ),
@@ -891,100 +867,83 @@ class _ModernCourseListItem extends StatelessWidget {
             ),
           ],
         ),
-        child: Row(
-          children: [
-            // Image Section
-            Container(
-              width: 120,
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: _getGradientColors(),
+        child: Directionality(
+          textDirection: TextDirection.rtl,
+          child: Row(
+            children: [
+              // Image Section (now on the right in RTL)
+              Container(
+                width: 120,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: _getGradientColors(),
+                  ),
+                  borderRadius: const BorderRadius.horizontal(
+                    right: Radius.circular(24),
+                  ),
                 ),
-                borderRadius: const BorderRadius.horizontal(
-                  left: Radius.circular(24),
-                ),
-              ),
-              child: Stack(
-                children: [
-                  if (course.thumbnailUrl != null)
-                    ClipRRect(
-                      borderRadius: const BorderRadius.horizontal(
-                        left: Radius.circular(24),
-                      ),
-                      child: CachedNetworkImage(
-                        imageUrl: course.thumbnailUrl!,
-                        fit: BoxFit.cover,
-                        width: double.infinity,
-                        height: double.infinity,
-                        placeholder: (context, url) => _buildPlaceholder(),
-                        errorWidget: (context, url, error) => _buildPlaceholder(),
-                      ),
-                    )
-                  else
-                    _buildPlaceholder(),
+                child: Stack(
+                  children: [
+                    if (course.thumbnailUrl != null)
+                      ClipRRect(
+                        borderRadius: const BorderRadius.horizontal(
+                          right: Radius.circular(24),
+                        ),
+                        child: CachedNetworkImage(
+                          imageUrl: course.thumbnailUrl!,
+                          fit: BoxFit.cover,
+                          width: double.infinity,
+                          height: double.infinity,
+                          placeholder: (context, url) => _buildPlaceholder(),
+                          errorWidget: (context, url, error) => _buildPlaceholder(),
+                        ),
+                      )
+                    else
+                      _buildPlaceholder(),
 
-                  // Play Icon
-                  Positioned.fill(
-                    child: Center(
+                    // Lessons Count
+                    Positioned(
+                      bottom: 8,
+                      left: 8,
                       child: Container(
-                        width: 40,
-                        height: 40,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 4,
+                        ),
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.95),
-                          shape: BoxShape.circle,
+                          color: Colors.black.withOpacity(0.6),
+                          borderRadius: BorderRadius.circular(8),
                         ),
-                        child: Icon(
-                          Icons.play_arrow_rounded,
-                          color: _getGradientColors()[0],
-                          size: 24,
-                        ),
-                      ),
-                    ),
-                  ),
-
-                  // Lessons Count
-                  Positioned(
-                    bottom: 8,
-                    right: 8,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 4,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.black.withOpacity(0.6),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          const Icon(
-                            Icons.play_lesson_rounded,
-                            color: Colors.white,
-                            size: 10,
-                          ),
-                          const SizedBox(width: 4),
-                          Text(
-                            '${course.totalLessons}',
-                            style: const TextStyle(
-                              fontFamily: 'Cairo',
-                              fontSize: 10,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              '${course.totalLessons}',
+                              style: const TextStyle(
+                                fontFamily: 'Cairo',
+                                fontSize: 10,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
                             ),
-                          ),
-                        ],
+                            const SizedBox(width: 4),
+                            const Icon(
+                              Icons.play_lesson_rounded,
+                              color: Colors.white,
+                              size: 10,
+                            ),
+                          ],
+                        ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
 
-            // Content Section
-            Expanded(
+              // Content Section
+              Expanded(
               child: Padding(
                 padding: const EdgeInsets.all(16),
                 child: Column(
@@ -1122,7 +1081,8 @@ class _ModernCourseListItem extends StatelessWidget {
                 ),
               ),
             ),
-          ],
+            ],
+          ),
         ),
       ),
     );

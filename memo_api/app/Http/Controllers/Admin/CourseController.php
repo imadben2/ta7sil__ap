@@ -97,6 +97,9 @@ class CourseController extends Controller
             'title_ar' => 'required|string|max:255',
             'description_ar' => 'required|string',
             'short_description_ar' => 'required|string|max:200',
+            'what_you_will_learn' => 'nullable|string',
+            'requirements' => 'nullable|string',
+            'target_audience' => 'nullable|string',
             'thumbnail' => 'required|image|max:2048',
             'trailer_video_url' => 'nullable|string',
             'trailer_video_type' => 'nullable|in:youtube,upload',
@@ -107,6 +110,7 @@ class CourseController extends Controller
             'price_dzd' => 'required|integer|min:0',
             'is_free' => 'boolean',
             'requires_subscription' => 'boolean',
+            'certificate_available' => 'boolean',
             'instructor_name' => 'required|string|max:255',
             'instructor_bio_ar' => 'nullable|string',
             'instructor_photo' => 'nullable|image|max:2048',
@@ -124,6 +128,20 @@ class CourseController extends Controller
         if (isset($validated['tags'])) {
             $validated['tags'] = array_map('trim', explode(',', $validated['tags']));
         }
+
+        // Convert learning content fields to arrays (split by newlines)
+        if (isset($validated['what_you_will_learn'])) {
+            $validated['what_you_will_learn'] = array_filter(array_map('trim', explode("\n", $validated['what_you_will_learn'])));
+        }
+        if (isset($validated['requirements'])) {
+            $validated['requirements'] = array_filter(array_map('trim', explode("\n", $validated['requirements'])));
+        }
+        if (isset($validated['target_audience'])) {
+            $validated['target_audience'] = array_filter(array_map('trim', explode("\n", $validated['target_audience'])));
+        }
+
+        // Set certificate_available default
+        $validated['certificate_available'] = $request->boolean('certificate_available', true);
 
         // Handle file uploads through service
         if ($request->hasFile('thumbnail')) {
@@ -157,7 +175,7 @@ class CourseController extends Controller
     public function show(Course $course)
     {
         $course->load([
-            'subject.academicStream',
+            'subject.streams',
             'subject.academicYear',
             'modules.lessons',
             'modules.quizzes.quiz',
@@ -206,16 +224,21 @@ class CourseController extends Controller
             'title_ar' => 'required|string|max:255',
             'description_ar' => 'required|string',
             'short_description_ar' => 'required|string|max:200',
+            'what_you_will_learn' => 'nullable|string',
+            'requirements' => 'nullable|string',
+            'target_audience' => 'nullable|string',
             'thumbnail' => 'nullable|image|max:2048',
             'trailer_video_url' => 'nullable|string',
-            'trailer_video_type' => 'nullable|in:youtube,upload',
+            'trailer_video_type' => 'nullable|in:youtube,vimeo,upload,uploaded',
             'trailer_video' => 'nullable|file|mimes:mp4,mov,avi|max:102400',
-            'subject_id' => 'nullable|exists:subjects,id',
+            'subject_id' => 'required|exists:subjects,id',
             'level' => 'required|in:beginner,intermediate,advanced',
+            'duration_days' => 'required|integer|min:1',
             'tags' => 'nullable|string',
             'price_dzd' => 'required|integer|min:0',
             'is_free' => 'boolean',
             'requires_subscription' => 'boolean',
+            'certificate_available' => 'boolean',
             'instructor_name' => 'required|string|max:255',
             'instructor_bio_ar' => 'nullable|string',
             'instructor_photo' => 'nullable|image|max:2048',
@@ -223,7 +246,7 @@ class CourseController extends Controller
             'instructor_phone' => 'nullable|string|max:20',
             'whatsapp_number' => 'nullable|string|max:20',
             'facebook_url' => 'nullable|url',
-            'featured' => 'boolean',
+            'is_featured' => 'boolean',
             'is_published' => 'boolean',
             'meta_description_ar' => 'nullable|string|max:160',
             'meta_keywords' => 'nullable|string',
@@ -233,6 +256,23 @@ class CourseController extends Controller
         if (isset($validated['tags'])) {
             $validated['tags'] = array_map('trim', explode(',', $validated['tags']));
         }
+
+        // Convert learning content fields to arrays (split by newlines)
+        if (isset($validated['what_you_will_learn'])) {
+            $validated['what_you_will_learn'] = array_filter(array_map('trim', explode("\n", $validated['what_you_will_learn'])));
+        }
+        if (isset($validated['requirements'])) {
+            $validated['requirements'] = array_filter(array_map('trim', explode("\n", $validated['requirements'])));
+        }
+        if (isset($validated['target_audience'])) {
+            $validated['target_audience'] = array_filter(array_map('trim', explode("\n", $validated['target_audience'])));
+        }
+
+        // Handle boolean values (checkboxes don't send value when unchecked)
+        $validated['is_free'] = $request->boolean('is_free');
+        $validated['is_published'] = $request->boolean('is_published');
+        $validated['is_featured'] = $request->boolean('is_featured');
+        $validated['certificate_available'] = $request->boolean('certificate_available', true);
 
         // Handle file uploads
         if ($request->hasFile('thumbnail')) {

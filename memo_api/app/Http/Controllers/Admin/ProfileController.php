@@ -8,6 +8,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\File;
 use Illuminate\Validation\Rules\Password;
 
 class ProfileController extends Controller
@@ -352,5 +354,116 @@ class ProfileController extends Controller
         );
 
         return back()->with('success', 'تم تحديث الإعدادات بنجاح');
+    }
+
+    /**
+     * Check if storage link exists
+     */
+    public function checkStorageLink()
+    {
+        $storagePath = public_path('storage');
+        $targetPath = storage_path('app/public');
+
+        $exists = false;
+        $message = '';
+
+        if (is_link($storagePath)) {
+            // It's a symbolic link
+            $linkTarget = readlink($storagePath);
+            if ($linkTarget === $targetPath || realpath($storagePath) === realpath($targetPath)) {
+                $exists = true;
+                $message = 'الرابط الرمزي يعمل بشكل صحيح';
+            } else {
+                $message = 'الرابط موجود لكنه يشير إلى مسار خاطئ';
+            }
+        } elseif (is_dir($storagePath)) {
+            // It's a directory (not a link)
+            $message = 'المجلد موجود كمجلد عادي وليس رابط رمزي';
+        } else {
+            $message = 'رابط التخزين غير موجود';
+        }
+
+        return response()->json([
+            'exists' => $exists,
+            'message' => $message,
+            'storage_path' => $storagePath,
+            'target_path' => $targetPath,
+        ]);
+    }
+
+    /**
+     * Create storage link
+     */
+    public function createStorageLink()
+    {
+        try {
+            $storagePath = public_path('storage');
+            $targetPath = storage_path('app/public');
+
+            // Check if it already exists
+            if (file_exists($storagePath) || is_link($storagePath)) {
+                // Remove existing link or directory
+                if (is_link($storagePath)) {
+                    // Remove symlink
+                    if (PHP_OS_FAMILY === 'Windows') {
+                        // On Windows, use rmdir for directory links
+                        @rmdir($storagePath);
+                    } else {
+                        @unlink($storagePath);
+                    }
+                } elseif (is_dir($storagePath)) {
+                    // If it's a regular directory, don't remove it - just warn
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'المجلد public/storage موجود كمجلد عادي. يرجى حذفه يدوياً أولاً.',
+                    ]);
+                }
+            }
+
+            // Make sure target directory exists
+            if (!File::exists($targetPath)) {
+                File::makeDirectory($targetPath, 0755, true);
+            }
+
+            // Create the symbolic link
+            if (PHP_OS_FAMILY === 'Windows') {
+                // On Windows, try using mklink (requires admin or developer mode)
+                $command = 'mklink /D "' . $storagePath . '" "' . $targetPath . '"';
+                exec($command, $output, $returnVar);
+
+                if ($returnVar !== 0) {
+                    // Try using junction as fallback
+                    $junctionCommand = 'mklink /J "' . $storagePath . '" "' . $targetPath . '"';
+                    exec($junctionCommand, $output, $returnVar);
+
+                    if ($returnVar !== 0) {
+                        // Use Laravel's storage:link as last resort
+                        Artisan::call('storage:link');
+                    }
+                }
+            } else {
+                // On Unix-like systems
+                symlink($targetPath, $storagePath);
+            }
+
+            // Verify the link was created
+            if (is_link($storagePath) || (is_dir($storagePath) && PHP_OS_FAMILY === 'Windows')) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'تم إنشاء رابط التخزين بنجاح!',
+                ]);
+            } else {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'فشل في إنشاء رابط التخزين. جرب تشغيل: php artisan storage:link',
+                ]);
+            }
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'حدث خطأ: ' . $e->getMessage(),
+            ]);
+        }
     }
 }

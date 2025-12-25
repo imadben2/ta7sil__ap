@@ -29,12 +29,26 @@ class PlannerSettingsModel {
   final int coefficientWeight;
   final int examProximityWeight;
   final int difficultyWeight;
+  final int historicalPerformanceGapWeight;
   final int inactivityWeight;
   final int performanceGapWeight;
   final int maxStudyHoursPerDay;
   final int minBreakBetweenSessions;
   final int sessionDurationMinutes;
   final Map<int, int> coefficientDurations;
+  // Additional fields
+  final int pomodoroSessions;
+  final bool sessionReminders;
+  final bool examReminders;
+  final bool prayerReminders;
+  final int reminderMinutesBefore;
+  final bool darkModeEnabled;
+  final String languageCode;
+  final String? viewMode;
+  final bool allowFriday;
+  final int defaultEnergyLevel;
+  final int gracePeriodMinutes;
+  final List<String> selectedSubjectIds;
 
   PlannerSettingsModel({
     required this.userId,
@@ -63,8 +77,9 @@ class PlannerSettingsModel {
     this.coefficientWeight = 40,
     this.examProximityWeight = 25,
     this.difficultyWeight = 15,
-    this.inactivityWeight = 10,
-    this.performanceGapWeight = 10,
+    this.historicalPerformanceGapWeight = 10,
+    this.inactivityWeight = 5,
+    this.performanceGapWeight = 5,
     this.maxStudyHoursPerDay = 8,
     this.minBreakBetweenSessions = 10,
     this.sessionDurationMinutes = 60,
@@ -77,15 +92,27 @@ class PlannerSettingsModel {
       2: 40,
       1: 30,
     },
+    this.pomodoroSessions = 4,
+    this.sessionReminders = true,
+    this.examReminders = true,
+    this.prayerReminders = true,
+    this.reminderMinutesBefore = 15,
+    this.darkModeEnabled = false,
+    this.languageCode = 'ar',
+    this.viewMode = 'list',
+    this.allowFriday = false,
+    this.defaultEnergyLevel = 7,
+    this.gracePeriodMinutes = 15,
+    this.selectedSubjectIds = const [],
   });
 
   factory PlannerSettingsModel.fromJson(Map<String, dynamic> json) {
     return PlannerSettingsModel(
       userId: json['user_id']?.toString() ?? '',
-      studyStartTime: json['study_start_time'] as String,
-      studyEndTime: json['study_end_time'] as String,
-      sleepStartTime: json['sleep_start_time'] as String,
-      sleepEndTime: json['sleep_end_time'] as String,
+      studyStartTime: json['study_start_time'] as String? ?? '08:00',
+      studyEndTime: json['study_end_time'] as String? ?? '22:00',
+      sleepStartTime: json['sleep_start_time'] as String? ?? '23:00',
+      sleepEndTime: json['sleep_end_time'] as String? ?? '07:00',
       exerciseEnabled: json['exercise_enabled'] as bool? ?? false,
       exerciseDays:
           (json['exercise_days'] as List<dynamic>?)?.cast<int>() ?? [],
@@ -110,12 +137,25 @@ class PlannerSettingsModel {
       coefficientWeight: json['coefficient_weight'] as int? ?? 40,
       examProximityWeight: json['exam_proximity_weight'] as int? ?? 25,
       difficultyWeight: json['difficulty_weight'] as int? ?? 15,
-      inactivityWeight: json['inactivity_weight'] as int? ?? 10,
-      performanceGapWeight: json['performance_gap_weight'] as int? ?? 10,
+      historicalPerformanceGapWeight: json['historical_performance_gap_weight'] as int? ?? 10,
+      inactivityWeight: json['inactivity_weight'] as int? ?? 5,
+      performanceGapWeight: json['performance_gap_weight'] as int? ?? 5,
       maxStudyHoursPerDay: json['max_study_hours_per_day'] as int? ?? 8,
       minBreakBetweenSessions: json['min_break_between_sessions'] as int? ?? 10,
       sessionDurationMinutes: json['session_duration_minutes'] as int? ?? 60,
       coefficientDurations: _parseCoefficientDurations(json['coefficient_durations']),
+      pomodoroSessions: json['pomodoro_sessions'] as int? ?? 4,
+      sessionReminders: json['session_reminders'] as bool? ?? true,
+      examReminders: json['exam_reminders'] as bool? ?? true,
+      prayerReminders: json['prayer_reminders'] as bool? ?? true,
+      reminderMinutesBefore: json['reminder_minutes_before'] as int? ?? 15,
+      darkModeEnabled: json['dark_mode_enabled'] as bool? ?? false,
+      languageCode: json['language_code'] as String? ?? 'ar',
+      viewMode: json['view_mode'] as String? ?? 'list',
+      allowFriday: json['allow_friday'] as bool? ?? false,
+      defaultEnergyLevel: json['default_energy_level'] as int? ?? 7,
+      gracePeriodMinutes: json['grace_period_minutes'] as int? ?? 15,
+      selectedSubjectIds: (json['selected_subject_ids'] as List<dynamic>?)?.cast<String>() ?? [],
     );
   }
 
@@ -178,6 +218,7 @@ class PlannerSettingsModel {
       'coefficient_weight': coefficientWeight,
       'exam_proximity_weight': examProximityWeight,
       'difficulty_weight': difficultyWeight,
+      'historical_performance_gap_weight': historicalPerformanceGapWeight,
       'inactivity_weight': inactivityWeight,
       'performance_gap_weight': performanceGapWeight,
       'max_study_hours_per_day': maxStudyHoursPerDay,
@@ -186,6 +227,18 @@ class PlannerSettingsModel {
       'coefficient_durations': coefficientDurations.map(
         (key, value) => MapEntry(key.toString(), value),
       ),
+      'pomodoro_sessions': pomodoroSessions,
+      'session_reminders': sessionReminders,
+      'exam_reminders': examReminders,
+      'prayer_reminders': prayerReminders,
+      'reminder_minutes_before': reminderMinutesBefore,
+      'dark_mode_enabled': darkModeEnabled,
+      'language_code': languageCode,
+      'view_mode': viewMode,
+      'allow_friday': allowFriday,
+      'default_energy_level': defaultEnergyLevel,
+      'grace_period_minutes': gracePeriodMinutes,
+      'selected_subject_ids': selectedSubjectIds,
     };
   }
 
@@ -219,12 +272,25 @@ class PlannerSettingsModel {
       coefficientWeight: coefficientWeight,
       examProximityWeight: examProximityWeight,
       difficultyWeight: difficultyWeight,
+      historicalPerformanceGapWeight: historicalPerformanceGapWeight,
       inactivityWeight: inactivityWeight,
       performanceGapWeight: performanceGapWeight,
       maxStudyHoursPerDay: maxStudyHoursPerDay,
       minBreakBetweenSessions: minBreakBetweenSessions,
       sessionDurationMinutes: sessionDurationMinutes,
       coefficientDurations: coefficientDurations,
+      pomodoroSessions: pomodoroSessions,
+      sessionReminders: sessionReminders,
+      examReminders: examReminders,
+      prayerReminders: prayerReminders,
+      reminderMinutesBefore: reminderMinutesBefore,
+      darkModeEnabled: darkModeEnabled,
+      languageCode: languageCode,
+      viewMode: viewMode,
+      allowFriday: allowFriday,
+      defaultEnergyLevel: defaultEnergyLevel,
+      gracePeriodMinutes: gracePeriodMinutes,
+      selectedSubjectIds: selectedSubjectIds,
     );
   }
 
@@ -258,12 +324,25 @@ class PlannerSettingsModel {
       coefficientWeight: entity.coefficientWeight,
       examProximityWeight: entity.examProximityWeight,
       difficultyWeight: entity.difficultyWeight,
+      historicalPerformanceGapWeight: entity.historicalPerformanceGapWeight,
       inactivityWeight: entity.inactivityWeight,
       performanceGapWeight: entity.performanceGapWeight,
       maxStudyHoursPerDay: entity.maxStudyHoursPerDay,
       minBreakBetweenSessions: entity.minBreakBetweenSessions,
       sessionDurationMinutes: entity.sessionDurationMinutes,
       coefficientDurations: entity.coefficientDurations,
+      pomodoroSessions: entity.pomodoroSessions,
+      sessionReminders: entity.sessionReminders,
+      examReminders: entity.examReminders,
+      prayerReminders: entity.prayerReminders,
+      reminderMinutesBefore: entity.reminderMinutesBefore,
+      darkModeEnabled: entity.darkModeEnabled,
+      languageCode: entity.languageCode,
+      viewMode: entity.viewMode,
+      allowFriday: entity.allowFriday,
+      defaultEnergyLevel: entity.defaultEnergyLevel,
+      gracePeriodMinutes: entity.gracePeriodMinutes,
+      selectedSubjectIds: entity.selectedSubjectIds,
     );
   }
 

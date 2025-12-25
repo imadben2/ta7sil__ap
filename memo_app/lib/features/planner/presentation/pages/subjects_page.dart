@@ -44,8 +44,8 @@ class _SubjectsPageContent extends StatelessWidget {
               // Modern App Bar
               _buildModernAppBar(context),
 
-              // Page Header
-              _buildPageHeader(context),
+              // Page Header - commented out
+              // _buildPageHeader(context),
 
               // Content
               Expanded(
@@ -393,7 +393,7 @@ class _SubjectsPageContent extends StatelessWidget {
                 crossAxisCount: 2,
                 crossAxisSpacing: 12,
                 mainAxisSpacing: 12,
-                childAspectRatio: 0.85,
+                childAspectRatio: 1.0,
               ),
               itemCount: subjects.length,
               itemBuilder: (context, index) {
@@ -459,7 +459,7 @@ class _SubjectsPageContent extends StatelessWidget {
 
             // Content
             Padding(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(12),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -467,38 +467,48 @@ class _SubjectsPageContent extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      // Icon container
+                      // Menu dots
                       Container(
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.2),
-                          borderRadius: BorderRadius.circular(14),
-                        ),
+                        padding: const EdgeInsets.all(4),
                         child: Icon(
-                          subject.icon,
-                          color: Colors.white,
-                          size: 24,
+                          Icons.more_horiz,
+                          color: Colors.white.withOpacity(0.7),
+                          size: 18,
                         ),
                       ),
 
                       // Coefficient badge
                       Container(
                         padding: const EdgeInsets.symmetric(
-                          horizontal: 10,
-                          vertical: 4,
+                          horizontal: 8,
+                          vertical: 3,
                         ),
                         decoration: BoxDecoration(
                           color: Colors.white.withOpacity(0.2),
-                          borderRadius: BorderRadius.circular(10),
+                          borderRadius: BorderRadius.circular(8),
                         ),
                         child: Text(
                           'معامل ${subject.coefficient}',
                           style: const TextStyle(
                             fontFamily: 'Cairo',
-                            fontSize: 10,
+                            fontSize: 9,
                             fontWeight: FontWeight.w600,
                             color: Colors.white,
                           ),
+                        ),
+                      ),
+
+                      // Icon container
+                      Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.2),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Icon(
+                          subject.icon,
+                          color: Colors.white,
+                          size: 20,
                         ),
                       ),
                     ],
@@ -511,26 +521,25 @@ class _SubjectsPageContent extends StatelessWidget {
                     subject.nameAr,
                     style: const TextStyle(
                       fontFamily: 'Cairo',
-                      fontSize: 18,
+                      fontSize: 15,
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
-                  const SizedBox(height: 2),
                   Text(
                     subject.name,
                     style: TextStyle(
                       fontFamily: 'Cairo',
-                      fontSize: 12,
+                      fontSize: 10,
                       color: Colors.white.withOpacity(0.85),
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
 
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 8),
 
                   // Progress section
                   Column(
@@ -540,35 +549,35 @@ class _SubjectsPageContent extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            'التقدم',
-                            style: TextStyle(
-                              fontFamily: 'Cairo',
-                              fontSize: 11,
-                              color: Colors.white.withOpacity(0.9),
-                            ),
-                          ),
-                          Text(
                             '${subject.progressPercentage.toStringAsFixed(0)}%',
                             style: const TextStyle(
                               fontFamily: 'Cairo',
-                              fontSize: 12,
+                              fontSize: 10,
                               fontWeight: FontWeight.bold,
                               color: Colors.white,
                             ),
                           ),
+                          Text(
+                            'التقدم',
+                            style: TextStyle(
+                              fontFamily: 'Cairo',
+                              fontSize: 10,
+                              color: Colors.white.withOpacity(0.9),
+                            ),
+                          ),
                         ],
                       ),
-                      const SizedBox(height: 6),
+                      const SizedBox(height: 4),
                       // Progress bar
                       ClipRRect(
-                        borderRadius: BorderRadius.circular(6),
+                        borderRadius: BorderRadius.circular(4),
                         child: LinearProgressIndicator(
                           value: subject.progressPercentage / 100,
                           backgroundColor: Colors.white.withOpacity(0.3),
                           valueColor: const AlwaysStoppedAnimation<Color>(
                             Colors.white,
                           ),
-                          minHeight: 6,
+                          minHeight: 5,
                         ),
                       ),
                     ],

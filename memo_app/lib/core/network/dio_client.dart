@@ -6,11 +6,15 @@ import '../storage/secure_storage_service.dart';
 import '../storage/hive_service.dart';
 import '../errors/exceptions.dart';
 
-/// Dio HTTP client with interceptors and error handling
+/// Dio HTTP client with interceptors, error handling, and request deduplication
 class DioClient {
   final Dio dio;
   final SecureStorageService secureStorage;
   final HiveService? hiveService;
+
+  /// Map to track in-flight GET requests to prevent duplicate calls
+  /// Key: request signature (path + queryParams), Value: pending Future
+  final Map<String, Future<Response>> _inFlightRequests = {};
 
   DioClient({
     required this.dio,
@@ -18,6 +22,16 @@ class DioClient {
     this.hiveService,
   }) {
     _configureDio();
+  }
+
+  /// Generate a unique key for request deduplication
+  String _getRequestKey(String path, Map<String, dynamic>? queryParameters) {
+    final sortedParams = queryParameters != null
+        ? (Map.fromEntries(
+            queryParameters.entries.toList()
+              ..sort((a, b) => a.key.compareTo(b.key))))
+        : <String, dynamic>{};
+    return '$path:${sortedParams.toString()}';
   }
 
   void _configureDio() {
@@ -47,12 +61,48 @@ class DioClient {
     );
   }
 
-  // GET request
+  /// GET request with automatic deduplication
+  /// If the same request is already in-flight, returns the pending Future
+  /// instead of making a duplicate request
   Future<Response> get(
     String path, {
     Map<String, dynamic>? queryParameters,
     Options? options,
+    bool deduplicate = true,
   }) async {
+    final requestKey = _getRequestKey(path, queryParameters);
+
+    // Check if same request is already in-flight
+    if (deduplicate && _inFlightRequests.containsKey(requestKey)) {
+      debugPrint('[DioClient] Deduplicating request: $path');
+      return _inFlightRequests[requestKey]!;
+    }
+
+    // Create the request future
+    final requestFuture = _executeGet(path, queryParameters, options);
+
+    // Track in-flight request (only for GET requests with deduplication enabled)
+    if (deduplicate) {
+      _inFlightRequests[requestKey] = requestFuture;
+    }
+
+    try {
+      final response = await requestFuture;
+      return response;
+    } finally {
+      // Remove from in-flight map when complete
+      if (deduplicate) {
+        _inFlightRequests.remove(requestKey);
+      }
+    }
+  }
+
+  /// Internal method to execute GET request
+  Future<Response> _executeGet(
+    String path,
+    Map<String, dynamic>? queryParameters,
+    Options? options,
+  ) async {
     try {
       final response = await dio.get(
         path,

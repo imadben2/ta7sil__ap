@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../domain/entities/subscription_package_entity.dart';
 import '../../domain/entities/user_subscription_entity.dart';
@@ -353,111 +354,443 @@ class _SubscriptionsPageState extends State<SubscriptionsPage>
   }
 
   Widget _buildModernPackageCard(SubscriptionPackageEntity package) {
+    // Hybrid card: use image-based if image exists, otherwise color-based
+    if (package.hasImage) {
+      return _buildImagePackageCard(package);
+    } else {
+      return _buildColorPackageCard(package);
+    }
+  }
+
+  /// Get color from API or default blue
+  Color _getPackageColor(SubscriptionPackageEntity package) {
+    return package.backgroundColorValue ?? AppColors.blue500;
+  }
+
+  /// Image-based package card (compact)
+  Widget _buildImagePackageCard(SubscriptionPackageEntity package) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 16),
+      height: 180,
+      margin: const EdgeInsets.only(bottom: 14),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 15,
-            offset: const Offset(0, 5),
+            color: Colors.black.withOpacity(0.08),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
           ),
         ],
       ),
-      child: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(16),
+        child: Stack(
           children: [
-            // Package Name
-            Text(
-              package.nameAr,
-              style: const TextStyle(
-                fontFamily: 'Cairo',
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: AppColors.slate900,
-              ),
-            ),
-
-            // Description
-            if (package.descriptionAr != null && package.descriptionAr!.isNotEmpty) ...[
-              const SizedBox(height: 8),
-              Text(
-                package.descriptionAr!,
-                style: const TextStyle(
-                  fontFamily: 'Cairo',
-                  fontSize: 13,
-                  color: AppColors.slate600,
-                ),
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ],
-
-            const SizedBox(height: 16),
-
-            // Price and Duration
-            Row(
-              children: [
-                Text(
-                  '${package.priceDzd} دج',
-                  style: const TextStyle(
-                    fontFamily: 'Cairo',
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.blue500,
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: AppColors.slate500.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Text(
-                    '${package.durationDays} يوم',
-                    style: const TextStyle(
-                      fontFamily: 'Cairo',
-                      fontSize: 12,
-                      color: AppColors.slate600,
+            // Background Image
+            Positioned.fill(
+              child: CachedNetworkImage(
+                imageUrl: package.imageFullUrl!,
+                fit: BoxFit.cover,
+                placeholder: (context, url) => Container(
+                  color: AppColors.slateBackground,
+                  child: const Center(
+                    child: CircularProgressIndicator(
+                      color: AppColors.blue500,
+                      strokeWidth: 2,
                     ),
                   ),
                 ),
-              ],
+                errorWidget: (context, url, error) => Container(
+                  color: AppColors.slateBackground,
+                  child: Icon(
+                    Icons.image_not_supported_rounded,
+                    size: 40,
+                    color: AppColors.slate500,
+                  ),
+                ),
+              ),
             ),
 
-            const SizedBox(height: 16),
+            // Badges (top)
+            Positioned(
+              top: 10,
+              left: 10,
+              right: 10,
+              child: Row(
+                children: [
+                  if (package.isFeatured)
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: Colors.amber,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: const Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.star_rounded, size: 12, color: Colors.white),
+                          SizedBox(width: 3),
+                          Text(
+                            'مميزة',
+                            style: TextStyle(
+                              fontFamily: 'Cairo',
+                              fontSize: 10,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  const Spacer(),
+                  if (package.badgeText != null && package.badgeText!.isNotEmpty)
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: Colors.red,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Text(
+                        package.badgeText!,
+                        style: const TextStyle(
+                          fontFamily: 'Cairo',
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+            ),
 
-            // Subscribe Button - Full width
-            SizedBox(
-              width: double.infinity,
-              height: 48,
+            // Subscribe Button (bottom left)
+            Positioned(
+              bottom: 12,
+              left: 12,
               child: ElevatedButton(
                 onPressed: () => _handleSubscribe(package),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.blue500,
-                  foregroundColor: Colors.white,
+                  backgroundColor: Colors.white,
+                  foregroundColor: AppColors.blue500,
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(10),
                   ),
                   elevation: 0,
+                  minimumSize: Size.zero,
+                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                 ),
                 child: const Text(
-                  'اشترك الآن',
+                  'اشترك',
                   style: TextStyle(
                     fontFamily: 'Cairo',
                     fontWeight: FontWeight.bold,
-                    fontSize: 14,
+                    fontSize: 12,
                   ),
                 ),
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  /// Modern color-based package card with gradient and glass effects
+  Widget _buildColorPackageCard(SubscriptionPackageEntity package) {
+    final cardColor = _getPackageColor(package);
+    // Create a darker shade for gradient
+    final HSLColor hsl = HSLColor.fromColor(cardColor);
+    final Color darkerColor = hsl.withLightness((hsl.lightness - 0.15).clamp(0.0, 1.0)).toColor();
+    final Color lighterColor = hsl.withLightness((hsl.lightness + 0.1).clamp(0.0, 1.0)).toColor();
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(20),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [lighterColor, cardColor, darkerColor],
+          stops: const [0.0, 0.5, 1.0],
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: cardColor.withOpacity(0.4),
+            blurRadius: 20,
+            offset: const Offset(0, 8),
+            spreadRadius: -2,
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(20),
+          onTap: () => _handleSubscribe(package),
+          child: Stack(
+            children: [
+              // Decorative circles
+              Positioned(
+                top: -30,
+                right: -30,
+                child: Container(
+                  width: 100,
+                  height: 100,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Colors.white.withOpacity(0.1),
+                  ),
+                ),
+              ),
+              Positioned(
+                bottom: -20,
+                left: -20,
+                child: Container(
+                  width: 70,
+                  height: 70,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Colors.white.withOpacity(0.08),
+                  ),
+                ),
+              ),
+              // Main content
+              Padding(
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // Top Row: Badges and Duration
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        // Badges
+                        Flexible(
+                          child: Wrap(
+                            spacing: 8,
+                            runSpacing: 4,
+                            children: [
+                              if (package.isFeatured)
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                                  decoration: BoxDecoration(
+                                    gradient: const LinearGradient(
+                                      colors: [Color(0xFFFFD700), Color(0xFFFFA500)],
+                                    ),
+                                    borderRadius: BorderRadius.circular(20),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.orange.withOpacity(0.3),
+                                        blurRadius: 8,
+                                        offset: const Offset(0, 2),
+                                      ),
+                                    ],
+                                  ),
+                                  child: const Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Icon(Icons.star_rounded, size: 14, color: Colors.white),
+                                      SizedBox(width: 4),
+                                      Text(
+                                        'مميزة',
+                                        style: TextStyle(
+                                          fontFamily: 'Cairo',
+                                          fontSize: 11,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              if (package.badgeText != null && package.badgeText!.isNotEmpty)
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(20),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withOpacity(0.1),
+                                        blurRadius: 8,
+                                        offset: const Offset(0, 2),
+                                      ),
+                                    ],
+                                  ),
+                                  child: Text(
+                                    package.badgeText!,
+                                    style: TextStyle(
+                                      fontFamily: 'Cairo',
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.bold,
+                                      color: cardColor,
+                                    ),
+                                  ),
+                                ),
+                            ],
+                          ),
+                        ),
+                        // Duration badge
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.2),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: Colors.white.withOpacity(0.3),
+                              width: 1,
+                            ),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Icon(Icons.schedule_rounded, size: 14, color: Colors.white),
+                              const SizedBox(width: 4),
+                              Text(
+                                '${package.durationDays} يوم',
+                                style: const TextStyle(
+                                  fontFamily: 'Cairo',
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+
+                    const SizedBox(height: 16),
+
+                    // Package Name
+                    Text(
+                      package.nameAr,
+                      style: const TextStyle(
+                        fontFamily: 'Cairo',
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                        height: 1.2,
+                      ),
+                    ),
+
+                    // Description
+                    if (package.descriptionAr != null && package.descriptionAr!.isNotEmpty) ...[
+                      const SizedBox(height: 8),
+                      Text(
+                        package.descriptionAr!,
+                        style: TextStyle(
+                          fontFamily: 'Cairo',
+                          fontSize: 13,
+                          color: Colors.white.withOpacity(0.85),
+                          height: 1.4,
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+
+                    const SizedBox(height: 16),
+
+                    // Divider
+                    Container(
+                      height: 1,
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [
+                            Colors.white.withOpacity(0.0),
+                            Colors.white.withOpacity(0.3),
+                            Colors.white.withOpacity(0.0),
+                          ],
+                        ),
+                      ),
+                    ),
+
+                    const SizedBox(height: 16),
+
+                    // Bottom Row: Price and Subscribe Button
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        // Price
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              'السعر',
+                              style: TextStyle(
+                                fontFamily: 'Cairo',
+                                fontSize: 11,
+                                color: Colors.white.withOpacity(0.7),
+                              ),
+                            ),
+                            Text(
+                              '${package.priceDzd} دج',
+                              style: const TextStyle(
+                                fontFamily: 'Cairo',
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ],
+                        ),
+                        // Subscribe Button
+                        Container(
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(14),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.15),
+                                blurRadius: 10,
+                                offset: const Offset(0, 4),
+                              ),
+                            ],
+                          ),
+                          child: Material(
+                            color: Colors.transparent,
+                            child: InkWell(
+                              borderRadius: BorderRadius.circular(14),
+                              onTap: () => _handleSubscribe(package),
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Text(
+                                      'اشترك الآن',
+                                      style: TextStyle(
+                                        fontFamily: 'Cairo',
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.bold,
+                                        color: cardColor,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 6),
+                                    Icon(
+                                      Icons.arrow_forward_rounded,
+                                      size: 18,
+                                      color: cardColor,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
