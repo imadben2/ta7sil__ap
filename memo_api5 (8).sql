@@ -2,10 +2,10 @@
 -- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
--- Hôte : 127.0.0.1
--- Généré le : mer. 24 déc. 2025 à 16:01
+-- Hôte : 127.0.0.1:3306
+-- Généré le : jeu. 25 déc. 2025 à 04:52
 -- Version du serveur : 8.2.0
--- Version de PHP : 8.2.12
+-- Version de PHP : 8.2.13
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -27,15 +27,18 @@ SET time_zone = "+00:00";
 -- Structure de la table `academic_phases`
 --
 
-CREATE TABLE `academic_phases` (
-  `id` bigint UNSIGNED NOT NULL,
+DROP TABLE IF EXISTS `academic_phases`;
+CREATE TABLE IF NOT EXISTS `academic_phases` (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
   `name_ar` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `slug` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `order` int NOT NULL,
   `is_active` tinyint(1) NOT NULL DEFAULT '1',
   `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `academic_phases_slug_unique` (`slug`)
+) ENGINE=MyISAM AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Déchargement des données de la table `academic_phases`
@@ -52,8 +55,9 @@ INSERT INTO `academic_phases` (`id`, `name_ar`, `slug`, `order`, `is_active`, `c
 -- Structure de la table `academic_streams`
 --
 
-CREATE TABLE `academic_streams` (
-  `id` bigint UNSIGNED NOT NULL,
+DROP TABLE IF EXISTS `academic_streams`;
+CREATE TABLE IF NOT EXISTS `academic_streams` (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
   `academic_year_id` bigint UNSIGNED NOT NULL,
   `name_ar` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `slug` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -61,8 +65,10 @@ CREATE TABLE `academic_streams` (
   `order` int NOT NULL,
   `is_active` tinyint(1) NOT NULL DEFAULT '1',
   `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `academic_streams_academic_year_id_foreign` (`academic_year_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Déchargement des données de la table `academic_streams`
@@ -82,16 +88,19 @@ INSERT INTO `academic_streams` (`id`, `academic_year_id`, `name_ar`, `slug`, `de
 -- Structure de la table `academic_years`
 --
 
-CREATE TABLE `academic_years` (
-  `id` bigint UNSIGNED NOT NULL,
+DROP TABLE IF EXISTS `academic_years`;
+CREATE TABLE IF NOT EXISTS `academic_years` (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
   `academic_phase_id` bigint UNSIGNED NOT NULL,
   `name_ar` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `level_number` int NOT NULL,
   `order` int NOT NULL,
   `is_active` tinyint(1) NOT NULL DEFAULT '1',
   `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `academic_years_academic_phase_id_foreign` (`academic_phase_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Déchargement des données de la table `academic_years`
@@ -117,8 +126,9 @@ INSERT INTO `academic_years` (`id`, `academic_phase_id`, `name_ar`, `level_numbe
 -- Structure de la table `achievements`
 --
 
-CREATE TABLE `achievements` (
-  `id` bigint UNSIGNED NOT NULL,
+DROP TABLE IF EXISTS `achievements`;
+CREATE TABLE IF NOT EXISTS `achievements` (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
   `name_ar` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `description_ar` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `icon` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -127,7 +137,8 @@ CREATE TABLE `achievements` (
   `criteria_value` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin,
   `points` int NOT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -136,16 +147,19 @@ CREATE TABLE `achievements` (
 -- Structure de la table `app_settings`
 --
 
-CREATE TABLE `app_settings` (
-  `id` bigint UNSIGNED NOT NULL,
+DROP TABLE IF EXISTS `app_settings`;
+CREATE TABLE IF NOT EXISTS `app_settings` (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
   `key` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `value` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `type` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'string',
   `group` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'general',
   `description` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `app_settings_key_unique` (`key`)
+) ENGINE=MyISAM AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Déchargement des données de la table `app_settings`
@@ -162,13 +176,16 @@ INSERT INTO `app_settings` (`id`, `key`, `value`, `type`, `group`, `description`
 -- Structure de la table `bac_sessions`
 --
 
-CREATE TABLE `bac_sessions` (
-  `id` bigint UNSIGNED NOT NULL,
+DROP TABLE IF EXISTS `bac_sessions`;
+CREATE TABLE IF NOT EXISTS `bac_sessions` (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
   `name_ar` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `slug` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `session_type` enum('main','makeup','foreign') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'main',
-  `exam_date` date DEFAULT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  `exam_date` date DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `bac_sessions_slug_unique` (`slug`)
+) ENGINE=MyISAM AUTO_INCREMENT=22 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Déchargement des données de la table `bac_sessions`
@@ -183,8 +200,9 @@ INSERT INTO `bac_sessions` (`id`, `name_ar`, `slug`, `session_type`, `exam_date`
 -- Structure de la table `bac_simulations`
 --
 
-CREATE TABLE `bac_simulations` (
-  `id` bigint UNSIGNED NOT NULL,
+DROP TABLE IF EXISTS `bac_simulations`;
+CREATE TABLE IF NOT EXISTS `bac_simulations` (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
   `user_id` bigint UNSIGNED NOT NULL,
   `bac_subject_id` bigint UNSIGNED NOT NULL,
   `started_at` datetime NOT NULL,
@@ -198,7 +216,10 @@ CREATE TABLE `bac_simulations` (
   `difficulty_felt` enum('easy','medium','hard') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `user_notes` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `bac_simulations_user_id_foreign` (`user_id`),
+  KEY `bac_simulations_bac_subject_id_foreign` (`bac_subject_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -207,16 +228,20 @@ CREATE TABLE `bac_simulations` (
 -- Structure de la table `bac_study_days`
 --
 
-CREATE TABLE `bac_study_days` (
-  `id` bigint UNSIGNED NOT NULL,
+DROP TABLE IF EXISTS `bac_study_days`;
+CREATE TABLE IF NOT EXISTS `bac_study_days` (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
   `academic_stream_id` bigint UNSIGNED NOT NULL,
   `day_number` int NOT NULL,
   `day_type` enum('study','review','reward') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'study',
   `title_ar` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `is_active` tinyint(1) NOT NULL DEFAULT '1',
   `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `bac_study_days_academic_stream_id_day_number_unique` (`academic_stream_id`,`day_number`),
+  KEY `bac_study_days_academic_stream_id_day_type_index` (`academic_stream_id`,`day_type`)
+) ENGINE=MyISAM AUTO_INCREMENT=380 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Déchargement des données de la table `bac_study_days`
@@ -524,14 +549,19 @@ INSERT INTO `bac_study_days` (`id`, `academic_stream_id`, `day_number`, `day_typ
 -- Structure de la table `bac_study_day_subjects`
 --
 
-CREATE TABLE `bac_study_day_subjects` (
-  `id` bigint UNSIGNED NOT NULL,
+DROP TABLE IF EXISTS `bac_study_day_subjects`;
+CREATE TABLE IF NOT EXISTS `bac_study_day_subjects` (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
   `bac_study_day_id` bigint UNSIGNED NOT NULL,
   `subject_id` bigint UNSIGNED NOT NULL,
   `order` int NOT NULL DEFAULT '1',
   `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `bac_study_day_subjects_bac_study_day_id_subject_id_unique` (`bac_study_day_id`,`subject_id`),
+  KEY `bac_study_day_subjects_bac_study_day_id_index` (`bac_study_day_id`),
+  KEY `bac_study_day_subjects_subject_id_index` (`subject_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=1198 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Déchargement des données de la table `bac_study_day_subjects`
@@ -1473,16 +1503,19 @@ INSERT INTO `bac_study_day_subjects` (`id`, `bac_study_day_id`, `subject_id`, `o
 -- Structure de la table `bac_study_day_topics`
 --
 
-CREATE TABLE `bac_study_day_topics` (
-  `id` bigint UNSIGNED NOT NULL,
+DROP TABLE IF EXISTS `bac_study_day_topics`;
+CREATE TABLE IF NOT EXISTS `bac_study_day_topics` (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
   `bac_study_day_subject_id` bigint UNSIGNED NOT NULL,
   `topic_ar` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `description_ar` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `task_type` enum('study','memorize','solve','review','exercise') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'study',
   `order` int NOT NULL DEFAULT '1',
   `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `bac_study_day_topics_bac_study_day_subject_id_index` (`bac_study_day_subject_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=2504 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Déchargement des données de la table `bac_study_day_topics`
@@ -3597,8 +3630,9 @@ INSERT INTO `bac_study_day_topics` (`id`, `bac_study_day_subject_id`, `topic_ar`
 -- Structure de la table `bac_subjects`
 --
 
-CREATE TABLE `bac_subjects` (
-  `id` bigint UNSIGNED NOT NULL,
+DROP TABLE IF EXISTS `bac_subjects`;
+CREATE TABLE IF NOT EXISTS `bac_subjects` (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
   `bac_year_id` bigint UNSIGNED NOT NULL,
   `bac_session_id` bigint UNSIGNED NOT NULL,
   `subject_id` bigint UNSIGNED NOT NULL,
@@ -3614,8 +3648,13 @@ CREATE TABLE `bac_subjects` (
   `downloads_count` int NOT NULL DEFAULT '0',
   `simulations_count` int UNSIGNED NOT NULL DEFAULT '0',
   `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `bac_subjects_bac_year_id_foreign` (`bac_year_id`),
+  KEY `bac_subjects_bac_session_id_foreign` (`bac_session_id`),
+  KEY `bac_subjects_subject_id_foreign` (`subject_id`),
+  KEY `bac_subjects_academic_stream_id_foreign` (`academic_stream_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=4531 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Déchargement des données de la table `bac_subjects`
@@ -4602,15 +4641,19 @@ INSERT INTO `bac_subjects` (`id`, `bac_year_id`, `bac_session_id`, `subject_id`,
 -- Structure de la table `bac_subject_bookmarks`
 --
 
-CREATE TABLE `bac_subject_bookmarks` (
-  `id` bigint UNSIGNED NOT NULL,
+DROP TABLE IF EXISTS `bac_subject_bookmarks`;
+CREATE TABLE IF NOT EXISTS `bac_subject_bookmarks` (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
   `user_id` bigint UNSIGNED NOT NULL,
   `bac_subject_id` bigint UNSIGNED NOT NULL,
   `page_number` int DEFAULT NULL,
   `notes` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `bac_subject_bookmarks_user_id_bac_subject_id_unique` (`user_id`,`bac_subject_id`),
+  KEY `bac_subject_bookmarks_bac_subject_id_foreign` (`bac_subject_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -4618,14 +4661,17 @@ CREATE TABLE `bac_subject_bookmarks` (
 -- Structure de la table `bac_subject_chapters`
 --
 
-CREATE TABLE `bac_subject_chapters` (
-  `id` bigint UNSIGNED NOT NULL,
+DROP TABLE IF EXISTS `bac_subject_chapters`;
+CREATE TABLE IF NOT EXISTS `bac_subject_chapters` (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
   `bac_subject_id` bigint UNSIGNED NOT NULL,
   `title_ar` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `order` int NOT NULL DEFAULT '0',
   `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `bac_subject_chapters_bac_subject_id_foreign` (`bac_subject_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=167 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Déchargement des données de la table `bac_subject_chapters`
@@ -4805,12 +4851,17 @@ INSERT INTO `bac_subject_chapters` (`id`, `bac_subject_id`, `title_ar`, `order`,
 -- Structure de la table `bac_topic_content_mapping`
 --
 
-CREATE TABLE `bac_topic_content_mapping` (
-  `id` bigint UNSIGNED NOT NULL,
+DROP TABLE IF EXISTS `bac_topic_content_mapping`;
+CREATE TABLE IF NOT EXISTS `bac_topic_content_mapping` (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
   `bac_study_day_topic_id` bigint UNSIGNED NOT NULL,
   `subject_planner_content_id` bigint UNSIGNED NOT NULL,
   `relevance_score` tinyint UNSIGNED NOT NULL DEFAULT '100' COMMENT '0-100, how relevant this content is to the BAC topic',
-  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `unique_mapping` (`bac_study_day_topic_id`,`subject_planner_content_id`),
+  KEY `bac_topic_content_mapping_subject_planner_content_id_foreign` (`subject_planner_content_id`),
+  KEY `idx_relevance` (`relevance_score`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -4819,8 +4870,9 @@ CREATE TABLE `bac_topic_content_mapping` (
 -- Structure de la table `bac_weekly_rewards`
 --
 
-CREATE TABLE `bac_weekly_rewards` (
-  `id` bigint UNSIGNED NOT NULL,
+DROP TABLE IF EXISTS `bac_weekly_rewards`;
+CREATE TABLE IF NOT EXISTS `bac_weekly_rewards` (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
   `academic_stream_id` bigint UNSIGNED NOT NULL,
   `week_number` int NOT NULL,
   `title_ar` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -4828,8 +4880,11 @@ CREATE TABLE `bac_weekly_rewards` (
   `movie_title` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `movie_image` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `bac_weekly_rewards_academic_stream_id_week_number_unique` (`academic_stream_id`,`week_number`),
+  KEY `bac_weekly_rewards_academic_stream_id_index` (`academic_stream_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Déchargement des données de la table `bac_weekly_rewards`
@@ -4851,11 +4906,14 @@ INSERT INTO `bac_weekly_rewards` (`id`, `academic_stream_id`, `week_number`, `ti
 -- Structure de la table `bac_years`
 --
 
-CREATE TABLE `bac_years` (
-  `id` bigint UNSIGNED NOT NULL,
+DROP TABLE IF EXISTS `bac_years`;
+CREATE TABLE IF NOT EXISTS `bac_years` (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
   `year` int NOT NULL,
-  `is_active` tinyint(1) NOT NULL DEFAULT '1'
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  `is_active` tinyint(1) NOT NULL DEFAULT '1',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `bac_years_year_unique` (`year`)
+) ENGINE=MyISAM AUTO_INCREMENT=18 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Déchargement des données de la table `bac_years`
@@ -4886,11 +4944,28 @@ INSERT INTO `bac_years` (`id`, `year`, `is_active`) VALUES
 -- Structure de la table `cache`
 --
 
-CREATE TABLE `cache` (
+DROP TABLE IF EXISTS `cache`;
+CREATE TABLE IF NOT EXISTS `cache` (
   `key` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `value` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `expiration` int NOT NULL
+  `expiration` int NOT NULL,
+  PRIMARY KEY (`key`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Déchargement des données de la table `cache`
+--
+
+INSERT INTO `cache` (`key`, `value`, `expiration`) VALUES
+('laravel-cache-app_setting_timezone', 'N;', 1766618559),
+('laravel-cache-dashboard_stats', 'a:6:{s:8:\"overview\";a:8:{s:11:\"total_users\";i:27;s:12:\"active_users\";i:27;s:13:\"total_content\";i:533;s:14:\"total_subjects\";i:17;s:11:\"user_growth\";d:0;s:14:\"content_growth\";d:100;s:13:\"total_quizzes\";i:8;s:13:\"total_courses\";i:15;}s:5:\"users\";a:8:{s:5:\"total\";i:27;s:6:\"active\";i:27;s:8:\"inactive\";i:0;s:9:\"suspended\";i:27;s:9:\"new_today\";i:0;s:13:\"new_this_week\";i:0;s:14:\"new_this_month\";i:0;s:12:\"active_today\";i:1;}s:7:\"content\";a:11:{s:5:\"total\";i:533;s:7:\"lessons\";i:136;s:9:\"summaries\";i:133;s:9:\"exercises\";i:135;s:5:\"tests\";i:129;s:9:\"published\";i:533;s:5:\"draft\";i:0;s:6:\"phases\";i:3;s:5:\"years\";i:12;s:7:\"streams\";i:6;s:8:\"subjects\";i:17;}s:10:\"engagement\";a:9:{s:14:\"total_sessions\";i:0;s:18:\"completed_sessions\";i:0;s:14:\"sessions_today\";i:0;s:18:\"sessions_this_week\";i:0;s:19:\"sessions_this_month\";i:0;s:19:\"total_quiz_attempts\";i:9;s:17:\"completed_quizzes\";i:6;s:13:\"average_score\";s:9:\"22.778333\";s:17:\"total_study_hours\";d:0;}s:7:\"courses\";a:6:{s:13:\"total_courses\";i:15;s:17:\"published_courses\";i:11;s:13:\"draft_courses\";i:4;s:19:\"total_subscriptions\";i:16;s:20:\"active_subscriptions\";i:12;s:21:\"expired_subscriptions\";i:1;}s:7:\"pending\";a:4:{s:24:\"device_transfer_requests\";i:0;s:21:\"pending_subscriptions\";i:3;s:13:\"draft_content\";i:0;s:15:\"reported_issues\";i:0;}}', 1766603832),
+('laravel-cache-bc33ea4e26e5e1af1408321416956113a4658763:timer', 'i:1766612296;', 1766612296),
+('laravel-cache-bc33ea4e26e5e1af1408321416956113a4658763', 'i:1;', 1766612296),
+('laravel-cache-app_setting_min_app_version', 'O:21:\"App\\Models\\AppSetting\":33:{s:13:\"\0*\0connection\";s:5:\"mysql\";s:8:\"\0*\0table\";s:12:\"app_settings\";s:13:\"\0*\0primaryKey\";s:2:\"id\";s:10:\"\0*\0keyType\";s:3:\"int\";s:12:\"incrementing\";b:1;s:7:\"\0*\0with\";a:0:{}s:12:\"\0*\0withCount\";a:0:{}s:19:\"preventsLazyLoading\";b:0;s:10:\"\0*\0perPage\";i:15;s:6:\"exists\";b:1;s:18:\"wasRecentlyCreated\";b:0;s:28:\"\0*\0escapeWhenCastingToString\";b:0;s:13:\"\0*\0attributes\";a:8:{s:2:\"id\";i:3;s:3:\"key\";s:15:\"min_app_version\";s:5:\"value\";s:3:\"1.0\";s:4:\"type\";s:6:\"string\";s:5:\"group\";s:3:\"app\";s:11:\"description\";s:28:\"Minimum required app version\";s:10:\"created_at\";s:19:\"2025-12-09 11:32:40\";s:10:\"updated_at\";s:19:\"2025-12-09 14:45:33\";}s:11:\"\0*\0original\";a:8:{s:2:\"id\";i:3;s:3:\"key\";s:15:\"min_app_version\";s:5:\"value\";s:3:\"1.0\";s:4:\"type\";s:6:\"string\";s:5:\"group\";s:3:\"app\";s:11:\"description\";s:28:\"Minimum required app version\";s:10:\"created_at\";s:19:\"2025-12-09 11:32:40\";s:10:\"updated_at\";s:19:\"2025-12-09 14:45:33\";}s:10:\"\0*\0changes\";a:0:{}s:11:\"\0*\0previous\";a:0:{}s:8:\"\0*\0casts\";a:0:{}s:17:\"\0*\0classCastCache\";a:0:{}s:21:\"\0*\0attributeCastCache\";a:0:{}s:13:\"\0*\0dateFormat\";N;s:10:\"\0*\0appends\";a:0:{}s:19:\"\0*\0dispatchesEvents\";a:0:{}s:14:\"\0*\0observables\";a:0:{}s:12:\"\0*\0relations\";a:0:{}s:10:\"\0*\0touches\";a:0:{}s:27:\"\0*\0relationAutoloadCallback\";N;s:26:\"\0*\0relationAutoloadContext\";N;s:10:\"timestamps\";b:1;s:13:\"usesUniqueIds\";b:0;s:9:\"\0*\0hidden\";a:0:{}s:10:\"\0*\0visible\";a:0:{}s:11:\"\0*\0fillable\";a:5:{i:0;s:3:\"key\";i:1;s:5:\"value\";i:2;s:4:\"type\";i:3;s:5:\"group\";i:4;s:11:\"description\";}s:10:\"\0*\0guarded\";a:1:{i:0;s:1:\"*\";}}', 1766612691),
+('laravel-cache-app_setting_sponsors_section_enabled', 'O:21:\"App\\Models\\AppSetting\":33:{s:13:\"\0*\0connection\";s:5:\"mysql\";s:8:\"\0*\0table\";s:12:\"app_settings\";s:13:\"\0*\0primaryKey\";s:2:\"id\";s:10:\"\0*\0keyType\";s:3:\"int\";s:12:\"incrementing\";b:1;s:7:\"\0*\0with\";a:0:{}s:12:\"\0*\0withCount\";a:0:{}s:19:\"preventsLazyLoading\";b:0;s:10:\"\0*\0perPage\";i:15;s:6:\"exists\";b:1;s:18:\"wasRecentlyCreated\";b:0;s:28:\"\0*\0escapeWhenCastingToString\";b:0;s:13:\"\0*\0attributes\";a:8:{s:2:\"id\";i:1;s:3:\"key\";s:24:\"sponsors_section_enabled\";s:5:\"value\";s:1:\"1\";s:4:\"type\";s:7:\"boolean\";s:5:\"group\";s:8:\"sponsors\";s:11:\"description\";s:61:\"تفعيل/تعطيل قسم الرعاة في التطبيق\";s:10:\"created_at\";s:19:\"2025-12-05 14:17:47\";s:10:\"updated_at\";s:19:\"2025-12-05 14:17:47\";}s:11:\"\0*\0original\";a:8:{s:2:\"id\";i:1;s:3:\"key\";s:24:\"sponsors_section_enabled\";s:5:\"value\";s:1:\"1\";s:4:\"type\";s:7:\"boolean\";s:5:\"group\";s:8:\"sponsors\";s:11:\"description\";s:61:\"تفعيل/تعطيل قسم الرعاة في التطبيق\";s:10:\"created_at\";s:19:\"2025-12-05 14:17:47\";s:10:\"updated_at\";s:19:\"2025-12-05 14:17:47\";}s:10:\"\0*\0changes\";a:0:{}s:11:\"\0*\0previous\";a:0:{}s:8:\"\0*\0casts\";a:0:{}s:17:\"\0*\0classCastCache\";a:0:{}s:21:\"\0*\0attributeCastCache\";a:0:{}s:13:\"\0*\0dateFormat\";N;s:10:\"\0*\0appends\";a:0:{}s:19:\"\0*\0dispatchesEvents\";a:0:{}s:14:\"\0*\0observables\";a:0:{}s:12:\"\0*\0relations\";a:0:{}s:10:\"\0*\0touches\";a:0:{}s:27:\"\0*\0relationAutoloadCallback\";N;s:26:\"\0*\0relationAutoloadContext\";N;s:10:\"timestamps\";b:1;s:13:\"usesUniqueIds\";b:0;s:9:\"\0*\0hidden\";a:0:{}s:10:\"\0*\0visible\";a:0:{}s:11:\"\0*\0fillable\";a:5:{i:0;s:3:\"key\";i:1;s:5:\"value\";i:2;s:4:\"type\";i:3;s:5:\"group\";i:4;s:11:\"description\";}s:10:\"\0*\0guarded\";a:1:{i:0;s:1:\"*\";}}', 1766612732),
+('laravel-cache-app_setting_promos_section_enabled', 'O:21:\"App\\Models\\AppSetting\":33:{s:13:\"\0*\0connection\";s:5:\"mysql\";s:8:\"\0*\0table\";s:12:\"app_settings\";s:13:\"\0*\0primaryKey\";s:2:\"id\";s:10:\"\0*\0keyType\";s:3:\"int\";s:12:\"incrementing\";b:1;s:7:\"\0*\0with\";a:0:{}s:12:\"\0*\0withCount\";a:0:{}s:19:\"preventsLazyLoading\";b:0;s:10:\"\0*\0perPage\";i:15;s:6:\"exists\";b:1;s:18:\"wasRecentlyCreated\";b:0;s:28:\"\0*\0escapeWhenCastingToString\";b:0;s:13:\"\0*\0attributes\";a:8:{s:2:\"id\";i:2;s:3:\"key\";s:22:\"promos_section_enabled\";s:5:\"value\";s:1:\"1\";s:4:\"type\";s:6:\"string\";s:5:\"group\";s:7:\"general\";s:11:\"description\";N;s:10:\"created_at\";s:19:\"2025-12-07 20:36:33\";s:10:\"updated_at\";s:19:\"2025-12-07 23:47:04\";}s:11:\"\0*\0original\";a:8:{s:2:\"id\";i:2;s:3:\"key\";s:22:\"promos_section_enabled\";s:5:\"value\";s:1:\"1\";s:4:\"type\";s:6:\"string\";s:5:\"group\";s:7:\"general\";s:11:\"description\";N;s:10:\"created_at\";s:19:\"2025-12-07 20:36:33\";s:10:\"updated_at\";s:19:\"2025-12-07 23:47:04\";}s:10:\"\0*\0changes\";a:0:{}s:11:\"\0*\0previous\";a:0:{}s:8:\"\0*\0casts\";a:0:{}s:17:\"\0*\0classCastCache\";a:0:{}s:21:\"\0*\0attributeCastCache\";a:0:{}s:13:\"\0*\0dateFormat\";N;s:10:\"\0*\0appends\";a:0:{}s:19:\"\0*\0dispatchesEvents\";a:0:{}s:14:\"\0*\0observables\";a:0:{}s:12:\"\0*\0relations\";a:0:{}s:10:\"\0*\0touches\";a:0:{}s:27:\"\0*\0relationAutoloadCallback\";N;s:26:\"\0*\0relationAutoloadContext\";N;s:10:\"timestamps\";b:1;s:13:\"usesUniqueIds\";b:0;s:9:\"\0*\0hidden\";a:0:{}s:10:\"\0*\0visible\";a:0:{}s:11:\"\0*\0fillable\";a:5:{i:0;s:3:\"key\";i:1;s:5:\"value\";i:2;s:4:\"type\";i:3;s:5:\"group\";i:4;s:11:\"description\";}s:10:\"\0*\0guarded\";a:1:{i:0;s:1:\"*\";}}', 1766612732),
+('laravel-cache-5c785c036466adea360111aa28563bfd556b5fba:timer', 'i:1766609189;', 1766609189),
+('laravel-cache-5c785c036466adea360111aa28563bfd556b5fba', 'i:1;', 1766609189);
 
 -- --------------------------------------------------------
 
@@ -4898,10 +4973,12 @@ CREATE TABLE `cache` (
 -- Structure de la table `cache_locks`
 --
 
-CREATE TABLE `cache_locks` (
+DROP TABLE IF EXISTS `cache_locks`;
+CREATE TABLE IF NOT EXISTS `cache_locks` (
   `key` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `owner` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `expiration` int NOT NULL
+  `expiration` int NOT NULL,
+  PRIMARY KEY (`key`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -4910,8 +4987,9 @@ CREATE TABLE `cache_locks` (
 -- Structure de la table `certificates`
 --
 
-CREATE TABLE `certificates` (
-  `id` bigint UNSIGNED NOT NULL,
+DROP TABLE IF EXISTS `certificates`;
+CREATE TABLE IF NOT EXISTS `certificates` (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
   `certificate_number` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `user_id` bigint UNSIGNED NOT NULL,
   `course_id` bigint UNSIGNED NOT NULL,
@@ -4930,7 +5008,14 @@ CREATE TABLE `certificates` (
   `revocation_reason` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `issued_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `certificates_user_id_course_id_unique` (`user_id`,`course_id`),
+  UNIQUE KEY `certificates_certificate_number_unique` (`certificate_number`),
+  KEY `certificates_course_id_foreign` (`course_id`),
+  KEY `certificates_user_course_progress_id_foreign` (`user_course_progress_id`),
+  KEY `certificates_certificate_number_index` (`certificate_number`),
+  KEY `certificates_issued_at_index` (`issued_at`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -4939,8 +5024,9 @@ CREATE TABLE `certificates` (
 -- Structure de la table `contents`
 --
 
-CREATE TABLE `contents` (
-  `id` bigint UNSIGNED NOT NULL,
+DROP TABLE IF EXISTS `contents`;
+CREATE TABLE IF NOT EXISTS `contents` (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
   `subject_id` bigint UNSIGNED NOT NULL,
   `academic_stream_id` bigint UNSIGNED DEFAULT NULL,
   `content_type_id` bigint UNSIGNED NOT NULL,
@@ -4972,8 +5058,15 @@ CREATE TABLE `contents` (
   `updated_by` bigint UNSIGNED DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
-  `deleted_at` timestamp NULL DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `contents_content_type_id_foreign` (`content_type_id`),
+  KEY `contents_chapter_id_foreign` (`chapter_id`),
+  KEY `contents_created_by_foreign` (`created_by`),
+  KEY `contents_updated_by_foreign` (`updated_by`),
+  KEY `idx_contents_main` (`subject_id`,`content_type_id`,`chapter_id`,`is_published`),
+  KEY `idx_contents_subject_stream` (`subject_id`,`academic_stream_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=608 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Déchargement des données de la table `contents`
@@ -5301,7 +5394,7 @@ INSERT INTO `contents` (`id`, `subject_id`, `academic_stream_id`, `content_type_
 (391, 61, 4, 4, NULL, 'فرض محروس - اللغة الإنجليزية', 'frd-mhros-allgh-alanglyzy-1766407510-316', 'محتوى تعليمي شامل ومفصل لمساعدة الطلاب على فهم المادة.', '<p>محتوى تجريبي للاختبار</p>', 'easy', 27, 1, NULL, 0, NULL, NULL, NULL, 0, NULL, NULL, NULL, 1, '2025-12-22 12:45:10', 0, NULL, NULL, 294, 73, NULL, NULL, '2025-12-22 12:45:10', '2025-12-22 12:45:10', NULL),
 (392, 61, 4, 4, NULL, 'اختبار تحضيري - اللغة الإنجليزية', 'akhtbar-thdyry-allgh-alanglyzy-1766407510-317', 'محتوى تعليمي شامل ومفصل لمساعدة الطلاب على فهم المادة.', '<p>محتوى تجريبي للاختبار</p>', 'hard', 36, 2, NULL, 0, NULL, NULL, NULL, 0, NULL, NULL, NULL, 1, '2025-12-22 12:45:10', 0, NULL, NULL, 73, 20, NULL, NULL, '2025-12-22 12:45:10', '2025-12-22 12:45:10', NULL),
 (393, 61, 4, 4, NULL, 'اختبار تحضيري - اللغة الإنجليزية', 'akhtbar-thdyry-allgh-alanglyzy-1766407510-318', 'محتوى تعليمي شامل ومفصل لمساعدة الطلاب على فهم المادة.', '<p>محتوى تجريبي للاختبار</p>', 'medium', 44, 3, NULL, 0, NULL, NULL, NULL, 0, NULL, NULL, NULL, 1, '2025-12-22 12:45:10', 0, NULL, NULL, 392, 46, NULL, NULL, '2025-12-22 12:45:10', '2025-12-22 12:45:10', NULL),
-(394, 62, 4, 1, NULL, 'مقدمة في الدرس - التربية الإسلامية', 'mkdm-fy-aldrs-altrby-alaslamy-1766407510-319', 'محتوى تعليمي شامل ومفصل لمساعدة الطلاب على فهم المادة.', '<p>محتوى تجريبي للاختبار</p>', 'easy', 49, 1, NULL, 0, NULL, NULL, NULL, 1, 'youtube', 'https://www.youtube.com/watch?v=CevxZvSJLk8', 463, 1, '2025-12-22 12:45:10', 0, NULL, NULL, 281, 67, NULL, NULL, '2025-12-22 12:45:10', '2025-12-22 12:50:07', NULL),
+(394, 62, 4, 1, NULL, 'مقدمة في الدرس - التربية الإسلامية', 'mkdm-fy-aldrs-altrby-alaslamy-1766407510-319', 'محتوى تعليمي شامل ومفصل لمساعدة الطلاب على فهم المادة.', '<p>محتوى تجريبي للاختبار</p>', 'easy', 49, 1, NULL, 0, NULL, NULL, NULL, 1, 'youtube', 'https://www.youtube.com/watch?v=CevxZvSJLk8', 463, 1, '2025-12-22 12:45:10', 0, NULL, NULL, 285, 67, NULL, NULL, '2025-12-22 12:45:10', '2025-12-24 18:02:35', NULL),
 (395, 62, 4, 1, NULL, 'مقدمة في الدرس - التربية الإسلامية', 'mkdm-fy-aldrs-altrby-alaslamy-1766407510-320', 'محتوى تعليمي شامل ومفصل لمساعدة الطلاب على فهم المادة.', '<p>محتوى تجريبي للاختبار</p>', 'easy', 25, 2, NULL, 0, NULL, NULL, NULL, 1, 'youtube', 'https://www.youtube.com/watch?v=9bZkp7q19f0', 930, 1, '2025-12-22 12:45:10', 0, NULL, NULL, 170, 60, NULL, NULL, '2025-12-22 12:45:10', '2025-12-22 12:50:07', NULL),
 (396, 62, 4, 1, NULL, 'مقدمة في الدرس - التربية الإسلامية', 'mkdm-fy-aldrs-altrby-alaslamy-1766407510-321', 'محتوى تعليمي شامل ومفصل لمساعدة الطلاب على فهم المادة.', '<p>محتوى تجريبي للاختبار</p>', 'easy', 55, 3, NULL, 0, NULL, NULL, NULL, 1, 'youtube', 'https://www.youtube.com/watch?v=kJQP7kiw5Fk', 1701, 1, '2025-12-22 12:45:10', 0, NULL, NULL, 90, 13, NULL, NULL, '2025-12-22 12:45:10', '2025-12-22 12:50:07', NULL),
 (397, 62, 4, 2, NULL, 'تلخيص الدرس - التربية الإسلامية', 'tlkhys-aldrs-altrby-alaslamy-1766407510-322', 'محتوى تعليمي شامل ومفصل لمساعدة الطلاب على فهم المادة.', '<p>محتوى تجريبي للاختبار</p>', 'hard', 60, 1, NULL, 0, NULL, NULL, NULL, 0, NULL, NULL, NULL, 1, '2025-12-22 12:45:10', 0, NULL, NULL, 370, 38, NULL, NULL, '2025-12-22 12:45:10', '2025-12-22 12:45:10', NULL),
@@ -5524,16 +5617,22 @@ INSERT INTO `contents` (`id`, `subject_id`, `academic_stream_id`, `content_type_
 -- Structure de la table `content_bookmarks`
 --
 
-CREATE TABLE `content_bookmarks` (
-  `id` bigint UNSIGNED NOT NULL,
+DROP TABLE IF EXISTS `content_bookmarks`;
+CREATE TABLE IF NOT EXISTS `content_bookmarks` (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
   `user_id` bigint UNSIGNED NOT NULL,
   `content_id` bigint UNSIGNED NOT NULL,
   `page_number` int DEFAULT NULL COMMENT 'For PDF content - specific page bookmarked',
   `timestamp_seconds` int DEFAULT NULL COMMENT 'For video content - specific timestamp bookmarked',
   `notes` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `content_bookmarks_user_id_content_id_unique` (`user_id`,`content_id`),
+  KEY `content_bookmarks_user_id_index` (`user_id`),
+  KEY `content_bookmarks_content_id_index` (`content_id`),
+  KEY `content_bookmarks_created_at_index` (`created_at`)
+) ENGINE=MyISAM AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -5541,8 +5640,9 @@ CREATE TABLE `content_bookmarks` (
 -- Structure de la table `content_chapters`
 --
 
-CREATE TABLE `content_chapters` (
-  `id` bigint UNSIGNED NOT NULL,
+DROP TABLE IF EXISTS `content_chapters`;
+CREATE TABLE IF NOT EXISTS `content_chapters` (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
   `subject_id` bigint UNSIGNED NOT NULL,
   `academic_stream_id` bigint UNSIGNED DEFAULT NULL,
   `title_ar` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -5551,8 +5651,11 @@ CREATE TABLE `content_chapters` (
   `order` int NOT NULL,
   `is_active` tinyint(1) NOT NULL DEFAULT '1',
   `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `chapters_subject_active_index` (`subject_id`,`is_active`,`order`),
+  KEY `idx_chapters_subject_stream` (`subject_id`,`academic_stream_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=363 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Déchargement des données de la table `content_chapters`
@@ -5929,12 +6032,16 @@ INSERT INTO `content_chapters` (`id`, `subject_id`, `academic_stream_id`, `title
 -- Structure de la table `content_quiz`
 --
 
-CREATE TABLE `content_quiz` (
-  `id` bigint UNSIGNED NOT NULL,
+DROP TABLE IF EXISTS `content_quiz`;
+CREATE TABLE IF NOT EXISTS `content_quiz` (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
   `content_id` bigint UNSIGNED NOT NULL,
   `quiz_id` bigint UNSIGNED NOT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `content_quiz_content_id_quiz_id_unique` (`content_id`,`quiz_id`),
+  KEY `content_quiz_quiz_id_foreign` (`quiz_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -5943,15 +6050,19 @@ CREATE TABLE `content_quiz` (
 -- Structure de la table `content_ratings`
 --
 
-CREATE TABLE `content_ratings` (
-  `id` bigint UNSIGNED NOT NULL,
+DROP TABLE IF EXISTS `content_ratings`;
+CREATE TABLE IF NOT EXISTS `content_ratings` (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
   `user_id` bigint UNSIGNED NOT NULL,
   `content_id` bigint UNSIGNED NOT NULL,
   `rating` int NOT NULL,
   `comment_ar` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `is_helpful` tinyint(1) DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `content_ratings_user_id_content_id_unique` (`user_id`,`content_id`),
+  KEY `content_ratings_content_id_foreign` (`content_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -5960,12 +6071,15 @@ CREATE TABLE `content_ratings` (
 -- Structure de la table `content_types`
 --
 
-CREATE TABLE `content_types` (
-  `id` bigint UNSIGNED NOT NULL,
+DROP TABLE IF EXISTS `content_types`;
+CREATE TABLE IF NOT EXISTS `content_types` (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
   `name_ar` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `slug` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `icon` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  `icon` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `content_types_slug_unique` (`slug`)
+) ENGINE=MyISAM AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Déchargement des données de la table `content_types`
@@ -5983,8 +6097,9 @@ INSERT INTO `content_types` (`id`, `name_ar`, `slug`, `icon`) VALUES
 -- Structure de la table `coupons`
 --
 
-CREATE TABLE `coupons` (
-  `id` bigint UNSIGNED NOT NULL,
+DROP TABLE IF EXISTS `coupons`;
+CREATE TABLE IF NOT EXISTS `coupons` (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
   `code` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `discount_type` enum('percentage','fixed') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'percentage',
   `discount_value` decimal(10,2) NOT NULL,
@@ -6002,7 +6117,12 @@ CREATE TABLE `coupons` (
   `first_purchase_only` tinyint(1) NOT NULL DEFAULT '0',
   `created_by` bigint UNSIGNED DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `coupons_code_unique` (`code`),
+  KEY `coupons_created_by_foreign` (`created_by`),
+  KEY `coupons_code_index` (`code`),
+  KEY `coupons_is_active_valid_until_index` (`is_active`,`valid_until`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -6011,15 +6131,20 @@ CREATE TABLE `coupons` (
 -- Structure de la table `coupon_usages`
 --
 
-CREATE TABLE `coupon_usages` (
-  `id` bigint UNSIGNED NOT NULL,
+DROP TABLE IF EXISTS `coupon_usages`;
+CREATE TABLE IF NOT EXISTS `coupon_usages` (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
   `coupon_id` bigint UNSIGNED NOT NULL,
   `user_id` bigint UNSIGNED NOT NULL,
   `order_id` bigint UNSIGNED DEFAULT NULL,
   `discount_applied_dzd` int NOT NULL,
   `used_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `coupon_usages_user_id_foreign` (`user_id`),
+  KEY `coupon_usages_coupon_id_user_id_index` (`coupon_id`,`user_id`),
+  KEY `coupon_usages_order_id_foreign` (`order_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -6028,8 +6153,9 @@ CREATE TABLE `coupon_usages` (
 -- Structure de la table `courses`
 --
 
-CREATE TABLE `courses` (
-  `id` bigint UNSIGNED NOT NULL,
+DROP TABLE IF EXISTS `courses`;
+CREATE TABLE IF NOT EXISTS `courses` (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
   `subject_id` bigint UNSIGNED NOT NULL,
   `level` enum('beginner','intermediate','advanced') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT 'beginner',
   `tags` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin,
@@ -6067,17 +6193,21 @@ CREATE TABLE `courses` (
   `whatsapp_number` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `facebook_url` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `meta_description_ar` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `meta_keywords` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `meta_keywords` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `courses_slug_unique` (`slug`),
+  KEY `courses_subject_id_foreign` (`subject_id`),
+  KEY `courses_created_by_foreign` (`created_by`)
+) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Déchargement des données de la table `courses`
 --
 
 INSERT INTO `courses` (`id`, `subject_id`, `level`, `tags`, `title_ar`, `slug`, `description_ar`, `short_description_ar`, `thumbnail_url`, `trailer_video_url`, `trailer_video_type`, `price_dzd`, `is_free`, `requires_subscription`, `instructor_name`, `instructor_bio_ar`, `instructor_photo_url`, `total_modules`, `total_lessons`, `total_quizzes`, `total_duration_minutes`, `duration_days`, `is_published`, `is_featured`, `view_count`, `published_at`, `created_by`, `created_at`, `updated_at`, `deleted_at`, `enrollment_count`, `average_rating`, `total_reviews`, `instructor_email`, `instructor_phone`, `whatsapp_number`, `facebook_url`, `meta_description_ar`, `meta_keywords`) VALUES
-(1, 10, 'beginner', NULL, 'دورة الرياضيات المتقدمة', 'dor-alryadyat-almtkdm', 'هذه دورة تعليمية شاملة ومتكاملة تغطي جميع جوانب المادة بشكل عميق ومفصل. تتضمن الدورة شرح نظري وتطبيقات عملية متنوعة لضمان استيعاب الطالب للمفاهيم الأساسية والمتقدمة.', NULL, 'courses/thumbnails/course_1.jpg', NULL, 'youtube', 15000.00, 0, 0, NULL, NULL, NULL, 0, 0, 0, 0, 38, 1, 1, 11, '2025-10-15 07:59:48', 2, '2025-11-14 07:59:48', '2025-12-23 09:19:06', NULL, 0, 0.00, 0, NULL, NULL, NULL, NULL, NULL, NULL),
+(1, 10, 'beginner', NULL, 'دورة الرياضيات المتقدمة', 'dor-alryadyat-almtkdm', 'هذه دورة تعليمية شاملة ومتكاملة تغطي جميع جوانب المادة بشكل عميق ومفصل. تتضمن الدورة شرح نظري وتطبيقات عملية متنوعة لضمان استيعاب الطالب للمفاهيم الأساسية والمتقدمة.', NULL, 'courses/thumbnails/course_1.jpg', NULL, 'youtube', 15000.00, 0, 0, NULL, NULL, NULL, 0, 0, 0, 0, 38, 1, 1, 12, '2025-10-15 07:59:48', 2, '2025-11-14 07:59:48', '2025-12-24 18:22:29', NULL, 0, 0.00, 0, NULL, NULL, NULL, NULL, NULL, NULL),
 (2, 7, 'beginner', NULL, 'دورة الفيزياء الشاملة', 'dor-alfyzyaaa-alshaml', 'هذه دورة تعليمية شاملة ومتكاملة تغطي جميع جوانب المادة بشكل عميق ومفصل. تتضمن الدورة شرح نظري وتطبيقات عملية متنوعة لضمان استيعاب الطالب للمفاهيم الأساسية والمتقدمة.', NULL, 'courses/thumbnails/course_2.jpg', NULL, 'youtube', 12000.00, 0, 0, NULL, NULL, NULL, 0, 0, 0, 0, 90, 1, 1, 4, '2025-11-12 07:59:48', 2, '2025-11-14 07:59:48', '2025-12-03 19:57:44', NULL, 0, 0.00, 0, NULL, NULL, NULL, NULL, NULL, NULL),
-(3, 6, 'beginner', NULL, 'دورة الكيمياء العضوية', 'dor-alkymyaaa-alaadoy', 'هذه دورة تعليمية شاملة ومتكاملة تغطي جميع جوانب المادة بشكل عميق ومفصل. تتضمن الدورة شرح نظري وتطبيقات عملية متنوعة لضمان استيعاب الطالب للمفاهيم الأساسية والمتقدمة.', NULL, 'courses/thumbnails/course_3.jpg', NULL, 'youtube', 10000.00, 0, 0, NULL, NULL, NULL, 0, 0, 0, 0, 39, 1, 1, 36, '2025-10-30 07:59:48', 2, '2025-11-14 07:59:48', '2025-12-24 11:04:46', NULL, 0, 0.00, 0, NULL, NULL, NULL, NULL, NULL, NULL),
+(3, 6, 'beginner', NULL, 'دورة الكيمياء العضوية', 'dor-alkymyaaa-alaadoy', 'هذه دورة تعليمية شاملة ومتكاملة تغطي جميع جوانب المادة بشكل عميق ومفصل. تتضمن الدورة شرح نظري وتطبيقات عملية متنوعة لضمان استيعاب الطالب للمفاهيم الأساسية والمتقدمة.', NULL, 'courses/thumbnails/course_3.jpg', NULL, 'youtube', 10000.00, 0, 0, NULL, NULL, NULL, 0, 0, 0, 0, 39, 1, 1, 38, '2025-10-30 07:59:48', 2, '2025-11-14 07:59:48', '2025-12-24 21:20:38', NULL, 0, 0.00, 0, NULL, NULL, NULL, NULL, NULL, NULL),
 (4, 4, 'beginner', NULL, 'دورة اللغة العربية', 'dor-allgh-alaarby', 'هذه دورة تعليمية شاملة ومتكاملة تغطي جميع جوانب المادة بشكل عميق ومفصل. تتضمن الدورة شرح نظري وتطبيقات عملية متنوعة لضمان استيعاب الطالب للمفاهيم الأساسية والمتقدمة.', NULL, 'courses/thumbnails/course_4.jpg', NULL, 'youtube', 8000.00, 0, 0, NULL, NULL, NULL, 0, 0, 0, 0, 83, 1, 0, 1, '2025-10-17 07:59:48', 2, '2025-11-14 07:59:48', '2025-12-22 18:10:32', NULL, 0, 0.00, 0, NULL, NULL, NULL, NULL, NULL, NULL),
 (5, 8, 'beginner', NULL, 'دورة اللغة الإنجليزية', 'dor-allgh-alanglyzy', 'هذه دورة تعليمية شاملة ومتكاملة تغطي جميع جوانب المادة بشكل عميق ومفصل. تتضمن الدورة شرح نظري وتطبيقات عملية متنوعة لضمان استيعاب الطالب للمفاهيم الأساسية والمتقدمة.', NULL, 'courses/thumbnails/course_5.jpg', NULL, 'youtube', 9000.00, 0, 0, NULL, NULL, NULL, 0, 0, 0, 0, 59, 1, 0, 0, '2025-10-29 07:59:48', 2, '2025-11-14 07:59:48', '2025-11-14 07:59:48', NULL, 0, 0.00, 0, NULL, NULL, NULL, NULL, NULL, NULL),
 (6, 8, 'beginner', NULL, 'دورة علوم الطبيعة', 'dor-aalom-altbyaa', 'هذه دورة تعليمية شاملة ومتكاملة تغطي جميع جوانب المادة بشكل عميق ومفصل. تتضمن الدورة شرح نظري وتطبيقات عملية متنوعة لضمان استيعاب الطالب للمفاهيم الأساسية والمتقدمة.', NULL, 'courses/thumbnails/course_6.jpg', NULL, 'youtube', 11000.00, 0, 0, NULL, NULL, NULL, 0, 0, 0, 0, 41, 1, 0, 0, '2025-11-09 07:59:48', 2, '2025-11-14 07:59:48', '2025-11-14 07:59:48', NULL, 0, 0.00, 0, NULL, NULL, NULL, NULL, NULL, NULL),
@@ -6085,7 +6215,7 @@ INSERT INTO `courses` (`id`, `subject_id`, `level`, `tags`, `title_ar`, `slug`, 
 (8, 7, 'beginner', NULL, 'دورة الفلسفة المعمقة', 'dor-alflsf-almaamk', 'هذه دورة تعليمية شاملة ومتكاملة تغطي جميع جوانب المادة بشكل عميق ومفصل. تتضمن الدورة شرح نظري وتطبيقات عملية متنوعة لضمان استيعاب الطالب للمفاهيم الأساسية والمتقدمة.', NULL, 'courses/thumbnails/course_8.jpg', NULL, 'youtube', 13000.00, 0, 0, NULL, NULL, NULL, 0, 0, 0, 0, 51, 1, 0, 2, '2025-10-30 07:59:48', 2, '2025-11-14 07:59:48', '2025-12-24 14:39:20', NULL, 0, 0.00, 0, NULL, NULL, NULL, NULL, NULL, NULL),
 (9, 4, 'beginner', NULL, 'دورة الإعلام الآلي', 'dor-alaaalam-alaly', 'هذه دورة تعليمية شاملة ومتكاملة تغطي جميع جوانب المادة بشكل عميق ومفصل. تتضمن الدورة شرح نظري وتطبيقات عملية متنوعة لضمان استيعاب الطالب للمفاهيم الأساسية والمتقدمة.', NULL, 'courses/thumbnails/course_9.jpg', NULL, 'youtube', 0.00, 0, 0, NULL, NULL, NULL, 0, 0, 0, 0, 64, 1, 0, 0, '2025-11-07 07:59:48', 2, '2025-11-14 07:59:48', '2025-11-14 07:59:48', NULL, 0, 0.00, 0, NULL, NULL, NULL, NULL, NULL, NULL),
 (10, 8, 'beginner', NULL, 'دورة المحاسبة المالية', 'dor-almhasb-almaly', 'هذه دورة تعليمية شاملة ومتكاملة تغطي جميع جوانب المادة بشكل عميق ومفصل. تتضمن الدورة شرح نظري وتطبيقات عملية متنوعة لضمان استيعاب الطالب للمفاهيم الأساسية والمتقدمة.', NULL, 'courses/thumbnails/course_10.jpg', NULL, 'youtube', 14000.00, 0, 0, NULL, NULL, NULL, 0, 0, 0, 0, 53, 1, 0, 0, '2025-11-12 07:59:48', 2, '2025-11-14 07:59:48', '2025-11-14 07:59:48', NULL, 0, 0.00, 0, NULL, NULL, NULL, NULL, NULL, NULL),
-(11, 7, 'beginner', NULL, 'دورة القانون الجزائري', 'dor-alkanon-algzayry', 'هذه دورة تعليمية شاملة ومتكاملة تغطي جميع جوانب المادة بشكل عميق ومفصل. تتضمن الدورة شرح نظري وتطبيقات عملية متنوعة لضمان استيعاب الطالب للمفاهيم الأساسية والمتقدمة.', NULL, 'courses/thumbnails/course_11.jpg', NULL, 'youtube', 12500.00, 0, 0, NULL, NULL, NULL, 3, 17, 0, 0, 60, 1, 0, 12, '2025-10-23 07:59:49', 2, '2025-11-14 07:59:49', '2025-12-24 12:55:48', NULL, 0, 3.44, 9, NULL, NULL, NULL, NULL, NULL, NULL),
+(11, 7, 'beginner', NULL, 'دورة القانون الجزائري', 'dor-alkanon-algzayry', 'هذه دورة تعليمية شاملة ومتكاملة تغطي جميع جوانب المادة بشكل عميق ومفصل. تتضمن الدورة شرح نظري وتطبيقات عملية متنوعة لضمان استيعاب الطالب للمفاهيم الأساسية والمتقدمة.', NULL, 'courses/thumbnails/course_11.jpg', NULL, 'youtube', 12500.00, 0, 0, NULL, NULL, NULL, 3, 17, 0, 0, 60, 1, 0, 13, '2025-10-23 07:59:49', 2, '2025-11-14 07:59:49', '2025-12-24 21:18:53', NULL, 0, 3.44, 9, NULL, NULL, NULL, NULL, NULL, NULL),
 (12, 10, 'beginner', NULL, 'دورة الاقتصاد والتسيير', 'dor-alaktsad-oaltsyyr', 'هذه دورة تعليمية شاملة ومتكاملة تغطي جميع جوانب المادة بشكل عميق ومفصل. تتضمن الدورة شرح نظري وتطبيقات عملية متنوعة لضمان استيعاب الطالب للمفاهيم الأساسية والمتقدمة.', NULL, 'courses/thumbnails/course_12.jpg', NULL, 'youtube', 0.00, 0, 0, NULL, NULL, NULL, 0, 0, 0, 0, 66, 0, 0, 0, NULL, 2, '2025-11-14 07:59:49', '2025-12-02 11:14:06', NULL, 0, 0.00, 0, NULL, NULL, NULL, NULL, NULL, NULL),
 (13, 1, 'beginner', NULL, 'دورة الأحياء الجزيئية', 'dor-alahyaaa-algzyyy', 'هذه دورة تعليمية شاملة ومتكاملة تغطي جميع جوانب المادة بشكل عميق ومفصل. تتضمن الدورة شرح نظري وتطبيقات عملية متنوعة لضمان استيعاب الطالب للمفاهيم الأساسية والمتقدمة.', NULL, 'courses/thumbnails/course_13.jpg', NULL, 'youtube', 16000.00, 0, 0, NULL, NULL, NULL, 0, 0, 0, 0, 54, 0, 0, 0, NULL, 2, '2025-11-14 07:59:49', '2025-11-14 07:59:49', NULL, 0, 0.00, 0, NULL, NULL, NULL, NULL, NULL, NULL),
 (14, 7, 'beginner', NULL, 'دورة الهندسة المدنية', 'dor-alhnds-almdny', 'هذه دورة تعليمية شاملة ومتكاملة تغطي جميع جوانب المادة بشكل عميق ومفصل. تتضمن الدورة شرح نظري وتطبيقات عملية متنوعة لضمان استيعاب الطالب للمفاهيم الأساسية والمتقدمة.', NULL, 'courses/thumbnails/course_14.jpg', NULL, 'youtube', 18000.00, 0, 0, NULL, NULL, NULL, 0, 0, 0, 0, 48, 0, 0, 0, NULL, 2, '2025-11-14 07:59:49', '2025-11-14 07:59:49', NULL, 0, 0.00, 0, NULL, NULL, NULL, NULL, NULL, NULL),
@@ -6097,8 +6227,9 @@ INSERT INTO `courses` (`id`, `subject_id`, `level`, `tags`, `title_ar`, `slug`, 
 -- Structure de la table `course_lessons`
 --
 
-CREATE TABLE `course_lessons` (
-  `id` bigint UNSIGNED NOT NULL,
+DROP TABLE IF EXISTS `course_lessons`;
+CREATE TABLE IF NOT EXISTS `course_lessons` (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
   `course_module_id` bigint UNSIGNED NOT NULL,
   `content_type` enum('video','document','quiz','text') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT 'video',
   `quiz_id` bigint UNSIGNED DEFAULT NULL,
@@ -6120,8 +6251,11 @@ CREATE TABLE `course_lessons` (
   `is_published` tinyint(1) NOT NULL DEFAULT '1',
   `is_free_preview` tinyint(1) DEFAULT '0',
   `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `course_lessons_course_module_id_foreign` (`course_module_id`),
+  KEY `fk_course_lessons_quiz` (`quiz_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=328 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Déchargement des données de la table `course_lessons`
@@ -6459,8 +6593,9 @@ INSERT INTO `course_lessons` (`id`, `course_module_id`, `content_type`, `quiz_id
 -- Structure de la table `course_lesson_attachments`
 --
 
-CREATE TABLE `course_lesson_attachments` (
-  `id` bigint UNSIGNED NOT NULL,
+DROP TABLE IF EXISTS `course_lesson_attachments`;
+CREATE TABLE IF NOT EXISTS `course_lesson_attachments` (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
   `course_lesson_id` bigint UNSIGNED NOT NULL,
   `file_name_ar` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `file_path` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -6468,7 +6603,9 @@ CREATE TABLE `course_lesson_attachments` (
   `file_size` int NOT NULL,
   `order` int NOT NULL DEFAULT '0',
   `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `course_lesson_attachments_course_lesson_id_order_index` (`course_lesson_id`,`order`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -6477,16 +6614,19 @@ CREATE TABLE `course_lesson_attachments` (
 -- Structure de la table `course_modules`
 --
 
-CREATE TABLE `course_modules` (
-  `id` bigint UNSIGNED NOT NULL,
+DROP TABLE IF EXISTS `course_modules`;
+CREATE TABLE IF NOT EXISTS `course_modules` (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
   `course_id` bigint UNSIGNED NOT NULL,
   `title_ar` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `description_ar` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `order` int NOT NULL,
   `is_published` tinyint(1) NOT NULL DEFAULT '1',
   `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `course_modules_course_id_foreign` (`course_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=60 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Déchargement des données de la table `course_modules`
@@ -6559,15 +6699,19 @@ INSERT INTO `course_modules` (`id`, `course_id`, `title_ar`, `description_ar`, `
 -- Structure de la table `course_quizzes`
 --
 
-CREATE TABLE `course_quizzes` (
-  `id` bigint UNSIGNED NOT NULL,
+DROP TABLE IF EXISTS `course_quizzes`;
+CREATE TABLE IF NOT EXISTS `course_quizzes` (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
   `course_module_id` bigint UNSIGNED NOT NULL,
   `quiz_id` bigint UNSIGNED NOT NULL,
   `is_required` tinyint(1) NOT NULL DEFAULT '0',
   `passing_score` int NOT NULL DEFAULT '70',
   `order` int NOT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `course_quizzes_course_module_id_foreign` (`course_module_id`),
+  KEY `course_quizzes_quiz_id_foreign` (`quiz_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -6576,16 +6720,20 @@ CREATE TABLE `course_quizzes` (
 -- Structure de la table `course_reviews`
 --
 
-CREATE TABLE `course_reviews` (
-  `id` bigint UNSIGNED NOT NULL,
+DROP TABLE IF EXISTS `course_reviews`;
+CREATE TABLE IF NOT EXISTS `course_reviews` (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
   `user_id` bigint UNSIGNED NOT NULL,
   `course_id` bigint UNSIGNED NOT NULL,
   `rating` int NOT NULL,
   `review_text_ar` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `is_approved` tinyint(1) NOT NULL DEFAULT '0',
   `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `course_reviews_user_id_course_id_unique` (`user_id`,`course_id`),
+  KEY `course_reviews_course_id_is_approved_index` (`course_id`,`is_approved`)
+) ENGINE=MyISAM AUTO_INCREMENT=123 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Déchargement des données de la table `course_reviews`
@@ -6721,8 +6869,9 @@ INSERT INTO `course_reviews` (`id`, `user_id`, `course_id`, `rating`, `review_te
 -- Structure de la table `device_sessions`
 --
 
-CREATE TABLE `device_sessions` (
-  `id` bigint UNSIGNED NOT NULL,
+DROP TABLE IF EXISTS `device_sessions`;
+CREATE TABLE IF NOT EXISTS `device_sessions` (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
   `user_id` bigint UNSIGNED NOT NULL,
   `device_name` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `device_type` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -6739,31 +6888,38 @@ CREATE TABLE `device_sessions` (
   `last_active_at` timestamp NULL DEFAULT NULL,
   `expires_at` timestamp NULL DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `device_sessions_token_id_unique` (`token_id`),
+  KEY `device_sessions_user_id_index` (`user_id`),
+  KEY `device_sessions_token_id_index` (`token_id`),
+  KEY `device_sessions_is_current_index` (`is_current`),
+  KEY `device_sessions_last_active_at_index` (`last_active_at`)
+) ENGINE=MyISAM AUTO_INCREMENT=33 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Déchargement des données de la table `device_sessions`
 --
 
 INSERT INTO `device_sessions` (`id`, `user_id`, `device_name`, `device_type`, `device_os`, `os_version`, `app_version`, `token_id`, `ip_address`, `user_agent`, `location`, `latitude`, `longitude`, `is_current`, `last_active_at`, `expires_at`, `created_at`, `updated_at`) VALUES
-(9, 27, 'Android Device', 'mobile', 'Android', NULL, NULL, '115', '127.0.0.1', 'Dart/3.9 (dart:io)', NULL, NULL, NULL, 0, '2025-12-10 09:58:29', '2025-12-17 09:58:29', '2025-12-10 09:58:29', '2025-12-24 10:56:17'),
-(3, 27, 'Android Device', 'mobile', 'Android', NULL, NULL, '109', '127.0.0.1', 'Dart/3.9 (dart:io)', NULL, NULL, NULL, 0, '2025-12-08 13:59:18', '2025-12-15 13:59:18', '2025-12-08 13:59:18', '2025-12-24 10:56:17'),
-(10, 27, 'Android Device', 'mobile', 'Android', NULL, NULL, '116', '127.0.0.1', 'Dart/3.9 (dart:io)', NULL, NULL, NULL, 0, '2025-12-11 18:47:23', '2025-12-18 18:47:23', '2025-12-11 18:47:23', '2025-12-24 10:56:17'),
-(11, 27, 'Android Device', 'mobile', 'Android', NULL, NULL, '117', '127.0.0.1', 'Dart/3.9 (dart:io)', NULL, NULL, NULL, 0, '2025-12-12 09:08:30', '2025-12-19 09:08:30', '2025-12-12 09:08:30', '2025-12-24 10:56:17'),
-(12, 27, 'Android Device', 'mobile', 'Android', NULL, NULL, '118', '127.0.0.1', 'Dart/3.9 (dart:io)', NULL, NULL, NULL, 0, '2025-12-12 09:37:53', '2025-12-19 09:37:53', '2025-12-12 09:37:53', '2025-12-24 10:56:17'),
-(13, 27, 'Android Device', 'mobile', 'Android', NULL, NULL, '119', '127.0.0.1', 'Dart/3.9 (dart:io)', NULL, NULL, NULL, 0, '2025-12-12 22:43:06', '2025-12-19 22:43:06', '2025-12-12 22:43:06', '2025-12-24 10:56:17'),
-(14, 27, 'Android Device', 'mobile', 'Android', NULL, NULL, '120', '127.0.0.1', 'Dart/3.9 (dart:io)', NULL, NULL, NULL, 0, '2025-12-15 10:33:17', '2025-12-22 10:33:17', '2025-12-15 10:33:17', '2025-12-24 10:56:17'),
-(15, 27, 'Android Device', 'mobile', 'Android', NULL, NULL, '121', '127.0.0.1', 'Dart/3.9 (dart:io)', NULL, NULL, NULL, 0, '2025-12-15 12:57:17', '2025-12-22 12:57:17', '2025-12-15 12:57:17', '2025-12-24 10:56:17'),
-(16, 27, 'Android Device', 'mobile', 'Android', NULL, NULL, '122', '127.0.0.1', 'Dart/3.9 (dart:io)', NULL, NULL, NULL, 0, '2025-12-16 17:42:11', '2025-12-23 17:42:11', '2025-12-16 17:42:11', '2025-12-24 10:56:17'),
-(17, 27, 'Android Device', 'mobile', 'Android', NULL, NULL, '123', '127.0.0.1', 'Dart/3.9 (dart:io)', NULL, NULL, NULL, 0, '2025-12-17 20:17:51', '2025-12-24 20:17:51', '2025-12-17 20:17:51', '2025-12-24 10:56:17'),
-(18, 27, 'Android Device', 'mobile', 'Android', NULL, NULL, '124', '127.0.0.1', 'Dart/3.9 (dart:io)', NULL, NULL, NULL, 0, '2025-12-18 18:02:46', '2025-12-25 18:02:46', '2025-12-18 18:02:46', '2025-12-24 10:56:17'),
-(25, 27, 'Android Device', 'mobile', 'Android', NULL, NULL, '131', '127.0.0.1', 'Dart/3.9 (dart:io)', NULL, NULL, NULL, 0, '2025-12-19 09:17:26', '2025-12-26 09:17:26', '2025-12-19 09:17:26', '2025-12-24 10:56:17'),
-(26, 27, 'Android Device', 'mobile', 'Android', NULL, NULL, '132', '127.0.0.1', 'Dart/3.9 (dart:io)', NULL, NULL, NULL, 0, '2025-12-22 09:47:35', '2025-12-29 09:47:35', '2025-12-22 09:47:35', '2025-12-24 10:56:17'),
-(27, 27, 'Android Device', 'mobile', 'Android', NULL, NULL, '133', '127.0.0.1', 'Dart/3.9 (dart:io)', NULL, NULL, NULL, 0, '2025-12-22 13:34:22', '2025-12-29 13:34:22', '2025-12-22 13:34:22', '2025-12-24 10:56:17'),
-(29, 27, 'Android Device', 'mobile', 'Android', NULL, NULL, '135', '127.0.0.1', 'Dart/3.9 (dart:io)', NULL, NULL, NULL, 0, '2025-12-23 09:18:01', '2025-12-30 09:18:01', '2025-12-23 09:18:01', '2025-12-24 10:56:17'),
-(30, 27, 'Android Device', 'mobile', 'Android', NULL, NULL, '136', '127.0.0.1', 'Dart/3.9 (dart:io)', NULL, NULL, NULL, 0, '2025-12-23 17:12:28', '2025-12-30 17:12:28', '2025-12-23 17:12:28', '2025-12-24 10:56:17'),
-(31, 27, 'Android Device', 'mobile', 'Android', NULL, NULL, '137', '127.0.0.1', 'Dart/3.9 (dart:io)', NULL, NULL, NULL, 1, '2025-12-24 10:56:17', '2025-12-31 10:56:17', '2025-12-24 10:56:17', '2025-12-24 10:56:17');
+(9, 27, 'Android Device', 'mobile', 'Android', NULL, NULL, '115', '127.0.0.1', 'Dart/3.9 (dart:io)', NULL, NULL, NULL, 0, '2025-12-10 09:58:29', '2025-12-17 09:58:29', '2025-12-10 09:58:29', '2025-12-24 20:45:29'),
+(3, 27, 'Android Device', 'mobile', 'Android', NULL, NULL, '109', '127.0.0.1', 'Dart/3.9 (dart:io)', NULL, NULL, NULL, 0, '2025-12-08 13:59:18', '2025-12-15 13:59:18', '2025-12-08 13:59:18', '2025-12-24 20:45:29'),
+(10, 27, 'Android Device', 'mobile', 'Android', NULL, NULL, '116', '127.0.0.1', 'Dart/3.9 (dart:io)', NULL, NULL, NULL, 0, '2025-12-11 18:47:23', '2025-12-18 18:47:23', '2025-12-11 18:47:23', '2025-12-24 20:45:29'),
+(11, 27, 'Android Device', 'mobile', 'Android', NULL, NULL, '117', '127.0.0.1', 'Dart/3.9 (dart:io)', NULL, NULL, NULL, 0, '2025-12-12 09:08:30', '2025-12-19 09:08:30', '2025-12-12 09:08:30', '2025-12-24 20:45:29'),
+(12, 27, 'Android Device', 'mobile', 'Android', NULL, NULL, '118', '127.0.0.1', 'Dart/3.9 (dart:io)', NULL, NULL, NULL, 0, '2025-12-12 09:37:53', '2025-12-19 09:37:53', '2025-12-12 09:37:53', '2025-12-24 20:45:29'),
+(13, 27, 'Android Device', 'mobile', 'Android', NULL, NULL, '119', '127.0.0.1', 'Dart/3.9 (dart:io)', NULL, NULL, NULL, 0, '2025-12-12 22:43:06', '2025-12-19 22:43:06', '2025-12-12 22:43:06', '2025-12-24 20:45:29'),
+(14, 27, 'Android Device', 'mobile', 'Android', NULL, NULL, '120', '127.0.0.1', 'Dart/3.9 (dart:io)', NULL, NULL, NULL, 0, '2025-12-15 10:33:17', '2025-12-22 10:33:17', '2025-12-15 10:33:17', '2025-12-24 20:45:29'),
+(15, 27, 'Android Device', 'mobile', 'Android', NULL, NULL, '121', '127.0.0.1', 'Dart/3.9 (dart:io)', NULL, NULL, NULL, 0, '2025-12-15 12:57:17', '2025-12-22 12:57:17', '2025-12-15 12:57:17', '2025-12-24 20:45:29'),
+(16, 27, 'Android Device', 'mobile', 'Android', NULL, NULL, '122', '127.0.0.1', 'Dart/3.9 (dart:io)', NULL, NULL, NULL, 0, '2025-12-16 17:42:11', '2025-12-23 17:42:11', '2025-12-16 17:42:11', '2025-12-24 20:45:29'),
+(17, 27, 'Android Device', 'mobile', 'Android', NULL, NULL, '123', '127.0.0.1', 'Dart/3.9 (dart:io)', NULL, NULL, NULL, 0, '2025-12-17 20:17:51', '2025-12-24 20:17:51', '2025-12-17 20:17:51', '2025-12-24 20:45:29'),
+(18, 27, 'Android Device', 'mobile', 'Android', NULL, NULL, '124', '127.0.0.1', 'Dart/3.9 (dart:io)', NULL, NULL, NULL, 0, '2025-12-18 18:02:46', '2025-12-25 18:02:46', '2025-12-18 18:02:46', '2025-12-24 20:45:29'),
+(25, 27, 'Android Device', 'mobile', 'Android', NULL, NULL, '131', '127.0.0.1', 'Dart/3.9 (dart:io)', NULL, NULL, NULL, 0, '2025-12-19 09:17:26', '2025-12-26 09:17:26', '2025-12-19 09:17:26', '2025-12-24 20:45:29'),
+(26, 27, 'Android Device', 'mobile', 'Android', NULL, NULL, '132', '127.0.0.1', 'Dart/3.9 (dart:io)', NULL, NULL, NULL, 0, '2025-12-22 09:47:35', '2025-12-29 09:47:35', '2025-12-22 09:47:35', '2025-12-24 20:45:29'),
+(27, 27, 'Android Device', 'mobile', 'Android', NULL, NULL, '133', '127.0.0.1', 'Dart/3.9 (dart:io)', NULL, NULL, NULL, 0, '2025-12-22 13:34:22', '2025-12-29 13:34:22', '2025-12-22 13:34:22', '2025-12-24 20:45:29'),
+(29, 27, 'Android Device', 'mobile', 'Android', NULL, NULL, '135', '127.0.0.1', 'Dart/3.9 (dart:io)', NULL, NULL, NULL, 0, '2025-12-23 09:18:01', '2025-12-30 09:18:01', '2025-12-23 09:18:01', '2025-12-24 20:45:29'),
+(30, 27, 'Android Device', 'mobile', 'Android', NULL, NULL, '136', '127.0.0.1', 'Dart/3.9 (dart:io)', NULL, NULL, NULL, 0, '2025-12-23 17:12:28', '2025-12-30 17:12:28', '2025-12-23 17:12:28', '2025-12-24 20:45:29'),
+(31, 27, 'Android Device', 'mobile', 'Android', NULL, NULL, '137', '127.0.0.1', 'Dart/3.9 (dart:io)', NULL, NULL, NULL, 0, '2025-12-24 10:56:17', '2025-12-31 10:56:17', '2025-12-24 10:56:17', '2025-12-24 20:45:29'),
+(32, 27, 'Android Device', 'mobile', 'Android', NULL, NULL, '138', '127.0.0.1', 'Dart/3.9 (dart:io)', NULL, NULL, NULL, 1, '2025-12-24 20:45:29', '2025-12-31 20:45:29', '2025-12-24 20:45:29', '2025-12-24 20:45:29');
 
 -- --------------------------------------------------------
 
@@ -6771,8 +6927,9 @@ INSERT INTO `device_sessions` (`id`, `user_id`, `device_name`, `device_type`, `d
 -- Structure de la table `device_transfer_requests`
 --
 
-CREATE TABLE `device_transfer_requests` (
-  `id` bigint UNSIGNED NOT NULL,
+DROP TABLE IF EXISTS `device_transfer_requests`;
+CREATE TABLE IF NOT EXISTS `device_transfer_requests` (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
   `user_id` bigint UNSIGNED NOT NULL,
   `old_device_uuid` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `new_device_uuid` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -6783,7 +6940,10 @@ CREATE TABLE `device_transfer_requests` (
   `approved_by` bigint UNSIGNED DEFAULT NULL,
   `approved_at` timestamp NULL DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `device_transfer_requests_approved_by_foreign` (`approved_by`),
+  KEY `device_transfer_requests_user_id_status_index` (`user_id`,`status`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -6792,8 +6952,9 @@ CREATE TABLE `device_transfer_requests` (
 -- Structure de la table `exam_schedule`
 --
 
-CREATE TABLE `exam_schedule` (
-  `id` bigint UNSIGNED NOT NULL,
+DROP TABLE IF EXISTS `exam_schedule`;
+CREATE TABLE IF NOT EXISTS `exam_schedule` (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
   `user_id` bigint UNSIGNED NOT NULL,
   `subject_id` bigint UNSIGNED NOT NULL,
   `exam_type` enum('quiz','test','exam','final_exam') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT 'test',
@@ -6807,7 +6968,11 @@ CREATE TABLE `exam_schedule` (
   `is_completed` tinyint(1) NOT NULL DEFAULT '0',
   `actual_score` decimal(5,2) DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `exam_schedule_subject_id_foreign` (`subject_id`),
+  KEY `exam_schedule_user_id_exam_date_index` (`user_id`,`exam_date`),
+  KEY `exam_schedule_user_id_subject_id_index` (`user_id`,`subject_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -6816,14 +6981,17 @@ CREATE TABLE `exam_schedule` (
 -- Structure de la table `failed_jobs`
 --
 
-CREATE TABLE `failed_jobs` (
-  `id` bigint UNSIGNED NOT NULL,
+DROP TABLE IF EXISTS `failed_jobs`;
+CREATE TABLE IF NOT EXISTS `failed_jobs` (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
   `uuid` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `connection` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `queue` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `payload` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `exception` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `failed_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
+  `failed_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `failed_jobs_uuid_unique` (`uuid`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -6832,8 +7000,9 @@ CREATE TABLE `failed_jobs` (
 -- Structure de la table `fcm_tokens`
 --
 
-CREATE TABLE `fcm_tokens` (
-  `id` bigint UNSIGNED NOT NULL,
+DROP TABLE IF EXISTS `fcm_tokens`;
+CREATE TABLE IF NOT EXISTS `fcm_tokens` (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
   `user_id` bigint UNSIGNED NOT NULL,
   `token` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `device_uuid` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -6841,15 +7010,18 @@ CREATE TABLE `fcm_tokens` (
   `is_active` tinyint(1) NOT NULL DEFAULT '1',
   `last_used_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `fcm_tokens_token_unique` (`token`),
+  KEY `fcm_tokens_user_id_foreign` (`user_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Déchargement des données de la table `fcm_tokens`
 --
 
 INSERT INTO `fcm_tokens` (`id`, `user_id`, `token`, `device_uuid`, `device_platform`, `is_active`, `last_used_at`, `created_at`, `updated_at`) VALUES
-(6, 27, 'dprAfiizTvSsI9SN1kWTM8:APA91bEf1uCAUs3vuNxXfP-7iRkQw6itVkFu65SNlNWUTeDFKUhTch3klrvsCKqk0U0zDAmtmRMDgg7lqG0onPBMOzxKc0i8g13x7CaPmabOyFqoZIlOW0c', 'BP22.250325.006', 'android', 1, '2025-12-23 17:12:30', '2025-12-18 22:07:03', '2025-12-23 17:12:30'),
+(6, 27, 'enLC1zmYREGTVgf4XtgJ-4:APA91bHc3I9cEB5ACWFqK9zAQHYjwDI-UbVH04hBHh54D3oMb81Gc8n0LYpr4qB3CfQZh7iZ0dGyESBYlgMVBSe_J5U0_qAbv6tEeyRZ0KokTN404uq5ut0', 'BP22.250325.006', 'android', 1, '2025-12-24 20:45:31', '2025-12-18 22:07:03', '2025-12-24 20:45:31'),
 (7, 27, 'e-kJIQXVQayzSg4tzpaSp8:APA91bHzK8HPpVnrPwBizajb-WaLtNk1jQYIyn5KqBbru-jQui0LphiEAzr7JuoqxzTGokBleIDfj7pAukALiRwkcySyXS0ZqKDCrT3xjZHq1XUVQ4rQ7vY', 'AE3A.240806.036', 'android', 1, '2025-12-24 10:56:18', '2025-12-22 09:47:38', '2025-12-24 10:56:18');
 
 -- --------------------------------------------------------
@@ -6858,8 +7030,9 @@ INSERT INTO `fcm_tokens` (`id`, `user_id`, `token`, `device_uuid`, `device_platf
 -- Structure de la table `flashcards`
 --
 
-CREATE TABLE `flashcards` (
-  `id` bigint UNSIGNED NOT NULL,
+DROP TABLE IF EXISTS `flashcards`;
+CREATE TABLE IF NOT EXISTS `flashcards` (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
   `deck_id` bigint UNSIGNED NOT NULL,
   `card_type` enum('basic','cloze','image','audio') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'basic',
   `front_text_ar` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -6882,8 +7055,12 @@ CREATE TABLE `flashcards` (
   `is_active` tinyint(1) NOT NULL DEFAULT '1',
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
-  `deleted_at` timestamp NULL DEFAULT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `flashcards_deck_id_is_active_index` (`deck_id`,`is_active`),
+  KEY `flashcards_card_type_index` (`card_type`),
+  KEY `flashcards_order_index` (`order`)
+) ENGINE=MyISAM AUTO_INCREMENT=127 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Déchargement des données de la table `flashcards`
@@ -7023,8 +7200,9 @@ INSERT INTO `flashcards` (`id`, `deck_id`, `card_type`, `front_text_ar`, `front_
 -- Structure de la table `flashcard_decks`
 --
 
-CREATE TABLE `flashcard_decks` (
-  `id` bigint UNSIGNED NOT NULL,
+DROP TABLE IF EXISTS `flashcard_decks`;
+CREATE TABLE IF NOT EXISTS `flashcard_decks` (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
   `subject_id` bigint UNSIGNED NOT NULL,
   `chapter_id` bigint UNSIGNED DEFAULT NULL,
   `academic_stream_id` bigint UNSIGNED DEFAULT NULL,
@@ -7046,8 +7224,15 @@ CREATE TABLE `flashcard_decks` (
   `created_by` bigint UNSIGNED DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
-  `deleted_at` timestamp NULL DEFAULT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `flashcard_decks_slug_unique` (`slug`),
+  KEY `flashcard_decks_created_by_foreign` (`created_by`),
+  KEY `flashcard_decks_subject_id_is_published_index` (`subject_id`,`is_published`),
+  KEY `flashcard_decks_chapter_id_is_published_index` (`chapter_id`,`is_published`),
+  KEY `flashcard_decks_academic_stream_id_index` (`academic_stream_id`),
+  KEY `flashcard_decks_is_premium_index` (`is_premium`)
+) ENGINE=MyISAM AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Déchargement des données de la table `flashcard_decks`
@@ -7071,12 +7256,16 @@ INSERT INTO `flashcard_decks` (`id`, `subject_id`, `chapter_id`, `academic_strea
 -- Structure de la table `flashcard_deck_stream`
 --
 
-CREATE TABLE `flashcard_deck_stream` (
-  `id` bigint UNSIGNED NOT NULL,
+DROP TABLE IF EXISTS `flashcard_deck_stream`;
+CREATE TABLE IF NOT EXISTS `flashcard_deck_stream` (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
   `flashcard_deck_id` bigint UNSIGNED NOT NULL,
   `academic_stream_id` bigint UNSIGNED NOT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `deck_stream_unique` (`flashcard_deck_id`,`academic_stream_id`),
+  KEY `flashcard_deck_stream_academic_stream_id_foreign` (`academic_stream_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -7085,8 +7274,9 @@ CREATE TABLE `flashcard_deck_stream` (
 -- Structure de la table `flashcard_review_logs`
 --
 
-CREATE TABLE `flashcard_review_logs` (
-  `id` bigint UNSIGNED NOT NULL,
+DROP TABLE IF EXISTS `flashcard_review_logs`;
+CREATE TABLE IF NOT EXISTS `flashcard_review_logs` (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
   `user_id` bigint UNSIGNED NOT NULL,
   `flashcard_id` bigint UNSIGNED NOT NULL,
   `session_id` bigint UNSIGNED DEFAULT NULL,
@@ -7100,8 +7290,12 @@ CREATE TABLE `flashcard_review_logs` (
   `next_review_after` date NOT NULL,
   `state_before` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `state_after` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `reviewed_at` timestamp NOT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  `reviewed_at` timestamp NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `flashcard_review_logs_user_id_reviewed_at_index` (`user_id`,`reviewed_at`),
+  KEY `flashcard_review_logs_flashcard_id_index` (`flashcard_id`),
+  KEY `flashcard_review_logs_session_id_index` (`session_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=48 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Déchargement des données de la table `flashcard_review_logs`
@@ -7162,8 +7356,9 @@ INSERT INTO `flashcard_review_logs` (`id`, `user_id`, `flashcard_id`, `session_i
 -- Structure de la table `flashcard_review_sessions`
 --
 
-CREATE TABLE `flashcard_review_sessions` (
-  `id` bigint UNSIGNED NOT NULL,
+DROP TABLE IF EXISTS `flashcard_review_sessions`;
+CREATE TABLE IF NOT EXISTS `flashcard_review_sessions` (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
   `user_id` bigint UNSIGNED NOT NULL,
   `deck_id` bigint UNSIGNED DEFAULT NULL,
   `started_at` timestamp NOT NULL,
@@ -7181,8 +7376,13 @@ CREATE TABLE `flashcard_review_sessions` (
   `status` enum('in_progress','completed','abandoned') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'in_progress',
   `cards_reviewed` json DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `flashcard_review_sessions_deck_id_foreign` (`deck_id`),
+  KEY `flashcard_review_sessions_user_id_status_index` (`user_id`,`status`),
+  KEY `flashcard_review_sessions_user_id_deck_id_index` (`user_id`,`deck_id`),
+  KEY `flashcard_review_sessions_started_at_index` (`started_at`)
+) ENGINE=MyISAM AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Déchargement des données de la table `flashcard_review_sessions`
@@ -7207,14 +7407,17 @@ INSERT INTO `flashcard_review_sessions` (`id`, `user_id`, `deck_id`, `started_at
 -- Structure de la table `jobs`
 --
 
-CREATE TABLE `jobs` (
-  `id` bigint UNSIGNED NOT NULL,
+DROP TABLE IF EXISTS `jobs`;
+CREATE TABLE IF NOT EXISTS `jobs` (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
   `queue` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `payload` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `attempts` tinyint UNSIGNED NOT NULL,
   `reserved_at` int UNSIGNED DEFAULT NULL,
   `available_at` int UNSIGNED NOT NULL,
-  `created_at` int UNSIGNED NOT NULL
+  `created_at` int UNSIGNED NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `jobs_queue_index` (`queue`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -7223,7 +7426,8 @@ CREATE TABLE `jobs` (
 -- Structure de la table `job_batches`
 --
 
-CREATE TABLE `job_batches` (
+DROP TABLE IF EXISTS `job_batches`;
+CREATE TABLE IF NOT EXISTS `job_batches` (
   `id` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `name` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `total_jobs` int NOT NULL,
@@ -7233,7 +7437,8 @@ CREATE TABLE `job_batches` (
   `options` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `cancelled_at` int DEFAULT NULL,
   `created_at` int NOT NULL,
-  `finished_at` int DEFAULT NULL
+  `finished_at` int DEFAULT NULL,
+  PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -7242,11 +7447,13 @@ CREATE TABLE `job_batches` (
 -- Structure de la table `migrations`
 --
 
-CREATE TABLE `migrations` (
-  `id` int UNSIGNED NOT NULL,
+DROP TABLE IF EXISTS `migrations`;
+CREATE TABLE IF NOT EXISTS `migrations` (
+  `id` int UNSIGNED NOT NULL AUTO_INCREMENT,
   `migration` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `batch` int NOT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  `batch` int NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM AUTO_INCREMENT=166 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Déchargement des données de la table `migrations`
@@ -7424,8 +7631,9 @@ INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES
 -- Structure de la table `notifications`
 --
 
-CREATE TABLE `notifications` (
-  `id` bigint UNSIGNED NOT NULL,
+DROP TABLE IF EXISTS `notifications`;
+CREATE TABLE IF NOT EXISTS `notifications` (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
   `user_id` bigint UNSIGNED NOT NULL,
   `type` enum('study_reminder','exam_alert','daily_summary','course_update','achievement','system') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `title_ar` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -7438,8 +7646,11 @@ CREATE TABLE `notifications` (
   `status` enum('pending','sent','failed') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'pending',
   `priority` enum('low','normal','high') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'normal',
   `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `notifications_user_id_status_index` (`user_id`,`status`),
+  KEY `notifications_scheduled_for_status_index` (`scheduled_for`,`status`)
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Déchargement des données de la table `notifications`
@@ -7451,7 +7662,8 @@ INSERT INTO `notifications` (`id`, `user_id`, `type`, `title_ar`, `body_ar`, `ac
 (3, 27, 'system', 'fdg', 'ytuyu', NULL, NULL, '2025-12-19 10:11:02', NULL, '2025-12-19 10:11:02', 'sent', 'normal', '2025-12-19 10:11:02', '2025-12-19 10:11:02'),
 (4, 27, 'system', 'ftghfgh', 'fghgfhfg', NULL, NULL, '2025-12-19 10:11:35', NULL, '2025-12-19 10:11:35', 'sent', 'normal', '2025-12-19 10:11:35', '2025-12-19 10:11:35'),
 (5, 27, 'system', '12121', '21212', NULL, NULL, '2025-12-19 10:13:24', NULL, '2025-12-19 10:13:25', 'sent', 'normal', '2025-12-19 10:13:24', '2025-12-19 10:13:25'),
-(6, 27, 'system', 'السلام عليكم', 'موعد البث المباشر اليوم على الساعة السابعة', NULL, NULL, '2025-12-19 10:14:05', NULL, '2025-12-19 10:14:06', 'sent', 'normal', '2025-12-19 10:14:05', '2025-12-19 10:14:06');
+(6, 27, 'system', 'السلام عليكم', 'موعد البث المباشر اليوم على الساعة السابعة', NULL, NULL, '2025-12-19 10:14:05', NULL, '2025-12-19 10:14:06', 'sent', 'normal', '2025-12-19 10:14:05', '2025-12-19 10:14:06'),
+(7, 27, 'system', 'مرحبا سارة', 'مرحبا سارة', NULL, NULL, '2025-12-24 22:07:49', NULL, '2025-12-24 22:07:49', 'sent', 'normal', '2025-12-24 22:07:49', '2025-12-24 22:07:49');
 
 -- --------------------------------------------------------
 
@@ -7459,8 +7671,9 @@ INSERT INTO `notifications` (`id`, `user_id`, `type`, `title_ar`, `body_ar`, `ac
 -- Structure de la table `orders`
 --
 
-CREATE TABLE `orders` (
-  `id` bigint UNSIGNED NOT NULL,
+DROP TABLE IF EXISTS `orders`;
+CREATE TABLE IF NOT EXISTS `orders` (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
   `order_number` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `user_id` bigint UNSIGNED NOT NULL,
   `course_id` bigint UNSIGNED DEFAULT NULL,
@@ -7482,7 +7695,16 @@ CREATE TABLE `orders` (
   `metadata` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin,
   `notes` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `orders_order_number_unique` (`order_number`),
+  KEY `orders_course_id_foreign` (`course_id`),
+  KEY `orders_package_id_foreign` (`package_id`),
+  KEY `orders_coupon_id_foreign` (`coupon_id`),
+  KEY `orders_order_number_index` (`order_number`),
+  KEY `orders_user_id_index` (`user_id`),
+  KEY `orders_status_index` (`status`),
+  KEY `orders_created_at_index` (`created_at`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -7491,11 +7713,15 @@ CREATE TABLE `orders` (
 -- Structure de la table `package_courses`
 --
 
-CREATE TABLE `package_courses` (
-  `id` bigint UNSIGNED NOT NULL,
+DROP TABLE IF EXISTS `package_courses`;
+CREATE TABLE IF NOT EXISTS `package_courses` (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
   `package_id` bigint UNSIGNED NOT NULL,
-  `course_id` bigint UNSIGNED NOT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  `course_id` bigint UNSIGNED NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `package_courses_package_id_foreign` (`package_id`),
+  KEY `package_courses_course_id_foreign` (`course_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=40 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Déchargement des données de la table `package_courses`
@@ -7548,10 +7774,12 @@ INSERT INTO `package_courses` (`id`, `package_id`, `course_id`) VALUES
 -- Structure de la table `password_reset_tokens`
 --
 
-CREATE TABLE `password_reset_tokens` (
+DROP TABLE IF EXISTS `password_reset_tokens`;
+CREATE TABLE IF NOT EXISTS `password_reset_tokens` (
   `email` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `token` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `created_at` timestamp NULL DEFAULT NULL
+  `created_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`email`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -7560,8 +7788,9 @@ CREATE TABLE `password_reset_tokens` (
 -- Structure de la table `payment_receipts`
 --
 
-CREATE TABLE `payment_receipts` (
-  `id` bigint UNSIGNED NOT NULL,
+DROP TABLE IF EXISTS `payment_receipts`;
+CREATE TABLE IF NOT EXISTS `payment_receipts` (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
   `user_id` bigint UNSIGNED NOT NULL,
   `course_id` bigint UNSIGNED DEFAULT NULL,
   `package_id` bigint UNSIGNED DEFAULT NULL,
@@ -7578,8 +7807,13 @@ CREATE TABLE `payment_receipts` (
   `reviewed_at` timestamp NULL DEFAULT NULL,
   `submitted_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `payment_receipts_user_id_foreign` (`user_id`),
+  KEY `payment_receipts_course_id_foreign` (`course_id`),
+  KEY `payment_receipts_reviewed_by_foreign` (`reviewed_by`),
+  KEY `payment_receipts_package_id_foreign` (`package_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=26 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Déchargement des données de la table `payment_receipts`
@@ -7618,8 +7852,9 @@ INSERT INTO `payment_receipts` (`id`, `user_id`, `course_id`, `package_id`, `rec
 -- Structure de la table `personal_access_tokens`
 --
 
-CREATE TABLE `personal_access_tokens` (
-  `id` bigint UNSIGNED NOT NULL,
+DROP TABLE IF EXISTS `personal_access_tokens`;
+CREATE TABLE IF NOT EXISTS `personal_access_tokens` (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
   `tokenable_type` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `tokenable_id` bigint UNSIGNED NOT NULL,
   `name` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -7628,8 +7863,12 @@ CREATE TABLE `personal_access_tokens` (
   `last_used_at` timestamp NULL DEFAULT NULL,
   `expires_at` timestamp NULL DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `personal_access_tokens_token_unique` (`token`),
+  KEY `personal_access_tokens_tokenable_type_tokenable_id_index` (`tokenable_type`,`tokenable_id`),
+  KEY `personal_access_tokens_expires_at_index` (`expires_at`)
+) ENGINE=MyISAM AUTO_INCREMENT=139 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Déchargement des données de la table `personal_access_tokens`
@@ -7757,8 +7996,9 @@ INSERT INTO `personal_access_tokens` (`id`, `tokenable_type`, `tokenable_id`, `n
 (132, 'App\\Models\\User', 27, 'auth-token', 'd65b8126506201590647a20a3cd68c0c3090cd3a846cf8be7aa7c3074b0d473f', '[\"*\"]', '2025-12-22 12:59:10', NULL, '2025-12-22 09:47:35', '2025-12-22 12:59:10'),
 (133, 'App\\Models\\User', 27, 'auth-token', '7bdc8a4ac66b2010f813448b8ec4a75837679ad078aea0c805cf0644e4b8e514', '[\"*\"]', '2025-12-24 10:03:08', NULL, '2025-12-22 13:34:22', '2025-12-24 10:03:08'),
 (135, 'App\\Models\\User', 27, 'auth-token', '19235da32a0e2ea60e8ae20686a9e67abae6e2a7be1c1a86a77b33d8090af901', '[\"*\"]', '2025-12-23 16:47:38', NULL, '2025-12-23 09:18:01', '2025-12-23 16:47:38'),
-(136, 'App\\Models\\User', 27, 'auth-token', 'dd71f2e1476d241655e471aaa7a8691e3f1e0b05c4bc39949f9f0795ee78410b', '[\"*\"]', '2025-12-24 00:09:55', NULL, '2025-12-23 17:12:28', '2025-12-24 00:09:55'),
-(137, 'App\\Models\\User', 27, 'auth-token', '06beea06312481ba56fe6fac84d52cfb923029bde848ea4de13c5cf3ee228fa2', '[\"*\"]', '2025-12-24 14:53:09', NULL, '2025-12-24 10:56:17', '2025-12-24 14:53:09');
+(136, 'App\\Models\\User', 27, 'auth-token', 'dd71f2e1476d241655e471aaa7a8691e3f1e0b05c4bc39949f9f0795ee78410b', '[\"*\"]', '2025-12-24 18:41:18', NULL, '2025-12-23 17:12:28', '2025-12-24 18:41:18'),
+(137, 'App\\Models\\User', 27, 'auth-token', '06beea06312481ba56fe6fac84d52cfb923029bde848ea4de13c5cf3ee228fa2', '[\"*\"]', '2025-12-24 14:53:09', NULL, '2025-12-24 10:56:17', '2025-12-24 14:53:09'),
+(138, 'App\\Models\\User', 27, 'auth-token', 'b5aa25b2aa08daf827961ce4995a9207370a4203288d5257f81adb211e66db24', '[\"*\"]', '2025-12-24 22:22:32', NULL, '2025-12-24 20:45:29', '2025-12-24 22:22:32');
 
 -- --------------------------------------------------------
 
@@ -7766,8 +8006,9 @@ INSERT INTO `personal_access_tokens` (`id`, `tokenable_type`, `tokenable_id`, `n
 -- Structure de la table `planner_achievements`
 --
 
-CREATE TABLE `planner_achievements` (
-  `id` bigint UNSIGNED NOT NULL,
+DROP TABLE IF EXISTS `planner_achievements`;
+CREATE TABLE IF NOT EXISTS `planner_achievements` (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
   `user_id` bigint UNSIGNED NOT NULL,
   `achievement_id` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `name` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -7776,7 +8017,11 @@ CREATE TABLE `planner_achievements` (
   `points` int NOT NULL,
   `unlocked_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `planner_achievements_achievement_id_unique` (`achievement_id`),
+  KEY `planner_achievements_user_id_unlocked_at_index` (`user_id`,`unlocked_at`),
+  KEY `planner_achievements_achievement_id_index` (`achievement_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -7785,8 +8030,9 @@ CREATE TABLE `planner_achievements` (
 -- Structure de la table `planner_exams`
 --
 
-CREATE TABLE `planner_exams` (
-  `id` bigint UNSIGNED NOT NULL,
+DROP TABLE IF EXISTS `planner_exams`;
+CREATE TABLE IF NOT EXISTS `planner_exams` (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
   `user_id` bigint UNSIGNED NOT NULL,
   `subject_id` bigint UNSIGNED NOT NULL,
   `title` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -7804,7 +8050,10 @@ CREATE TABLE `planner_exams` (
   `adaptation_triggered_at` timestamp NULL DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
-  `deleted_at` timestamp NULL DEFAULT NULL
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `planner_exams_user_id_exam_date_index` (`user_id`,`exam_date`),
+  KEY `planner_exams_subject_id_index` (`subject_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -7813,8 +8062,9 @@ CREATE TABLE `planner_exams` (
 -- Structure de la table `planner_points_history`
 --
 
-CREATE TABLE `planner_points_history` (
-  `id` bigint UNSIGNED NOT NULL,
+DROP TABLE IF EXISTS `planner_points_history`;
+CREATE TABLE IF NOT EXISTS `planner_points_history` (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
   `user_id` bigint UNSIGNED NOT NULL,
   `session_id` bigint UNSIGNED DEFAULT NULL,
   `points` int NOT NULL,
@@ -7822,7 +8072,11 @@ CREATE TABLE `planner_points_history` (
   `title` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `planner_points_history_session_id_foreign` (`session_id`),
+  KEY `planner_points_history_user_id_created_at_index` (`user_id`,`created_at`),
+  KEY `planner_points_history_source_index` (`source`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -7831,8 +8085,9 @@ CREATE TABLE `planner_points_history` (
 -- Structure de la table `planner_schedules`
 --
 
-CREATE TABLE `planner_schedules` (
-  `id` bigint UNSIGNED NOT NULL,
+DROP TABLE IF EXISTS `planner_schedules`;
+CREATE TABLE IF NOT EXISTS `planner_schedules` (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
   `user_id` bigint UNSIGNED NOT NULL,
   `academic_year_id` bigint UNSIGNED NOT NULL,
   `academic_stream_id` bigint UNSIGNED NOT NULL,
@@ -7855,8 +8110,14 @@ CREATE TABLE `planner_schedules` (
   `completion_rate` double NOT NULL DEFAULT '0',
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
-  `deleted_at` timestamp NULL DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `planner_schedules_academic_year_id_foreign` (`academic_year_id`),
+  KEY `planner_schedules_academic_stream_id_foreign` (`academic_stream_id`),
+  KEY `planner_schedules_user_id_is_active_index` (`user_id`,`is_active`),
+  KEY `planner_schedules_start_date_index` (`start_date`),
+  KEY `planner_schedules_user_status_date_idx` (`user_id`,`status`,`start_date`)
+) ENGINE=InnoDB AUTO_INCREMENT=184 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Déchargement des données de la table `planner_schedules`
@@ -7871,8 +8132,9 @@ INSERT INTO `planner_schedules` (`id`, `user_id`, `academic_year_id`, `academic_
 -- Structure de la table `planner_settings`
 --
 
-CREATE TABLE `planner_settings` (
-  `id` bigint UNSIGNED NOT NULL,
+DROP TABLE IF EXISTS `planner_settings`;
+CREATE TABLE IF NOT EXISTS `planner_settings` (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
   `user_id` bigint UNSIGNED NOT NULL,
   `study_start_time` time NOT NULL DEFAULT '17:30:00',
   `study_end_time` time NOT NULL DEFAULT '22:30:00',
@@ -7914,8 +8176,10 @@ CREATE TABLE `planner_settings` (
   `prayer_duration_minutes` int NOT NULL DEFAULT '15',
   `city_for_prayer` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'Algiers',
   `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `planner_settings_user_id_unique` (`user_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=27 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Déchargement des données de la table `planner_settings`
@@ -7955,8 +8219,9 @@ INSERT INTO `planner_settings` (`id`, `user_id`, `study_start_time`, `study_end_
 -- Structure de la table `planner_study_sessions`
 --
 
-CREATE TABLE `planner_study_sessions` (
-  `id` bigint UNSIGNED NOT NULL,
+DROP TABLE IF EXISTS `planner_study_sessions`;
+CREATE TABLE IF NOT EXISTS `planner_study_sessions` (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
   `user_id` bigint UNSIGNED NOT NULL,
   `schedule_id` bigint UNSIGNED NOT NULL,
   `subject_id` bigint UNSIGNED DEFAULT NULL,
@@ -8007,8 +8272,20 @@ CREATE TABLE `planner_study_sessions` (
   `points_earned` int DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
-  `deleted_at` timestamp NULL DEFAULT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `planner_study_sessions_chapter_id_foreign` (`chapter_id`),
+  KEY `planner_study_sessions_user_id_scheduled_date_index` (`user_id`,`scheduled_date`),
+  KEY `planner_study_sessions_schedule_id_status_index` (`schedule_id`,`status`),
+  KEY `planner_study_sessions_subject_id_status_index` (`subject_id`,`status`),
+  KEY `planner_study_sessions_original_topic_test_session_id_foreign` (`original_topic_test_session_id`),
+  KEY `idx_session_content` (`subject_planner_content_id`,`content_phase`),
+  KEY `idx_spaced_reviews` (`is_spaced_review`,`scheduled_date`),
+  KEY `idx_mock_tests` (`is_mock_test`,`scheduled_date`),
+  KEY `idx_language_daily` (`is_language_daily`,`scheduled_date`),
+  KEY `idx_late_sessions` (`is_late`,`status`),
+  KEY `idx_due_sessions` (`due_date`,`status`)
+) ENGINE=MyISAM AUTO_INCREMENT=35259 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Déchargement des données de la table `planner_study_sessions`
@@ -8596,8 +8873,9 @@ INSERT INTO `planner_study_sessions` (`id`, `user_id`, `schedule_id`, `subject_i
 -- Structure de la table `planner_subjects`
 --
 
-CREATE TABLE `planner_subjects` (
-  `id` bigint UNSIGNED NOT NULL,
+DROP TABLE IF EXISTS `planner_subjects`;
+CREATE TABLE IF NOT EXISTS `planner_subjects` (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
   `user_id` bigint UNSIGNED NOT NULL,
   `subject_id` bigint UNSIGNED NOT NULL,
   `difficulty_level` tinyint NOT NULL DEFAULT '3' COMMENT '1=Very Easy, 2=Easy, 3=Medium, 4=Hard, 5=Very Hard',
@@ -8606,8 +8884,13 @@ CREATE TABLE `planner_subjects` (
   `progress_percentage` tinyint NOT NULL DEFAULT '0' COMMENT '0-100',
   `is_active` tinyint(1) NOT NULL DEFAULT '1',
   `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `planner_subjects_user_id_subject_id_unique` (`user_id`,`subject_id`),
+  KEY `planner_subjects_user_id_index` (`user_id`),
+  KEY `planner_subjects_subject_id_index` (`subject_id`),
+  KEY `planner_subjects_user_id_is_active_index` (`user_id`,`is_active`)
+) ENGINE=MyISAM AUTO_INCREMENT=31 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Déchargement des données de la table `planner_subjects`
@@ -8634,8 +8917,9 @@ INSERT INTO `planner_subjects` (`id`, `user_id`, `subject_id`, `difficulty_level
 -- Structure de la table `prayer_times`
 --
 
-CREATE TABLE `prayer_times` (
-  `id` bigint UNSIGNED NOT NULL,
+DROP TABLE IF EXISTS `prayer_times`;
+CREATE TABLE IF NOT EXISTS `prayer_times` (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
   `user_id` bigint UNSIGNED NOT NULL,
   `date` date NOT NULL,
   `fajr_time` time NOT NULL,
@@ -8645,8 +8929,11 @@ CREATE TABLE `prayer_times` (
   `isha_time` time NOT NULL,
   `prayer_duration_minutes` int NOT NULL DEFAULT '15',
   `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `prayer_times_user_id_date_unique` (`user_id`,`date`),
+  KEY `prayer_times_user_id_date_index` (`user_id`,`date`)
+) ENGINE=MyISAM AUTO_INCREMENT=32 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Déchargement des données de la table `prayer_times`
@@ -8691,8 +8978,9 @@ INSERT INTO `prayer_times` (`id`, `user_id`, `date`, `fajr_time`, `dhuhr_time`, 
 -- Structure de la table `promos`
 --
 
-CREATE TABLE `promos` (
-  `id` bigint UNSIGNED NOT NULL,
+DROP TABLE IF EXISTS `promos`;
+CREATE TABLE IF NOT EXISTS `promos` (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
   `title` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `subtitle` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `badge` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
@@ -8711,8 +8999,11 @@ CREATE TABLE `promos` (
   `starts_at` timestamp NULL DEFAULT NULL,
   `ends_at` timestamp NULL DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `promos_is_active_display_order_index` (`is_active`,`display_order`),
+  KEY `promos_starts_at_ends_at_index` (`starts_at`,`ends_at`)
+) ENGINE=MyISAM AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Déchargement des données de la table `promos`
@@ -8733,8 +9024,9 @@ INSERT INTO `promos` (`id`, `title`, `subtitle`, `badge`, `action_text`, `icon_n
 -- Structure de la table `quizzes`
 --
 
-CREATE TABLE `quizzes` (
-  `id` bigint UNSIGNED NOT NULL,
+DROP TABLE IF EXISTS `quizzes`;
+CREATE TABLE IF NOT EXISTS `quizzes` (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
   `subject_id` bigint UNSIGNED DEFAULT NULL,
   `academic_stream_id` bigint UNSIGNED DEFAULT NULL,
   `chapter_id` bigint UNSIGNED DEFAULT NULL,
@@ -8759,8 +9051,13 @@ CREATE TABLE `quizzes` (
   `created_by` bigint UNSIGNED DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
-  `deleted_at` timestamp NULL DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `quizzes_chapter_id_foreign` (`chapter_id`),
+  KEY `quizzes_created_by_foreign` (`created_by`),
+  KEY `quizzes_filtering_index` (`subject_id`,`difficulty_level`,`is_published`),
+  KEY `quizzes_subject_chapter_index` (`subject_id`,`chapter_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=664 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Déchargement des données de la table `quizzes`
@@ -8790,8 +9087,9 @@ INSERT INTO `quizzes` (`id`, `subject_id`, `academic_stream_id`, `chapter_id`, `
 -- Structure de la table `quiz_attempts`
 --
 
-CREATE TABLE `quiz_attempts` (
-  `id` bigint UNSIGNED NOT NULL,
+DROP TABLE IF EXISTS `quiz_attempts`;
+CREATE TABLE IF NOT EXISTS `quiz_attempts` (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
   `quiz_id` bigint UNSIGNED NOT NULL,
   `user_id` bigint UNSIGNED NOT NULL,
   `status` enum('in_progress','completed','abandoned') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'in_progress',
@@ -8809,8 +9107,14 @@ CREATE TABLE `quiz_attempts` (
   `seed` bigint DEFAULT NULL,
   `passed` tinyint(1) NOT NULL DEFAULT '0',
   `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `quiz_attempts_quiz_id_foreign` (`quiz_id`),
+  KEY `attempts_user_quiz_status_index` (`user_id`,`quiz_id`,`status`),
+  KEY `attempts_user_completed_index` (`user_id`,`completed_at`),
+  KEY `qa_analytics_date_index` (`user_id`,`started_at`,`status`),
+  KEY `qa_score_analytics_index` (`user_id`,`status`,`score_percentage`)
+) ENGINE=InnoDB AUTO_INCREMENT=42 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Déchargement des données de la table `quiz_attempts`
@@ -8833,8 +9137,9 @@ INSERT INTO `quiz_attempts` (`id`, `quiz_id`, `user_id`, `status`, `total_questi
 -- Structure de la table `quiz_attempt_answers`
 --
 
-CREATE TABLE `quiz_attempt_answers` (
-  `id` bigint UNSIGNED NOT NULL,
+DROP TABLE IF EXISTS `quiz_attempt_answers`;
+CREATE TABLE IF NOT EXISTS `quiz_attempt_answers` (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
   `quiz_attempt_id` bigint UNSIGNED NOT NULL,
   `quiz_question_id` bigint UNSIGNED NOT NULL,
   `user_answer` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
@@ -8842,7 +9147,10 @@ CREATE TABLE `quiz_attempt_answers` (
   `points_earned` int NOT NULL DEFAULT '0',
   `answered_at` datetime DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `quiz_attempt_answers_quiz_attempt_id_foreign` (`quiz_attempt_id`),
+  KEY `quiz_attempt_answers_quiz_question_id_foreign` (`quiz_question_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -8851,8 +9159,9 @@ CREATE TABLE `quiz_attempt_answers` (
 -- Structure de la table `quiz_questions`
 --
 
-CREATE TABLE `quiz_questions` (
-  `id` bigint UNSIGNED NOT NULL,
+DROP TABLE IF EXISTS `quiz_questions`;
+CREATE TABLE IF NOT EXISTS `quiz_questions` (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
   `quiz_id` bigint UNSIGNED NOT NULL,
   `question_type` enum('mcq_single','mcq_multiple','true_false','matching','fill_blank','sequence','short_answer','long_answer') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `question_text_ar` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -8866,8 +9175,10 @@ CREATE TABLE `quiz_questions` (
   `question_order` int NOT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
-  `deleted_at` timestamp NULL DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `questions_quiz_type_index` (`quiz_id`,`question_type`)
+) ENGINE=InnoDB AUTO_INCREMENT=1289 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Déchargement des données de la table `quiz_questions`
@@ -9186,13 +9497,17 @@ INSERT INTO `quiz_questions` (`id`, `quiz_id`, `question_type`, `question_text_a
 -- Structure de la table `sessions`
 --
 
-CREATE TABLE `sessions` (
+DROP TABLE IF EXISTS `sessions`;
+CREATE TABLE IF NOT EXISTS `sessions` (
   `id` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `user_id` bigint UNSIGNED DEFAULT NULL,
   `ip_address` varchar(45) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `user_agent` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `payload` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `last_activity` int NOT NULL
+  `last_activity` int NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `sessions_user_id_index` (`user_id`),
+  KEY `sessions_last_activity_index` (`last_activity`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -9201,13 +9516,16 @@ CREATE TABLE `sessions` (
 -- Structure de la table `session_activities`
 --
 
-CREATE TABLE `session_activities` (
-  `id` bigint UNSIGNED NOT NULL,
+DROP TABLE IF EXISTS `session_activities`;
+CREATE TABLE IF NOT EXISTS `session_activities` (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
   `study_session_id` bigint UNSIGNED NOT NULL,
   `activity_type` enum('start','pause','resume','complete') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `activity_timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `metadata` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin,
-  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `session_activities_study_session_id_foreign` (`study_session_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -9216,8 +9534,9 @@ CREATE TABLE `session_activities` (
 -- Structure de la table `sponsors`
 --
 
-CREATE TABLE `sponsors` (
-  `id` bigint UNSIGNED NOT NULL,
+DROP TABLE IF EXISTS `sponsors`;
+CREATE TABLE IF NOT EXISTS `sponsors` (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
   `name_ar` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `photo_url` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `external_link` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -9235,8 +9554,10 @@ CREATE TABLE `sponsors` (
   `is_active` tinyint(1) NOT NULL DEFAULT '1',
   `display_order` int UNSIGNED NOT NULL DEFAULT '0',
   `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `sponsors_is_active_display_order_index` (`is_active`,`display_order`)
+) ENGINE=MyISAM AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Déchargement des données de la table `sponsors`
@@ -9253,8 +9574,9 @@ INSERT INTO `sponsors` (`id`, `name_ar`, `photo_url`, `external_link`, `youtube_
 -- Structure de la table `study_schedules`
 --
 
-CREATE TABLE `study_schedules` (
-  `id` bigint UNSIGNED NOT NULL,
+DROP TABLE IF EXISTS `study_schedules`;
+CREATE TABLE IF NOT EXISTS `study_schedules` (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
   `user_id` bigint UNSIGNED NOT NULL,
   `schedule_type` enum('daily','weekly') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'weekly',
   `start_date` date NOT NULL,
@@ -9267,8 +9589,10 @@ CREATE TABLE `study_schedules` (
   `generated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `activated_at` timestamp NULL DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `study_schedules_user_id_status_start_date_index` (`user_id`,`status`,`start_date`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Déchargement des données de la table `study_schedules`
@@ -9283,8 +9607,9 @@ INSERT INTO `study_schedules` (`id`, `user_id`, `schedule_type`, `start_date`, `
 -- Structure de la table `study_sessions`
 --
 
-CREATE TABLE `study_sessions` (
-  `id` bigint UNSIGNED NOT NULL,
+DROP TABLE IF EXISTS `study_sessions`;
+CREATE TABLE IF NOT EXISTS `study_sessions` (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
   `study_schedule_id` bigint UNSIGNED DEFAULT NULL,
   `user_id` bigint UNSIGNED NOT NULL,
   `subject_id` bigint UNSIGNED NOT NULL,
@@ -9310,7 +9635,15 @@ CREATE TABLE `study_sessions` (
   `is_pinned` tinyint(1) NOT NULL DEFAULT '0',
   `priority_score` int NOT NULL DEFAULT '5',
   `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `study_sessions_study_schedule_id_foreign` (`study_schedule_id`),
+  KEY `study_sessions_suggested_content_id_foreign` (`suggested_content_id`),
+  KEY `study_sessions_user_id_scheduled_date_status_index` (`user_id`,`scheduled_date`,`status`),
+  KEY `study_sessions_subject_id_scheduled_date_index` (`subject_id`,`scheduled_date`),
+  KEY `study_sessions_chapter_id_foreign` (`chapter_id`),
+  KEY `ss_heatmap_index` (`user_id`,`status`,`scheduled_date`),
+  KEY `ss_subject_analytics_index` (`user_id`,`subject_id`,`status`,`scheduled_date`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -9319,8 +9652,9 @@ CREATE TABLE `study_sessions` (
 -- Structure de la table `subjects`
 --
 
-CREATE TABLE `subjects` (
-  `id` bigint UNSIGNED NOT NULL,
+DROP TABLE IF EXISTS `subjects`;
+CREATE TABLE IF NOT EXISTS `subjects` (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
   `academic_stream_ids` json DEFAULT NULL,
   `academic_year_id` bigint UNSIGNED NOT NULL,
   `name_ar` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -9333,8 +9667,11 @@ CREATE TABLE `subjects` (
   `order` int NOT NULL,
   `is_active` tinyint(1) NOT NULL DEFAULT '1',
   `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `subjects_academic_year_id_foreign` (`academic_year_id`),
+  KEY `subjects_academic_stream_id_academic_year_id_index` (`academic_year_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=76 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Déchargement des données de la table `subjects`
@@ -9365,8 +9702,9 @@ INSERT INTO `subjects` (`id`, `academic_stream_ids`, `academic_year_id`, `name_a
 -- Structure de la table `subject_planner_content`
 --
 
-CREATE TABLE `subject_planner_content` (
-  `id` bigint UNSIGNED NOT NULL,
+DROP TABLE IF EXISTS `subject_planner_content`;
+CREATE TABLE IF NOT EXISTS `subject_planner_content` (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
   `academic_phase_id` bigint UNSIGNED NOT NULL,
   `academic_year_id` bigint UNSIGNED NOT NULL,
   `academic_stream_ids` json DEFAULT NULL,
@@ -9400,8 +9738,19 @@ CREATE TABLE `subject_planner_content` (
   `updated_by` bigint UNSIGNED DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
-  `deleted_at` timestamp NULL DEFAULT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `subject_planner_content_academic_year_id_foreign` (`academic_year_id`),
+  KEY `subject_planner_content_subject_id_foreign` (`subject_id`),
+  KEY `subject_planner_content_related_chapter_id_foreign` (`related_chapter_id`),
+  KEY `subject_planner_content_created_by_foreign` (`created_by`),
+  KEY `subject_planner_content_updated_by_foreign` (`updated_by`),
+  KEY `idx_academic_context` (`academic_phase_id`,`academic_year_id`,`subject_id`),
+  KEY `idx_hierarchy` (`parent_id`,`level`,`order`),
+  KEY `idx_bac_priority` (`is_bac_priority`,`bac_frequency`),
+  KEY `idx_published` (`is_published`,`is_active`),
+  KEY `idx_content_type` (`content_type`,`difficulty_level`)
+) ENGINE=MyISAM AUTO_INCREMENT=181 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Déchargement des données de la table `subject_planner_content`
@@ -9519,8 +9868,9 @@ INSERT INTO `subject_planner_content` (`id`, `academic_phase_id`, `academic_year
 -- Structure de la table `subject_priorities`
 --
 
-CREATE TABLE `subject_priorities` (
-  `id` bigint UNSIGNED NOT NULL,
+DROP TABLE IF EXISTS `subject_priorities`;
+CREATE TABLE IF NOT EXISTS `subject_priorities` (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
   `user_id` bigint UNSIGNED NOT NULL,
   `subject_id` bigint UNSIGNED NOT NULL,
   `coefficient_score` decimal(5,2) NOT NULL,
@@ -9532,8 +9882,11 @@ CREATE TABLE `subject_priorities` (
   `total_priority_score` decimal(5,2) NOT NULL,
   `calculated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `subject_priorities_user_id_subject_id_unique` (`user_id`,`subject_id`),
+  KEY `subject_priorities_subject_id_foreign` (`subject_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Déchargement des données de la table `subject_priorities`
@@ -9556,16 +9909,21 @@ INSERT INTO `subject_priorities` (`id`, `user_id`, `subject_id`, `coefficient_sc
 -- Structure de la table `subject_stream`
 --
 
-CREATE TABLE `subject_stream` (
-  `id` bigint UNSIGNED NOT NULL,
+DROP TABLE IF EXISTS `subject_stream`;
+CREATE TABLE IF NOT EXISTS `subject_stream` (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
   `subject_id` bigint UNSIGNED NOT NULL,
   `academic_stream_id` bigint UNSIGNED NOT NULL,
   `coefficient` decimal(3,1) NOT NULL DEFAULT '1.0',
   `category` enum('HARD_CORE','LANGUAGE','MEMORIZATION','OTHER') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'OTHER' COMMENT 'Subject category for this specific stream',
   `is_active` tinyint(1) NOT NULL DEFAULT '1',
   `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `subject_stream_unique` (`subject_id`,`academic_stream_id`),
+  KEY `subject_stream_subject_id_index` (`subject_id`),
+  KEY `subject_stream_academic_stream_id_index` (`academic_stream_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=117 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Déchargement des données de la table `subject_stream`
@@ -9637,8 +9995,9 @@ INSERT INTO `subject_stream` (`id`, `subject_id`, `academic_stream_id`, `coeffic
 -- Structure de la table `subscription_codes`
 --
 
-CREATE TABLE `subscription_codes` (
-  `id` bigint UNSIGNED NOT NULL,
+DROP TABLE IF EXISTS `subscription_codes`;
+CREATE TABLE IF NOT EXISTS `subscription_codes` (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
   `list_id` bigint UNSIGNED DEFAULT NULL,
   `code` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `code_type` enum('single_course','package') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'single_course' COMMENT 'Type of subscription code: single course or package',
@@ -9650,8 +10009,14 @@ CREATE TABLE `subscription_codes` (
   `is_active` tinyint(1) NOT NULL DEFAULT '1',
   `created_by` bigint UNSIGNED NOT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `subscription_codes_code_unique` (`code`),
+  KEY `subscription_codes_course_id_foreign` (`course_id`),
+  KEY `subscription_codes_package_id_foreign` (`package_id`),
+  KEY `subscription_codes_created_by_foreign` (`created_by`),
+  KEY `subscription_codes_list_id_index` (`list_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=101 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Déchargement des données de la table `subscription_codes`
@@ -9765,8 +10130,9 @@ INSERT INTO `subscription_codes` (`id`, `list_id`, `code`, `code_type`, `course_
 -- Structure de la table `subscription_code_lists`
 --
 
-CREATE TABLE `subscription_code_lists` (
-  `id` bigint UNSIGNED NOT NULL,
+DROP TABLE IF EXISTS `subscription_code_lists`;
+CREATE TABLE IF NOT EXISTS `subscription_code_lists` (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
   `name` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `code_type` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `course_id` bigint UNSIGNED DEFAULT NULL,
@@ -9776,8 +10142,14 @@ CREATE TABLE `subscription_code_lists` (
   `expires_at` datetime DEFAULT NULL,
   `created_by` bigint UNSIGNED NOT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `subscription_code_lists_course_id_foreign` (`course_id`),
+  KEY `subscription_code_lists_package_id_foreign` (`package_id`),
+  KEY `subscription_code_lists_created_by_foreign` (`created_by`),
+  KEY `subscription_code_lists_code_type_created_by_index` (`code_type`,`created_by`),
+  KEY `subscription_code_lists_created_at_index` (`created_at`)
+) ENGINE=MyISAM AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Déchargement des données de la table `subscription_code_lists`
@@ -9793,16 +10165,18 @@ INSERT INTO `subscription_code_lists` (`id`, `name`, `code_type`, `course_id`, `
 -- Structure de la table `subscription_packages`
 --
 
-CREATE TABLE `subscription_packages` (
-  `id` bigint UNSIGNED NOT NULL,
+DROP TABLE IF EXISTS `subscription_packages`;
+CREATE TABLE IF NOT EXISTS `subscription_packages` (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
   `name_ar` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `description_ar` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `price_dzd` decimal(10,2) NOT NULL,
   `duration_days` int NOT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
-  `is_active` tinyint(1) NOT NULL DEFAULT '1'
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  `is_active` tinyint(1) NOT NULL DEFAULT '1',
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Déchargement des données de la table `subscription_packages`
@@ -9822,8 +10196,9 @@ INSERT INTO `subscription_packages` (`id`, `name_ar`, `description_ar`, `price_d
 -- Structure de la table `users`
 --
 
-CREATE TABLE `users` (
-  `id` bigint UNSIGNED NOT NULL,
+DROP TABLE IF EXISTS `users`;
+CREATE TABLE IF NOT EXISTS `users` (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
   `name` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `email` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `photo_url` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
@@ -9856,8 +10231,12 @@ CREATE TABLE `users` (
   `points_to_next_level` int NOT NULL DEFAULT '100',
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
-  `last_activity_at` timestamp NULL DEFAULT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  `last_activity_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `users_email_unique` (`email`),
+  UNIQUE KEY `users_device_uuid_unique` (`device_uuid`),
+  KEY `users_device_id_index` (`device_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=29 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Déchargement des données de la table `users`
@@ -9890,7 +10269,7 @@ INSERT INTO `users` (`id`, `name`, `email`, `photo_url`, `phone_number`, `bio`, 
 (24, 'طالب رقم 19', 'student19@test.com', NULL, NULL, NULL, NULL, NULL, NULL, 'Egypt', 'Africa/Cairo', NULL, NULL, NULL, NULL, NULL, 0, '$2y$12$IWjjvP8J.JneEonKgC8yCe8tzOVQ6cdkXgZn/BGXQFtn9xveZKAvG', 'student', NULL, NULL, NULL, NULL, NULL, 1, NULL, 0, NULL, 0, 1, 100, '2025-11-14 07:59:47', '2025-11-14 07:59:47', NULL),
 (25, 'طالب رقم 20', 'student20@test.com', NULL, NULL, NULL, NULL, NULL, NULL, 'Egypt', 'Africa/Cairo', NULL, NULL, NULL, NULL, NULL, 0, '$2y$12$V/sd0r7h/3UVig1HAAUpLOY9EKMyjGJ9ILQkvt4q4d1z/7gajDeAO', 'student', NULL, NULL, NULL, NULL, NULL, 1, NULL, 0, NULL, 0, 1, 100, '2025-11-14 07:59:48', '2025-11-14 07:59:48', NULL),
 (26, 'مدير النظام', 'admin@memo.dz', NULL, NULL, NULL, NULL, NULL, NULL, 'Egypt', 'Africa/Cairo', NULL, NULL, NULL, NULL, '2025-11-14 21:04:11', 1, '$2y$12$Iiv/q48qS6h0cpKUIoRQd.ISwOLJFl.XVpVnLyjU0.wswJaJAO26W', 'student', NULL, NULL, NULL, NULL, NULL, 1, NULL, 0, NULL, 0, 1, 100, '2025-11-14 21:04:11', '2025-11-14 21:04:11', NULL),
-(27, 'Student Two', 'student2@memo.com', NULL, NULL, NULL, '2005-01-01', 'female', 'Algiers', 'Egypt', 'Africa/Cairo', NULL, NULL, NULL, 'BP22.250325.006', NULL, 0, '$2y$12$mGYlIUqt7fMgxH9u5/MDuumjmqDSSbcIPcvwi/U4sGM5CPk1b1oTO', 'student', NULL, NULL, NULL, NULL, NULL, 1, '2025-12-24 10:56:17', 38, NULL, 0, 1, 100, '2025-11-19 15:30:19', '2025-12-24 10:56:17', NULL),
+(27, 'Student Two', 'student2@memo.com', NULL, NULL, NULL, '2005-01-01', 'female', 'Algiers', 'Egypt', 'Africa/Cairo', NULL, NULL, NULL, 'BP22.250325.006', NULL, 0, '$2y$12$mGYlIUqt7fMgxH9u5/MDuumjmqDSSbcIPcvwi/U4sGM5CPk1b1oTO', 'student', NULL, NULL, NULL, NULL, NULL, 1, '2025-12-24 20:45:29', 39, NULL, 0, 1, 100, '2025-11-19 15:30:19', '2025-12-24 20:45:29', NULL),
 (28, 'Test User', 'test@memo.com', NULL, NULL, NULL, NULL, NULL, NULL, 'Egypt', 'Africa/Cairo', NULL, NULL, NULL, NULL, NULL, 0, '$2y$12$tHoJRQ2pB0QRK7R/TdKjuOENbw1jdSsB/POAxs7QqoYVeLJyJFUu2', 'student', NULL, NULL, NULL, NULL, NULL, 1, NULL, 0, NULL, 0, 1, 100, '2025-11-19 15:31:02', '2025-11-19 16:54:57', NULL);
 
 -- --------------------------------------------------------
@@ -9899,16 +10278,22 @@ INSERT INTO `users` (`id`, `name`, `email`, `photo_url`, `phone_number`, `bio`, 
 -- Structure de la table `user_academic_profiles`
 --
 
-CREATE TABLE `user_academic_profiles` (
-  `id` bigint UNSIGNED NOT NULL,
+DROP TABLE IF EXISTS `user_academic_profiles`;
+CREATE TABLE IF NOT EXISTS `user_academic_profiles` (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
   `user_id` bigint UNSIGNED NOT NULL,
   `academic_phase_id` bigint UNSIGNED NOT NULL,
   `academic_year_id` bigint UNSIGNED NOT NULL,
   `academic_stream_id` bigint UNSIGNED DEFAULT NULL,
   `onboarding_completed` tinyint(1) NOT NULL DEFAULT '0',
   `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `user_academic_profiles_user_id_unique` (`user_id`),
+  KEY `user_academic_profiles_academic_phase_id_foreign` (`academic_phase_id`),
+  KEY `user_academic_profiles_academic_year_id_foreign` (`academic_year_id`),
+  KEY `user_academic_profiles_academic_stream_id_foreign` (`academic_stream_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Déchargement des données de la table `user_academic_profiles`
@@ -9925,14 +10310,18 @@ INSERT INTO `user_academic_profiles` (`id`, `user_id`, `academic_phase_id`, `aca
 -- Structure de la table `user_achievements`
 --
 
-CREATE TABLE `user_achievements` (
-  `id` bigint UNSIGNED NOT NULL,
+DROP TABLE IF EXISTS `user_achievements`;
+CREATE TABLE IF NOT EXISTS `user_achievements` (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
   `user_id` bigint UNSIGNED NOT NULL,
   `achievement_id` bigint UNSIGNED NOT NULL,
   `unlocked_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `progress` int NOT NULL DEFAULT '0',
   `created_at` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
-  `updated_at` timestamp NULL DEFAULT NULL
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `user_achievements_user_id_achievement_id_unique` (`user_id`,`achievement_id`),
+  KEY `user_achievements_achievement_id_foreign` (`achievement_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -9941,12 +10330,15 @@ CREATE TABLE `user_achievements` (
 -- Structure de la table `user_activity_log`
 --
 
-CREATE TABLE `user_activity_log` (
-  `id` bigint UNSIGNED NOT NULL,
+DROP TABLE IF EXISTS `user_activity_log`;
+CREATE TABLE IF NOT EXISTS `user_activity_log` (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
   `user_id` bigint UNSIGNED NOT NULL,
   `activity_type` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `activity_data` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin,
-  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `user_activity_log_user_id_activity_type_created_at_index` (`user_id`,`activity_type`,`created_at`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -9955,8 +10347,9 @@ CREATE TABLE `user_activity_log` (
 -- Structure de la table `user_activity_logs`
 --
 
-CREATE TABLE `user_activity_logs` (
-  `id` bigint UNSIGNED NOT NULL,
+DROP TABLE IF EXISTS `user_activity_logs`;
+CREATE TABLE IF NOT EXISTS `user_activity_logs` (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
   `user_id` bigint UNSIGNED NOT NULL,
   `activity_type` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `activity_description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
@@ -9964,8 +10357,12 @@ CREATE TABLE `user_activity_logs` (
   `ip_address` varchar(45) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `user_agent` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `user_activity_logs_user_id_index` (`user_id`),
+  KEY `user_activity_logs_activity_type_index` (`activity_type`),
+  KEY `user_activity_logs_created_at_index` (`created_at`)
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Déchargement des données de la table `user_activity_logs`
@@ -9981,15 +10378,19 @@ INSERT INTO `user_activity_logs` (`id`, `user_id`, `activity_type`, `activity_de
 -- Structure de la table `user_bac_performance`
 --
 
-CREATE TABLE `user_bac_performance` (
-  `id` bigint UNSIGNED NOT NULL,
+DROP TABLE IF EXISTS `user_bac_performance`;
+CREATE TABLE IF NOT EXISTS `user_bac_performance` (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
   `user_id` bigint UNSIGNED NOT NULL,
   `subject_id` bigint UNSIGNED NOT NULL,
   `total_simulations` int NOT NULL DEFAULT '0',
   `average_score` decimal(5,2) DEFAULT NULL,
   `best_score` decimal(5,2) DEFAULT NULL,
   `weak_chapters` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin,
-  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `user_bac_performance_user_id_foreign` (`user_id`),
+  KEY `user_bac_performance_subject_id_foreign` (`subject_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -9998,15 +10399,20 @@ CREATE TABLE `user_bac_performance` (
 -- Structure de la table `user_bac_study_progress`
 --
 
-CREATE TABLE `user_bac_study_progress` (
-  `id` bigint UNSIGNED NOT NULL,
+DROP TABLE IF EXISTS `user_bac_study_progress`;
+CREATE TABLE IF NOT EXISTS `user_bac_study_progress` (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
   `user_id` bigint UNSIGNED NOT NULL,
   `bac_study_day_topic_id` bigint UNSIGNED NOT NULL,
   `is_completed` tinyint(1) NOT NULL DEFAULT '0',
   `completed_at` timestamp NULL DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `user_bac_study_progress_user_id_bac_study_day_topic_id_unique` (`user_id`,`bac_study_day_topic_id`),
+  KEY `user_bac_study_progress_bac_study_day_topic_id_foreign` (`bac_study_day_topic_id`),
+  KEY `user_bac_study_progress_user_id_is_completed_index` (`user_id`,`is_completed`)
+) ENGINE=MyISAM AUTO_INCREMENT=43 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Déchargement des données de la table `user_bac_study_progress`
@@ -10062,8 +10468,9 @@ INSERT INTO `user_bac_study_progress` (`id`, `user_id`, `bac_study_day_topic_id`
 -- Structure de la table `user_content_progress`
 --
 
-CREATE TABLE `user_content_progress` (
-  `id` bigint UNSIGNED NOT NULL,
+DROP TABLE IF EXISTS `user_content_progress`;
+CREATE TABLE IF NOT EXISTS `user_content_progress` (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
   `user_id` bigint UNSIGNED NOT NULL,
   `content_id` bigint UNSIGNED NOT NULL,
   `status` enum('not_started','in_progress','completed') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'not_started',
@@ -10074,8 +10481,11 @@ CREATE TABLE `user_content_progress` (
   `started_at` timestamp NULL DEFAULT NULL,
   `completed_at` timestamp NULL DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `user_content_progress_user_id_content_id_unique` (`user_id`,`content_id`),
+  KEY `user_content_progress_content_id_foreign` (`content_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=22 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Déchargement des données de la table `user_content_progress`
@@ -10088,7 +10498,8 @@ INSERT INTO `user_content_progress` (`id`, `user_id`, `content_id`, `status`, `i
 (17, 27, 75, 'completed', 1, 100, 60, '2025-12-23 19:41:57', '2025-12-22 13:56:13', '2025-12-22 13:57:19', '2025-12-22 13:56:13', '2025-12-23 19:41:57'),
 (18, 27, 76, 'completed', 1, 100, 0, '2025-12-22 13:58:06', '2025-12-22 13:57:45', '2025-12-22 13:58:06', '2025-12-22 13:57:45', '2025-12-22 13:58:06'),
 (19, 27, 77, 'in_progress', 0, 0, 0, '2025-12-23 19:08:26', '2025-12-22 19:09:15', NULL, '2025-12-22 19:09:15', '2025-12-23 19:08:26'),
-(20, 27, 78, 'in_progress', 0, 0, 0, '2025-12-23 19:42:02', '2025-12-22 19:09:24', NULL, '2025-12-22 19:09:24', '2025-12-23 19:42:02');
+(20, 27, 78, 'in_progress', 0, 0, 0, '2025-12-23 19:42:02', '2025-12-22 19:09:24', NULL, '2025-12-22 19:09:24', '2025-12-23 19:42:02'),
+(21, 27, 394, 'in_progress', 0, 0, 0, '2025-12-24 18:02:35', '2025-12-24 18:02:27', NULL, '2025-12-24 18:02:27', '2025-12-24 18:02:35');
 
 -- --------------------------------------------------------
 
@@ -10096,8 +10507,9 @@ INSERT INTO `user_content_progress` (`id`, `user_id`, `content_id`, `status`, `i
 -- Structure de la table `user_course_progress`
 --
 
-CREATE TABLE `user_course_progress` (
-  `id` bigint UNSIGNED NOT NULL,
+DROP TABLE IF EXISTS `user_course_progress`;
+CREATE TABLE IF NOT EXISTS `user_course_progress` (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
   `user_id` bigint UNSIGNED NOT NULL,
   `course_id` bigint UNSIGNED NOT NULL,
   `course_lesson_id` bigint UNSIGNED DEFAULT NULL,
@@ -10107,7 +10519,12 @@ CREATE TABLE `user_course_progress` (
   `completed_lessons` int NOT NULL DEFAULT '0',
   `last_accessed_at` timestamp NULL DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `user_course_progress_user_id_course_id_course_lesson_id_unique` (`user_id`,`course_id`,`course_lesson_id`),
+  KEY `user_course_progress_course_id_foreign` (`course_id`),
+  KEY `user_course_progress_course_lesson_id_foreign` (`course_lesson_id`),
+  KEY `user_course_progress_last_lesson_id_foreign` (`last_lesson_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -10116,8 +10533,9 @@ CREATE TABLE `user_course_progress` (
 -- Structure de la table `user_flashcard_progress`
 --
 
-CREATE TABLE `user_flashcard_progress` (
-  `id` bigint UNSIGNED NOT NULL,
+DROP TABLE IF EXISTS `user_flashcard_progress`;
+CREATE TABLE IF NOT EXISTS `user_flashcard_progress` (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
   `user_id` bigint UNSIGNED NOT NULL,
   `flashcard_id` bigint UNSIGNED NOT NULL,
   `ease_factor` decimal(4,2) NOT NULL DEFAULT '2.50',
@@ -10132,8 +10550,13 @@ CREATE TABLE `user_flashcard_progress` (
   `longest_streak` int UNSIGNED NOT NULL DEFAULT '0',
   `learning_state` enum('new','learning','reviewing','relearning') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'new',
   `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `user_flashcard_progress_user_id_flashcard_id_unique` (`user_id`,`flashcard_id`),
+  KEY `user_flashcard_progress_flashcard_id_foreign` (`flashcard_id`),
+  KEY `user_flashcard_progress_user_id_next_review_date_index` (`user_id`,`next_review_date`),
+  KEY `user_flashcard_progress_user_id_learning_state_index` (`user_id`,`learning_state`)
+) ENGINE=MyISAM AUTO_INCREMENT=46 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Déchargement des données de la table `user_flashcard_progress`
@@ -10192,8 +10615,9 @@ INSERT INTO `user_flashcard_progress` (`id`, `user_id`, `flashcard_id`, `ease_fa
 -- Structure de la table `user_lesson_progress`
 --
 
-CREATE TABLE `user_lesson_progress` (
-  `id` bigint UNSIGNED NOT NULL,
+DROP TABLE IF EXISTS `user_lesson_progress`;
+CREATE TABLE IF NOT EXISTS `user_lesson_progress` (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
   `user_id` bigint UNSIGNED NOT NULL,
   `course_lesson_id` bigint UNSIGNED NOT NULL,
   `watch_time_seconds` int NOT NULL DEFAULT '0',
@@ -10203,7 +10627,11 @@ CREATE TABLE `user_lesson_progress` (
   `last_position_seconds` int NOT NULL DEFAULT '0',
   `last_watched_at` timestamp NULL DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `user_lesson_progress_user_id_course_lesson_id_unique` (`user_id`,`course_lesson_id`),
+  KEY `user_lesson_progress_course_lesson_id_foreign` (`course_lesson_id`),
+  KEY `user_lesson_progress_user_id_is_completed_index` (`user_id`,`is_completed`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -10212,8 +10640,9 @@ CREATE TABLE `user_lesson_progress` (
 -- Structure de la table `user_notification_settings`
 --
 
-CREATE TABLE `user_notification_settings` (
-  `id` bigint UNSIGNED NOT NULL,
+DROP TABLE IF EXISTS `user_notification_settings`;
+CREATE TABLE IF NOT EXISTS `user_notification_settings` (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
   `user_id` bigint UNSIGNED NOT NULL,
   `notifications_enabled` tinyint(1) NOT NULL DEFAULT '1',
   `study_reminders` tinyint(1) NOT NULL DEFAULT '1',
@@ -10226,8 +10655,10 @@ CREATE TABLE `user_notification_settings` (
   `quiet_start_time` time DEFAULT NULL,
   `quiet_end_time` time DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `user_notification_settings_user_id_unique` (`user_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Déchargement des données de la table `user_notification_settings`
@@ -10242,8 +10673,9 @@ INSERT INTO `user_notification_settings` (`id`, `user_id`, `notifications_enable
 -- Structure de la table `user_preferences`
 --
 
-CREATE TABLE `user_preferences` (
-  `id` bigint UNSIGNED NOT NULL,
+DROP TABLE IF EXISTS `user_preferences`;
+CREATE TABLE IF NOT EXISTS `user_preferences` (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
   `user_id` bigint UNSIGNED NOT NULL,
   `theme` enum('light','dark','auto') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'light',
   `font_size` enum('small','medium','large') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'medium',
@@ -10260,8 +10692,10 @@ CREATE TABLE `user_preferences` (
   `motivational_quotes_enabled` tinyint(1) NOT NULL DEFAULT '1',
   `sound_effects_enabled` tinyint(1) NOT NULL DEFAULT '1',
   `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `user_preferences_user_id_unique` (`user_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Déchargement des données de la table `user_preferences`
@@ -10276,8 +10710,9 @@ INSERT INTO `user_preferences` (`id`, `user_id`, `theme`, `font_size`, `notifica
 -- Structure de la table `user_profiles`
 --
 
-CREATE TABLE `user_profiles` (
-  `id` bigint UNSIGNED NOT NULL,
+DROP TABLE IF EXISTS `user_profiles`;
+CREATE TABLE IF NOT EXISTS `user_profiles` (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
   `user_id` bigint UNSIGNED NOT NULL,
   `full_name_ar` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `phone` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
@@ -10290,7 +10725,9 @@ CREATE TABLE `user_profiles` (
   `longest_streak_days` int NOT NULL DEFAULT '0',
   `last_activity_date` date DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `user_profiles_user_id_unique` (`user_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -10299,8 +10736,9 @@ CREATE TABLE `user_profiles` (
 -- Structure de la table `user_quiz_performance`
 --
 
-CREATE TABLE `user_quiz_performance` (
-  `id` bigint UNSIGNED NOT NULL,
+DROP TABLE IF EXISTS `user_quiz_performance`;
+CREATE TABLE IF NOT EXISTS `user_quiz_performance` (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
   `user_id` bigint UNSIGNED NOT NULL,
   `subject_id` bigint UNSIGNED NOT NULL,
   `quiz_id` bigint UNSIGNED NOT NULL,
@@ -10311,8 +10749,12 @@ CREATE TABLE `user_quiz_performance` (
   `best_score` decimal(5,2) NOT NULL,
   `weak_concepts` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin,
   `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `updated_at` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `user_quiz_performance_user_id_quiz_id_subject_id_unique` (`user_id`,`quiz_id`,`subject_id`),
+  KEY `user_quiz_performance_subject_id_foreign` (`subject_id`),
+  KEY `user_quiz_performance_quiz_id_foreign` (`quiz_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Déchargement des données de la table `user_quiz_performance`
@@ -10338,8 +10780,9 @@ INSERT INTO `user_quiz_performance` (`id`, `user_id`, `subject_id`, `quiz_id`, `
 -- Structure de la table `user_settings`
 --
 
-CREATE TABLE `user_settings` (
-  `id` bigint UNSIGNED NOT NULL,
+DROP TABLE IF EXISTS `user_settings`;
+CREATE TABLE IF NOT EXISTS `user_settings` (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
   `user_id` bigint UNSIGNED NOT NULL,
   `notify_new_memo` tinyint(1) NOT NULL DEFAULT '1',
   `notify_memo_due` tinyint(1) NOT NULL DEFAULT '1',
@@ -10379,8 +10822,12 @@ CREATE TABLE `user_settings` (
   `download_on_wifi_only` tinyint(1) NOT NULL DEFAULT '1',
   `backup_frequency` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'weekly',
   `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `user_settings_user_id_unique` (`user_id`),
+  KEY `user_settings_language_index` (`language`),
+  KEY `user_settings_theme_index` (`theme`)
+) ENGINE=MyISAM AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Déchargement des données de la table `user_settings`
@@ -10396,8 +10843,9 @@ INSERT INTO `user_settings` (`id`, `user_id`, `notify_new_memo`, `notify_memo_du
 -- Structure de la table `user_stats`
 --
 
-CREATE TABLE `user_stats` (
-  `id` bigint UNSIGNED NOT NULL,
+DROP TABLE IF EXISTS `user_stats`;
+CREATE TABLE IF NOT EXISTS `user_stats` (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
   `user_id` bigint UNSIGNED NOT NULL,
   `total_study_minutes` int NOT NULL DEFAULT '0',
   `total_sessions` int NOT NULL DEFAULT '0',
@@ -10421,8 +10869,10 @@ CREATE TABLE `user_stats` (
   `experience_points` int NOT NULL DEFAULT '0',
   `gamification_points` int NOT NULL DEFAULT '0',
   `total_achievements_unlocked` int NOT NULL DEFAULT '0',
-  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `user_stats_user_id_unique` (`user_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=27 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Déchargement des données de la table `user_stats`
@@ -10462,16 +10912,20 @@ INSERT INTO `user_stats` (`id`, `user_id`, `total_study_minutes`, `total_session
 -- Structure de la table `user_subjects`
 --
 
-CREATE TABLE `user_subjects` (
-  `id` bigint UNSIGNED NOT NULL,
+DROP TABLE IF EXISTS `user_subjects`;
+CREATE TABLE IF NOT EXISTS `user_subjects` (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
   `user_id` bigint UNSIGNED NOT NULL,
   `subject_id` bigint UNSIGNED NOT NULL,
   `goal_hours_per_week` decimal(5,2) DEFAULT NULL,
   `priority_override` int DEFAULT NULL,
   `is_active` tinyint(1) NOT NULL DEFAULT '1',
   `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `user_subjects_user_id_subject_id_unique` (`user_id`,`subject_id`),
+  KEY `user_subjects_subject_id_foreign` (`subject_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Déchargement des données de la table `user_subjects`
@@ -10488,8 +10942,9 @@ INSERT INTO `user_subjects` (`id`, `user_id`, `subject_id`, `goal_hours_per_week
 -- Structure de la table `user_subject_planner_progress`
 --
 
-CREATE TABLE `user_subject_planner_progress` (
-  `id` bigint UNSIGNED NOT NULL,
+DROP TABLE IF EXISTS `user_subject_planner_progress`;
+CREATE TABLE IF NOT EXISTS `user_subject_planner_progress` (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
   `user_id` bigint UNSIGNED NOT NULL,
   `subject_planner_content_id` bigint UNSIGNED NOT NULL,
   `status` enum('not_started','in_progress','completed','mastered') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'not_started',
@@ -10504,7 +10959,12 @@ CREATE TABLE `user_subject_planner_progress` (
   `last_studied_at` timestamp NULL DEFAULT NULL,
   `next_review_at` timestamp NULL DEFAULT NULL COMMENT 'Scheduled date for next review (spaced repetition)',
   `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `unique_user_content` (`user_id`,`subject_planner_content_id`),
+  KEY `user_subject_planner_progress_subject_planner_content_id_foreign` (`subject_planner_content_id`),
+  KEY `idx_status` (`status`,`completion_percentage`),
+  KEY `idx_next_review` (`next_review_at`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -10513,8 +10973,9 @@ CREATE TABLE `user_subject_planner_progress` (
 -- Structure de la table `user_subject_progress`
 --
 
-CREATE TABLE `user_subject_progress` (
-  `id` bigint UNSIGNED NOT NULL,
+DROP TABLE IF EXISTS `user_subject_progress`;
+CREATE TABLE IF NOT EXISTS `user_subject_progress` (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
   `user_id` bigint UNSIGNED NOT NULL,
   `subject_id` bigint UNSIGNED NOT NULL,
   `difficulty_level` int NOT NULL DEFAULT '5',
@@ -10525,7 +10986,13 @@ CREATE TABLE `user_subject_progress` (
   `average_score` decimal(5,2) DEFAULT NULL,
   `last_year_average` decimal(4,2) DEFAULT NULL COMMENT 'معدل السنة الماضية (0-20 scale)',
   `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `user_subject_progress_user_id_subject_id_unique` (`user_id`,`subject_id`),
+  KEY `user_subject_progress_subject_id_foreign` (`subject_id`),
+  KEY `user_subject_progress_user_id_index` (`user_id`),
+  KEY `user_subject_progress_user_id_progress_percentage_index` (`user_id`,`progress_percentage`),
+  KEY `user_subject_progress_user_id_last_studied_at_index` (`user_id`,`last_studied_at`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -10534,8 +11001,9 @@ CREATE TABLE `user_subject_progress` (
 -- Structure de la table `user_subscriptions`
 --
 
-CREATE TABLE `user_subscriptions` (
-  `id` bigint UNSIGNED NOT NULL,
+DROP TABLE IF EXISTS `user_subscriptions`;
+CREATE TABLE IF NOT EXISTS `user_subscriptions` (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
   `user_id` bigint UNSIGNED NOT NULL,
   `course_id` bigint UNSIGNED DEFAULT NULL,
   `package_id` bigint UNSIGNED DEFAULT NULL,
@@ -10549,8 +11017,15 @@ CREATE TABLE `user_subscriptions` (
   `status` enum('active','expired','cancelled') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'active',
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
-  `order_id` bigint UNSIGNED DEFAULT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  `order_id` bigint UNSIGNED DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `user_subscriptions_user_id_foreign` (`user_id`),
+  KEY `user_subscriptions_course_id_foreign` (`course_id`),
+  KEY `user_subscriptions_code_id_foreign` (`code_id`),
+  KEY `user_subscriptions_receipt_id_foreign` (`receipt_id`),
+  KEY `user_subscriptions_package_id_foreign` (`package_id`),
+  KEY `user_subscriptions_order_id_foreign` (`order_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=17 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Déchargement des données de la table `user_subscriptions`
@@ -10579,1415 +11054,9 @@ INSERT INTO `user_subscriptions` (`id`, `user_id`, `course_id`, `package_id`, `a
 --
 
 --
--- Index pour la table `academic_phases`
---
-ALTER TABLE `academic_phases`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `academic_phases_slug_unique` (`slug`);
-
---
--- Index pour la table `academic_streams`
---
-ALTER TABLE `academic_streams`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `academic_streams_academic_year_id_foreign` (`academic_year_id`);
-
---
--- Index pour la table `academic_years`
---
-ALTER TABLE `academic_years`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `academic_years_academic_phase_id_foreign` (`academic_phase_id`);
-
---
--- Index pour la table `achievements`
---
-ALTER TABLE `achievements`
-  ADD PRIMARY KEY (`id`);
-
---
--- Index pour la table `app_settings`
---
-ALTER TABLE `app_settings`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `app_settings_key_unique` (`key`);
-
---
--- Index pour la table `bac_sessions`
---
-ALTER TABLE `bac_sessions`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `bac_sessions_slug_unique` (`slug`);
-
---
--- Index pour la table `bac_simulations`
---
-ALTER TABLE `bac_simulations`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `bac_simulations_user_id_foreign` (`user_id`),
-  ADD KEY `bac_simulations_bac_subject_id_foreign` (`bac_subject_id`);
-
---
--- Index pour la table `bac_study_days`
---
-ALTER TABLE `bac_study_days`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `bac_study_days_academic_stream_id_day_number_unique` (`academic_stream_id`,`day_number`),
-  ADD KEY `bac_study_days_academic_stream_id_day_type_index` (`academic_stream_id`,`day_type`);
-
---
--- Index pour la table `bac_study_day_subjects`
---
-ALTER TABLE `bac_study_day_subjects`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `bac_study_day_subjects_bac_study_day_id_subject_id_unique` (`bac_study_day_id`,`subject_id`),
-  ADD KEY `bac_study_day_subjects_bac_study_day_id_index` (`bac_study_day_id`),
-  ADD KEY `bac_study_day_subjects_subject_id_index` (`subject_id`);
-
---
--- Index pour la table `bac_study_day_topics`
---
-ALTER TABLE `bac_study_day_topics`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `bac_study_day_topics_bac_study_day_subject_id_index` (`bac_study_day_subject_id`);
-
---
--- Index pour la table `bac_subjects`
---
-ALTER TABLE `bac_subjects`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `bac_subjects_bac_year_id_foreign` (`bac_year_id`),
-  ADD KEY `bac_subjects_bac_session_id_foreign` (`bac_session_id`),
-  ADD KEY `bac_subjects_subject_id_foreign` (`subject_id`),
-  ADD KEY `bac_subjects_academic_stream_id_foreign` (`academic_stream_id`);
-
---
--- Index pour la table `bac_subject_bookmarks`
---
-ALTER TABLE `bac_subject_bookmarks`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `bac_subject_bookmarks_user_id_bac_subject_id_unique` (`user_id`,`bac_subject_id`),
-  ADD KEY `bac_subject_bookmarks_bac_subject_id_foreign` (`bac_subject_id`);
-
---
--- Index pour la table `bac_subject_chapters`
---
-ALTER TABLE `bac_subject_chapters`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `bac_subject_chapters_bac_subject_id_foreign` (`bac_subject_id`);
-
---
--- Index pour la table `bac_topic_content_mapping`
---
-ALTER TABLE `bac_topic_content_mapping`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `unique_mapping` (`bac_study_day_topic_id`,`subject_planner_content_id`),
-  ADD KEY `bac_topic_content_mapping_subject_planner_content_id_foreign` (`subject_planner_content_id`),
-  ADD KEY `idx_relevance` (`relevance_score`);
-
---
--- Index pour la table `bac_weekly_rewards`
---
-ALTER TABLE `bac_weekly_rewards`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `bac_weekly_rewards_academic_stream_id_week_number_unique` (`academic_stream_id`,`week_number`),
-  ADD KEY `bac_weekly_rewards_academic_stream_id_index` (`academic_stream_id`);
-
---
--- Index pour la table `bac_years`
---
-ALTER TABLE `bac_years`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `bac_years_year_unique` (`year`);
-
---
--- Index pour la table `cache`
---
-ALTER TABLE `cache`
-  ADD PRIMARY KEY (`key`);
-
---
--- Index pour la table `cache_locks`
---
-ALTER TABLE `cache_locks`
-  ADD PRIMARY KEY (`key`);
-
---
--- Index pour la table `certificates`
---
-ALTER TABLE `certificates`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `certificates_user_id_course_id_unique` (`user_id`,`course_id`),
-  ADD UNIQUE KEY `certificates_certificate_number_unique` (`certificate_number`),
-  ADD KEY `certificates_course_id_foreign` (`course_id`),
-  ADD KEY `certificates_user_course_progress_id_foreign` (`user_course_progress_id`),
-  ADD KEY `certificates_certificate_number_index` (`certificate_number`),
-  ADD KEY `certificates_issued_at_index` (`issued_at`);
-
---
 -- Index pour la table `contents`
 --
-ALTER TABLE `contents`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `contents_content_type_id_foreign` (`content_type_id`),
-  ADD KEY `contents_chapter_id_foreign` (`chapter_id`),
-  ADD KEY `contents_created_by_foreign` (`created_by`),
-  ADD KEY `contents_updated_by_foreign` (`updated_by`),
-  ADD KEY `idx_contents_main` (`subject_id`,`content_type_id`,`chapter_id`,`is_published`),
-  ADD KEY `idx_contents_subject_stream` (`subject_id`,`academic_stream_id`);
 ALTER TABLE `contents` ADD FULLTEXT KEY `ft_contents_search` (`title_ar`,`description_ar`,`search_keywords`);
-
---
--- Index pour la table `content_bookmarks`
---
-ALTER TABLE `content_bookmarks`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `content_bookmarks_user_id_content_id_unique` (`user_id`,`content_id`),
-  ADD KEY `content_bookmarks_user_id_index` (`user_id`),
-  ADD KEY `content_bookmarks_content_id_index` (`content_id`),
-  ADD KEY `content_bookmarks_created_at_index` (`created_at`);
-
---
--- Index pour la table `content_chapters`
---
-ALTER TABLE `content_chapters`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `chapters_subject_active_index` (`subject_id`,`is_active`,`order`),
-  ADD KEY `idx_chapters_subject_stream` (`subject_id`,`academic_stream_id`);
-
---
--- Index pour la table `content_quiz`
---
-ALTER TABLE `content_quiz`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `content_quiz_content_id_quiz_id_unique` (`content_id`,`quiz_id`),
-  ADD KEY `content_quiz_quiz_id_foreign` (`quiz_id`);
-
---
--- Index pour la table `content_ratings`
---
-ALTER TABLE `content_ratings`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `content_ratings_user_id_content_id_unique` (`user_id`,`content_id`),
-  ADD KEY `content_ratings_content_id_foreign` (`content_id`);
-
---
--- Index pour la table `content_types`
---
-ALTER TABLE `content_types`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `content_types_slug_unique` (`slug`);
-
---
--- Index pour la table `coupons`
---
-ALTER TABLE `coupons`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `coupons_code_unique` (`code`),
-  ADD KEY `coupons_created_by_foreign` (`created_by`),
-  ADD KEY `coupons_code_index` (`code`),
-  ADD KEY `coupons_is_active_valid_until_index` (`is_active`,`valid_until`);
-
---
--- Index pour la table `coupon_usages`
---
-ALTER TABLE `coupon_usages`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `coupon_usages_user_id_foreign` (`user_id`),
-  ADD KEY `coupon_usages_coupon_id_user_id_index` (`coupon_id`,`user_id`),
-  ADD KEY `coupon_usages_order_id_foreign` (`order_id`);
-
---
--- Index pour la table `courses`
---
-ALTER TABLE `courses`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `courses_slug_unique` (`slug`),
-  ADD KEY `courses_subject_id_foreign` (`subject_id`),
-  ADD KEY `courses_created_by_foreign` (`created_by`);
-
---
--- Index pour la table `course_lessons`
---
-ALTER TABLE `course_lessons`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `course_lessons_course_module_id_foreign` (`course_module_id`),
-  ADD KEY `fk_course_lessons_quiz` (`quiz_id`);
-
---
--- Index pour la table `course_lesson_attachments`
---
-ALTER TABLE `course_lesson_attachments`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `course_lesson_attachments_course_lesson_id_order_index` (`course_lesson_id`,`order`);
-
---
--- Index pour la table `course_modules`
---
-ALTER TABLE `course_modules`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `course_modules_course_id_foreign` (`course_id`);
-
---
--- Index pour la table `course_quizzes`
---
-ALTER TABLE `course_quizzes`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `course_quizzes_course_module_id_foreign` (`course_module_id`),
-  ADD KEY `course_quizzes_quiz_id_foreign` (`quiz_id`);
-
---
--- Index pour la table `course_reviews`
---
-ALTER TABLE `course_reviews`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `course_reviews_user_id_course_id_unique` (`user_id`,`course_id`),
-  ADD KEY `course_reviews_course_id_is_approved_index` (`course_id`,`is_approved`);
-
---
--- Index pour la table `device_sessions`
---
-ALTER TABLE `device_sessions`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `device_sessions_token_id_unique` (`token_id`),
-  ADD KEY `device_sessions_user_id_index` (`user_id`),
-  ADD KEY `device_sessions_token_id_index` (`token_id`),
-  ADD KEY `device_sessions_is_current_index` (`is_current`),
-  ADD KEY `device_sessions_last_active_at_index` (`last_active_at`);
-
---
--- Index pour la table `device_transfer_requests`
---
-ALTER TABLE `device_transfer_requests`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `device_transfer_requests_approved_by_foreign` (`approved_by`),
-  ADD KEY `device_transfer_requests_user_id_status_index` (`user_id`,`status`);
-
---
--- Index pour la table `exam_schedule`
---
-ALTER TABLE `exam_schedule`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `exam_schedule_subject_id_foreign` (`subject_id`),
-  ADD KEY `exam_schedule_user_id_exam_date_index` (`user_id`,`exam_date`),
-  ADD KEY `exam_schedule_user_id_subject_id_index` (`user_id`,`subject_id`);
-
---
--- Index pour la table `failed_jobs`
---
-ALTER TABLE `failed_jobs`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `failed_jobs_uuid_unique` (`uuid`);
-
---
--- Index pour la table `fcm_tokens`
---
-ALTER TABLE `fcm_tokens`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `fcm_tokens_token_unique` (`token`),
-  ADD KEY `fcm_tokens_user_id_foreign` (`user_id`);
-
---
--- Index pour la table `flashcards`
---
-ALTER TABLE `flashcards`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `flashcards_deck_id_is_active_index` (`deck_id`,`is_active`),
-  ADD KEY `flashcards_card_type_index` (`card_type`),
-  ADD KEY `flashcards_order_index` (`order`);
-
---
--- Index pour la table `flashcard_decks`
---
-ALTER TABLE `flashcard_decks`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `flashcard_decks_slug_unique` (`slug`),
-  ADD KEY `flashcard_decks_created_by_foreign` (`created_by`),
-  ADD KEY `flashcard_decks_subject_id_is_published_index` (`subject_id`,`is_published`),
-  ADD KEY `flashcard_decks_chapter_id_is_published_index` (`chapter_id`,`is_published`),
-  ADD KEY `flashcard_decks_academic_stream_id_index` (`academic_stream_id`),
-  ADD KEY `flashcard_decks_is_premium_index` (`is_premium`);
-
---
--- Index pour la table `flashcard_deck_stream`
---
-ALTER TABLE `flashcard_deck_stream`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `deck_stream_unique` (`flashcard_deck_id`,`academic_stream_id`),
-  ADD KEY `flashcard_deck_stream_academic_stream_id_foreign` (`academic_stream_id`);
-
---
--- Index pour la table `flashcard_review_logs`
---
-ALTER TABLE `flashcard_review_logs`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `flashcard_review_logs_user_id_reviewed_at_index` (`user_id`,`reviewed_at`),
-  ADD KEY `flashcard_review_logs_flashcard_id_index` (`flashcard_id`),
-  ADD KEY `flashcard_review_logs_session_id_index` (`session_id`);
-
---
--- Index pour la table `flashcard_review_sessions`
---
-ALTER TABLE `flashcard_review_sessions`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `flashcard_review_sessions_deck_id_foreign` (`deck_id`),
-  ADD KEY `flashcard_review_sessions_user_id_status_index` (`user_id`,`status`),
-  ADD KEY `flashcard_review_sessions_user_id_deck_id_index` (`user_id`,`deck_id`),
-  ADD KEY `flashcard_review_sessions_started_at_index` (`started_at`);
-
---
--- Index pour la table `jobs`
---
-ALTER TABLE `jobs`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `jobs_queue_index` (`queue`);
-
---
--- Index pour la table `job_batches`
---
-ALTER TABLE `job_batches`
-  ADD PRIMARY KEY (`id`);
-
---
--- Index pour la table `migrations`
---
-ALTER TABLE `migrations`
-  ADD PRIMARY KEY (`id`);
-
---
--- Index pour la table `notifications`
---
-ALTER TABLE `notifications`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `notifications_user_id_status_index` (`user_id`,`status`),
-  ADD KEY `notifications_scheduled_for_status_index` (`scheduled_for`,`status`);
-
---
--- Index pour la table `orders`
---
-ALTER TABLE `orders`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `orders_order_number_unique` (`order_number`),
-  ADD KEY `orders_course_id_foreign` (`course_id`),
-  ADD KEY `orders_package_id_foreign` (`package_id`),
-  ADD KEY `orders_coupon_id_foreign` (`coupon_id`),
-  ADD KEY `orders_order_number_index` (`order_number`),
-  ADD KEY `orders_user_id_index` (`user_id`),
-  ADD KEY `orders_status_index` (`status`),
-  ADD KEY `orders_created_at_index` (`created_at`);
-
---
--- Index pour la table `package_courses`
---
-ALTER TABLE `package_courses`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `package_courses_package_id_foreign` (`package_id`),
-  ADD KEY `package_courses_course_id_foreign` (`course_id`);
-
---
--- Index pour la table `password_reset_tokens`
---
-ALTER TABLE `password_reset_tokens`
-  ADD PRIMARY KEY (`email`);
-
---
--- Index pour la table `payment_receipts`
---
-ALTER TABLE `payment_receipts`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `payment_receipts_user_id_foreign` (`user_id`),
-  ADD KEY `payment_receipts_course_id_foreign` (`course_id`),
-  ADD KEY `payment_receipts_reviewed_by_foreign` (`reviewed_by`),
-  ADD KEY `payment_receipts_package_id_foreign` (`package_id`);
-
---
--- Index pour la table `personal_access_tokens`
---
-ALTER TABLE `personal_access_tokens`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `personal_access_tokens_token_unique` (`token`),
-  ADD KEY `personal_access_tokens_tokenable_type_tokenable_id_index` (`tokenable_type`,`tokenable_id`),
-  ADD KEY `personal_access_tokens_expires_at_index` (`expires_at`);
-
---
--- Index pour la table `planner_achievements`
---
-ALTER TABLE `planner_achievements`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `planner_achievements_achievement_id_unique` (`achievement_id`),
-  ADD KEY `planner_achievements_user_id_unlocked_at_index` (`user_id`,`unlocked_at`),
-  ADD KEY `planner_achievements_achievement_id_index` (`achievement_id`);
-
---
--- Index pour la table `planner_exams`
---
-ALTER TABLE `planner_exams`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `planner_exams_user_id_exam_date_index` (`user_id`,`exam_date`),
-  ADD KEY `planner_exams_subject_id_index` (`subject_id`);
-
---
--- Index pour la table `planner_points_history`
---
-ALTER TABLE `planner_points_history`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `planner_points_history_session_id_foreign` (`session_id`),
-  ADD KEY `planner_points_history_user_id_created_at_index` (`user_id`,`created_at`),
-  ADD KEY `planner_points_history_source_index` (`source`);
-
---
--- Index pour la table `planner_schedules`
---
-ALTER TABLE `planner_schedules`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `planner_schedules_academic_year_id_foreign` (`academic_year_id`),
-  ADD KEY `planner_schedules_academic_stream_id_foreign` (`academic_stream_id`),
-  ADD KEY `planner_schedules_user_id_is_active_index` (`user_id`,`is_active`),
-  ADD KEY `planner_schedules_start_date_index` (`start_date`),
-  ADD KEY `planner_schedules_user_status_date_idx` (`user_id`,`status`,`start_date`);
-
---
--- Index pour la table `planner_settings`
---
-ALTER TABLE `planner_settings`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `planner_settings_user_id_unique` (`user_id`);
-
---
--- Index pour la table `planner_study_sessions`
---
-ALTER TABLE `planner_study_sessions`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `planner_study_sessions_chapter_id_foreign` (`chapter_id`),
-  ADD KEY `planner_study_sessions_user_id_scheduled_date_index` (`user_id`,`scheduled_date`),
-  ADD KEY `planner_study_sessions_schedule_id_status_index` (`schedule_id`,`status`),
-  ADD KEY `planner_study_sessions_subject_id_status_index` (`subject_id`,`status`),
-  ADD KEY `planner_study_sessions_original_topic_test_session_id_foreign` (`original_topic_test_session_id`),
-  ADD KEY `idx_session_content` (`subject_planner_content_id`,`content_phase`),
-  ADD KEY `idx_spaced_reviews` (`is_spaced_review`,`scheduled_date`),
-  ADD KEY `idx_mock_tests` (`is_mock_test`,`scheduled_date`),
-  ADD KEY `idx_language_daily` (`is_language_daily`,`scheduled_date`),
-  ADD KEY `idx_late_sessions` (`is_late`,`status`),
-  ADD KEY `idx_due_sessions` (`due_date`,`status`);
-
---
--- Index pour la table `planner_subjects`
---
-ALTER TABLE `planner_subjects`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `planner_subjects_user_id_subject_id_unique` (`user_id`,`subject_id`),
-  ADD KEY `planner_subjects_user_id_index` (`user_id`),
-  ADD KEY `planner_subjects_subject_id_index` (`subject_id`),
-  ADD KEY `planner_subjects_user_id_is_active_index` (`user_id`,`is_active`);
-
---
--- Index pour la table `prayer_times`
---
-ALTER TABLE `prayer_times`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `prayer_times_user_id_date_unique` (`user_id`,`date`),
-  ADD KEY `prayer_times_user_id_date_index` (`user_id`,`date`);
-
---
--- Index pour la table `promos`
---
-ALTER TABLE `promos`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `promos_is_active_display_order_index` (`is_active`,`display_order`),
-  ADD KEY `promos_starts_at_ends_at_index` (`starts_at`,`ends_at`);
-
---
--- Index pour la table `quizzes`
---
-ALTER TABLE `quizzes`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `quizzes_chapter_id_foreign` (`chapter_id`),
-  ADD KEY `quizzes_created_by_foreign` (`created_by`),
-  ADD KEY `quizzes_filtering_index` (`subject_id`,`difficulty_level`,`is_published`),
-  ADD KEY `quizzes_subject_chapter_index` (`subject_id`,`chapter_id`);
-
---
--- Index pour la table `quiz_attempts`
---
-ALTER TABLE `quiz_attempts`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `quiz_attempts_quiz_id_foreign` (`quiz_id`),
-  ADD KEY `attempts_user_quiz_status_index` (`user_id`,`quiz_id`,`status`),
-  ADD KEY `attempts_user_completed_index` (`user_id`,`completed_at`),
-  ADD KEY `qa_analytics_date_index` (`user_id`,`started_at`,`status`),
-  ADD KEY `qa_score_analytics_index` (`user_id`,`status`,`score_percentage`);
-
---
--- Index pour la table `quiz_attempt_answers`
---
-ALTER TABLE `quiz_attempt_answers`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `quiz_attempt_answers_quiz_attempt_id_foreign` (`quiz_attempt_id`),
-  ADD KEY `quiz_attempt_answers_quiz_question_id_foreign` (`quiz_question_id`);
-
---
--- Index pour la table `quiz_questions`
---
-ALTER TABLE `quiz_questions`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `questions_quiz_type_index` (`quiz_id`,`question_type`);
-
---
--- Index pour la table `sessions`
---
-ALTER TABLE `sessions`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `sessions_user_id_index` (`user_id`),
-  ADD KEY `sessions_last_activity_index` (`last_activity`);
-
---
--- Index pour la table `session_activities`
---
-ALTER TABLE `session_activities`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `session_activities_study_session_id_foreign` (`study_session_id`);
-
---
--- Index pour la table `sponsors`
---
-ALTER TABLE `sponsors`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `sponsors_is_active_display_order_index` (`is_active`,`display_order`);
-
---
--- Index pour la table `study_schedules`
---
-ALTER TABLE `study_schedules`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `study_schedules_user_id_status_start_date_index` (`user_id`,`status`,`start_date`);
-
---
--- Index pour la table `study_sessions`
---
-ALTER TABLE `study_sessions`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `study_sessions_study_schedule_id_foreign` (`study_schedule_id`),
-  ADD KEY `study_sessions_suggested_content_id_foreign` (`suggested_content_id`),
-  ADD KEY `study_sessions_user_id_scheduled_date_status_index` (`user_id`,`scheduled_date`,`status`),
-  ADD KEY `study_sessions_subject_id_scheduled_date_index` (`subject_id`,`scheduled_date`),
-  ADD KEY `study_sessions_chapter_id_foreign` (`chapter_id`),
-  ADD KEY `ss_heatmap_index` (`user_id`,`status`,`scheduled_date`),
-  ADD KEY `ss_subject_analytics_index` (`user_id`,`subject_id`,`status`,`scheduled_date`);
-
---
--- Index pour la table `subjects`
---
-ALTER TABLE `subjects`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `subjects_academic_year_id_foreign` (`academic_year_id`),
-  ADD KEY `subjects_academic_stream_id_academic_year_id_index` (`academic_year_id`);
-
---
--- Index pour la table `subject_planner_content`
---
-ALTER TABLE `subject_planner_content`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `subject_planner_content_academic_year_id_foreign` (`academic_year_id`),
-  ADD KEY `subject_planner_content_subject_id_foreign` (`subject_id`),
-  ADD KEY `subject_planner_content_related_chapter_id_foreign` (`related_chapter_id`),
-  ADD KEY `subject_planner_content_created_by_foreign` (`created_by`),
-  ADD KEY `subject_planner_content_updated_by_foreign` (`updated_by`),
-  ADD KEY `idx_academic_context` (`academic_phase_id`,`academic_year_id`,`subject_id`),
-  ADD KEY `idx_hierarchy` (`parent_id`,`level`,`order`),
-  ADD KEY `idx_bac_priority` (`is_bac_priority`,`bac_frequency`),
-  ADD KEY `idx_published` (`is_published`,`is_active`),
-  ADD KEY `idx_content_type` (`content_type`,`difficulty_level`);
-
---
--- Index pour la table `subject_priorities`
---
-ALTER TABLE `subject_priorities`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `subject_priorities_user_id_subject_id_unique` (`user_id`,`subject_id`),
-  ADD KEY `subject_priorities_subject_id_foreign` (`subject_id`);
-
---
--- Index pour la table `subject_stream`
---
-ALTER TABLE `subject_stream`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `subject_stream_unique` (`subject_id`,`academic_stream_id`),
-  ADD KEY `subject_stream_subject_id_index` (`subject_id`),
-  ADD KEY `subject_stream_academic_stream_id_index` (`academic_stream_id`);
-
---
--- Index pour la table `subscription_codes`
---
-ALTER TABLE `subscription_codes`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `subscription_codes_code_unique` (`code`),
-  ADD KEY `subscription_codes_course_id_foreign` (`course_id`),
-  ADD KEY `subscription_codes_package_id_foreign` (`package_id`),
-  ADD KEY `subscription_codes_created_by_foreign` (`created_by`),
-  ADD KEY `subscription_codes_list_id_index` (`list_id`);
-
---
--- Index pour la table `subscription_code_lists`
---
-ALTER TABLE `subscription_code_lists`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `subscription_code_lists_course_id_foreign` (`course_id`),
-  ADD KEY `subscription_code_lists_package_id_foreign` (`package_id`),
-  ADD KEY `subscription_code_lists_created_by_foreign` (`created_by`),
-  ADD KEY `subscription_code_lists_code_type_created_by_index` (`code_type`,`created_by`),
-  ADD KEY `subscription_code_lists_created_at_index` (`created_at`);
-
---
--- Index pour la table `subscription_packages`
---
-ALTER TABLE `subscription_packages`
-  ADD PRIMARY KEY (`id`);
-
---
--- Index pour la table `users`
---
-ALTER TABLE `users`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `users_email_unique` (`email`),
-  ADD UNIQUE KEY `users_device_uuid_unique` (`device_uuid`),
-  ADD KEY `users_device_id_index` (`device_id`);
-
---
--- Index pour la table `user_academic_profiles`
---
-ALTER TABLE `user_academic_profiles`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `user_academic_profiles_user_id_unique` (`user_id`),
-  ADD KEY `user_academic_profiles_academic_phase_id_foreign` (`academic_phase_id`),
-  ADD KEY `user_academic_profiles_academic_year_id_foreign` (`academic_year_id`),
-  ADD KEY `user_academic_profiles_academic_stream_id_foreign` (`academic_stream_id`);
-
---
--- Index pour la table `user_achievements`
---
-ALTER TABLE `user_achievements`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `user_achievements_user_id_achievement_id_unique` (`user_id`,`achievement_id`),
-  ADD KEY `user_achievements_achievement_id_foreign` (`achievement_id`);
-
---
--- Index pour la table `user_activity_log`
---
-ALTER TABLE `user_activity_log`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `user_activity_log_user_id_activity_type_created_at_index` (`user_id`,`activity_type`,`created_at`);
-
---
--- Index pour la table `user_activity_logs`
---
-ALTER TABLE `user_activity_logs`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `user_activity_logs_user_id_index` (`user_id`),
-  ADD KEY `user_activity_logs_activity_type_index` (`activity_type`),
-  ADD KEY `user_activity_logs_created_at_index` (`created_at`);
-
---
--- Index pour la table `user_bac_performance`
---
-ALTER TABLE `user_bac_performance`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `user_bac_performance_user_id_foreign` (`user_id`),
-  ADD KEY `user_bac_performance_subject_id_foreign` (`subject_id`);
-
---
--- Index pour la table `user_bac_study_progress`
---
-ALTER TABLE `user_bac_study_progress`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `user_bac_study_progress_user_id_bac_study_day_topic_id_unique` (`user_id`,`bac_study_day_topic_id`),
-  ADD KEY `user_bac_study_progress_bac_study_day_topic_id_foreign` (`bac_study_day_topic_id`),
-  ADD KEY `user_bac_study_progress_user_id_is_completed_index` (`user_id`,`is_completed`);
-
---
--- Index pour la table `user_content_progress`
---
-ALTER TABLE `user_content_progress`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `user_content_progress_user_id_content_id_unique` (`user_id`,`content_id`),
-  ADD KEY `user_content_progress_content_id_foreign` (`content_id`);
-
---
--- Index pour la table `user_course_progress`
---
-ALTER TABLE `user_course_progress`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `user_course_progress_user_id_course_id_course_lesson_id_unique` (`user_id`,`course_id`,`course_lesson_id`),
-  ADD KEY `user_course_progress_course_id_foreign` (`course_id`),
-  ADD KEY `user_course_progress_course_lesson_id_foreign` (`course_lesson_id`),
-  ADD KEY `user_course_progress_last_lesson_id_foreign` (`last_lesson_id`);
-
---
--- Index pour la table `user_flashcard_progress`
---
-ALTER TABLE `user_flashcard_progress`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `user_flashcard_progress_user_id_flashcard_id_unique` (`user_id`,`flashcard_id`),
-  ADD KEY `user_flashcard_progress_flashcard_id_foreign` (`flashcard_id`),
-  ADD KEY `user_flashcard_progress_user_id_next_review_date_index` (`user_id`,`next_review_date`),
-  ADD KEY `user_flashcard_progress_user_id_learning_state_index` (`user_id`,`learning_state`);
-
---
--- Index pour la table `user_lesson_progress`
---
-ALTER TABLE `user_lesson_progress`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `user_lesson_progress_user_id_course_lesson_id_unique` (`user_id`,`course_lesson_id`),
-  ADD KEY `user_lesson_progress_course_lesson_id_foreign` (`course_lesson_id`),
-  ADD KEY `user_lesson_progress_user_id_is_completed_index` (`user_id`,`is_completed`);
-
---
--- Index pour la table `user_notification_settings`
---
-ALTER TABLE `user_notification_settings`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `user_notification_settings_user_id_unique` (`user_id`);
-
---
--- Index pour la table `user_preferences`
---
-ALTER TABLE `user_preferences`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `user_preferences_user_id_unique` (`user_id`);
-
---
--- Index pour la table `user_profiles`
---
-ALTER TABLE `user_profiles`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `user_profiles_user_id_unique` (`user_id`);
-
---
--- Index pour la table `user_quiz_performance`
---
-ALTER TABLE `user_quiz_performance`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `user_quiz_performance_user_id_quiz_id_subject_id_unique` (`user_id`,`quiz_id`,`subject_id`),
-  ADD KEY `user_quiz_performance_subject_id_foreign` (`subject_id`),
-  ADD KEY `user_quiz_performance_quiz_id_foreign` (`quiz_id`);
-
---
--- Index pour la table `user_settings`
---
-ALTER TABLE `user_settings`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `user_settings_user_id_unique` (`user_id`),
-  ADD KEY `user_settings_language_index` (`language`),
-  ADD KEY `user_settings_theme_index` (`theme`);
-
---
--- Index pour la table `user_stats`
---
-ALTER TABLE `user_stats`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `user_stats_user_id_unique` (`user_id`);
-
---
--- Index pour la table `user_subjects`
---
-ALTER TABLE `user_subjects`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `user_subjects_user_id_subject_id_unique` (`user_id`,`subject_id`),
-  ADD KEY `user_subjects_subject_id_foreign` (`subject_id`);
-
---
--- Index pour la table `user_subject_planner_progress`
---
-ALTER TABLE `user_subject_planner_progress`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `unique_user_content` (`user_id`,`subject_planner_content_id`),
-  ADD KEY `user_subject_planner_progress_subject_planner_content_id_foreign` (`subject_planner_content_id`),
-  ADD KEY `idx_status` (`status`,`completion_percentage`),
-  ADD KEY `idx_next_review` (`next_review_at`);
-
---
--- Index pour la table `user_subject_progress`
---
-ALTER TABLE `user_subject_progress`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `user_subject_progress_user_id_subject_id_unique` (`user_id`,`subject_id`),
-  ADD KEY `user_subject_progress_subject_id_foreign` (`subject_id`),
-  ADD KEY `user_subject_progress_user_id_index` (`user_id`),
-  ADD KEY `user_subject_progress_user_id_progress_percentage_index` (`user_id`,`progress_percentage`),
-  ADD KEY `user_subject_progress_user_id_last_studied_at_index` (`user_id`,`last_studied_at`);
-
---
--- Index pour la table `user_subscriptions`
---
-ALTER TABLE `user_subscriptions`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `user_subscriptions_user_id_foreign` (`user_id`),
-  ADD KEY `user_subscriptions_course_id_foreign` (`course_id`),
-  ADD KEY `user_subscriptions_code_id_foreign` (`code_id`),
-  ADD KEY `user_subscriptions_receipt_id_foreign` (`receipt_id`),
-  ADD KEY `user_subscriptions_package_id_foreign` (`package_id`),
-  ADD KEY `user_subscriptions_order_id_foreign` (`order_id`);
-
---
--- AUTO_INCREMENT pour les tables déchargées
---
-
---
--- AUTO_INCREMENT pour la table `academic_phases`
---
-ALTER TABLE `academic_phases`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
-
---
--- AUTO_INCREMENT pour la table `academic_streams`
---
-ALTER TABLE `academic_streams`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
-
---
--- AUTO_INCREMENT pour la table `academic_years`
---
-ALTER TABLE `academic_years`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
-
---
--- AUTO_INCREMENT pour la table `achievements`
---
-ALTER TABLE `achievements`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT pour la table `app_settings`
---
-ALTER TABLE `app_settings`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
-
---
--- AUTO_INCREMENT pour la table `bac_sessions`
---
-ALTER TABLE `bac_sessions`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
-
---
--- AUTO_INCREMENT pour la table `bac_simulations`
---
-ALTER TABLE `bac_simulations`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT pour la table `bac_study_days`
---
-ALTER TABLE `bac_study_days`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=380;
-
---
--- AUTO_INCREMENT pour la table `bac_study_day_subjects`
---
-ALTER TABLE `bac_study_day_subjects`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1198;
-
---
--- AUTO_INCREMENT pour la table `bac_study_day_topics`
---
-ALTER TABLE `bac_study_day_topics`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2504;
-
---
--- AUTO_INCREMENT pour la table `bac_subjects`
---
-ALTER TABLE `bac_subjects`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4531;
-
---
--- AUTO_INCREMENT pour la table `bac_subject_bookmarks`
---
-ALTER TABLE `bac_subject_bookmarks`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
-
---
--- AUTO_INCREMENT pour la table `bac_subject_chapters`
---
-ALTER TABLE `bac_subject_chapters`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=167;
-
---
--- AUTO_INCREMENT pour la table `bac_topic_content_mapping`
---
-ALTER TABLE `bac_topic_content_mapping`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT pour la table `bac_weekly_rewards`
---
-ALTER TABLE `bac_weekly_rewards`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
-
---
--- AUTO_INCREMENT pour la table `bac_years`
---
-ALTER TABLE `bac_years`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
-
---
--- AUTO_INCREMENT pour la table `certificates`
---
-ALTER TABLE `certificates`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT pour la table `contents`
---
-ALTER TABLE `contents`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=608;
-
---
--- AUTO_INCREMENT pour la table `content_bookmarks`
---
-ALTER TABLE `content_bookmarks`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
-
---
--- AUTO_INCREMENT pour la table `content_chapters`
---
-ALTER TABLE `content_chapters`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=363;
-
---
--- AUTO_INCREMENT pour la table `content_quiz`
---
-ALTER TABLE `content_quiz`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT pour la table `content_ratings`
---
-ALTER TABLE `content_ratings`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT pour la table `content_types`
---
-ALTER TABLE `content_types`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
-
---
--- AUTO_INCREMENT pour la table `coupons`
---
-ALTER TABLE `coupons`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT pour la table `coupon_usages`
---
-ALTER TABLE `coupon_usages`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT pour la table `courses`
---
-ALTER TABLE `courses`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
-
---
--- AUTO_INCREMENT pour la table `course_lessons`
---
-ALTER TABLE `course_lessons`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=328;
-
---
--- AUTO_INCREMENT pour la table `course_lesson_attachments`
---
-ALTER TABLE `course_lesson_attachments`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT pour la table `course_modules`
---
-ALTER TABLE `course_modules`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=60;
-
---
--- AUTO_INCREMENT pour la table `course_quizzes`
---
-ALTER TABLE `course_quizzes`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT pour la table `course_reviews`
---
-ALTER TABLE `course_reviews`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=123;
-
---
--- AUTO_INCREMENT pour la table `device_sessions`
---
-ALTER TABLE `device_sessions`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=32;
-
---
--- AUTO_INCREMENT pour la table `device_transfer_requests`
---
-ALTER TABLE `device_transfer_requests`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT pour la table `exam_schedule`
---
-ALTER TABLE `exam_schedule`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT pour la table `failed_jobs`
---
-ALTER TABLE `failed_jobs`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT pour la table `fcm_tokens`
---
-ALTER TABLE `fcm_tokens`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
-
---
--- AUTO_INCREMENT pour la table `flashcards`
---
-ALTER TABLE `flashcards`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=127;
-
---
--- AUTO_INCREMENT pour la table `flashcard_decks`
---
-ALTER TABLE `flashcard_decks`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
-
---
--- AUTO_INCREMENT pour la table `flashcard_deck_stream`
---
-ALTER TABLE `flashcard_deck_stream`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT pour la table `flashcard_review_logs`
---
-ALTER TABLE `flashcard_review_logs`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=48;
-
---
--- AUTO_INCREMENT pour la table `flashcard_review_sessions`
---
-ALTER TABLE `flashcard_review_sessions`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
-
---
--- AUTO_INCREMENT pour la table `jobs`
---
-ALTER TABLE `jobs`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT pour la table `migrations`
---
-ALTER TABLE `migrations`
-  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=166;
-
---
--- AUTO_INCREMENT pour la table `notifications`
---
-ALTER TABLE `notifications`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
-
---
--- AUTO_INCREMENT pour la table `orders`
---
-ALTER TABLE `orders`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT pour la table `package_courses`
---
-ALTER TABLE `package_courses`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=40;
-
---
--- AUTO_INCREMENT pour la table `payment_receipts`
---
-ALTER TABLE `payment_receipts`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
-
---
--- AUTO_INCREMENT pour la table `personal_access_tokens`
---
-ALTER TABLE `personal_access_tokens`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=138;
-
---
--- AUTO_INCREMENT pour la table `planner_achievements`
---
-ALTER TABLE `planner_achievements`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT pour la table `planner_exams`
---
-ALTER TABLE `planner_exams`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT pour la table `planner_points_history`
---
-ALTER TABLE `planner_points_history`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT pour la table `planner_schedules`
---
-ALTER TABLE `planner_schedules`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=184;
-
---
--- AUTO_INCREMENT pour la table `planner_settings`
---
-ALTER TABLE `planner_settings`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
-
---
--- AUTO_INCREMENT pour la table `planner_study_sessions`
---
-ALTER TABLE `planner_study_sessions`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=35259;
-
---
--- AUTO_INCREMENT pour la table `planner_subjects`
---
-ALTER TABLE `planner_subjects`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
-
---
--- AUTO_INCREMENT pour la table `prayer_times`
---
-ALTER TABLE `prayer_times`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=32;
-
---
--- AUTO_INCREMENT pour la table `promos`
---
-ALTER TABLE `promos`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
-
---
--- AUTO_INCREMENT pour la table `quizzes`
---
-ALTER TABLE `quizzes`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=664;
-
---
--- AUTO_INCREMENT pour la table `quiz_attempts`
---
-ALTER TABLE `quiz_attempts`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=42;
-
---
--- AUTO_INCREMENT pour la table `quiz_attempt_answers`
---
-ALTER TABLE `quiz_attempt_answers`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT pour la table `quiz_questions`
---
-ALTER TABLE `quiz_questions`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1289;
-
---
--- AUTO_INCREMENT pour la table `session_activities`
---
-ALTER TABLE `session_activities`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT pour la table `sponsors`
---
-ALTER TABLE `sponsors`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
-
---
--- AUTO_INCREMENT pour la table `study_schedules`
---
-ALTER TABLE `study_schedules`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
-
---
--- AUTO_INCREMENT pour la table `study_sessions`
---
-ALTER TABLE `study_sessions`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT pour la table `subjects`
---
-ALTER TABLE `subjects`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=76;
-
---
--- AUTO_INCREMENT pour la table `subject_planner_content`
---
-ALTER TABLE `subject_planner_content`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=181;
-
---
--- AUTO_INCREMENT pour la table `subject_priorities`
---
-ALTER TABLE `subject_priorities`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
-
---
--- AUTO_INCREMENT pour la table `subject_stream`
---
-ALTER TABLE `subject_stream`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=117;
-
---
--- AUTO_INCREMENT pour la table `subscription_codes`
---
-ALTER TABLE `subscription_codes`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=101;
-
---
--- AUTO_INCREMENT pour la table `subscription_code_lists`
---
-ALTER TABLE `subscription_code_lists`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
-
---
--- AUTO_INCREMENT pour la table `subscription_packages`
---
-ALTER TABLE `subscription_packages`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
-
---
--- AUTO_INCREMENT pour la table `users`
---
-ALTER TABLE `users`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
-
---
--- AUTO_INCREMENT pour la table `user_academic_profiles`
---
-ALTER TABLE `user_academic_profiles`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
-
---
--- AUTO_INCREMENT pour la table `user_achievements`
---
-ALTER TABLE `user_achievements`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT pour la table `user_activity_log`
---
-ALTER TABLE `user_activity_log`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT pour la table `user_activity_logs`
---
-ALTER TABLE `user_activity_logs`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
-
---
--- AUTO_INCREMENT pour la table `user_bac_performance`
---
-ALTER TABLE `user_bac_performance`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT pour la table `user_bac_study_progress`
---
-ALTER TABLE `user_bac_study_progress`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=43;
-
---
--- AUTO_INCREMENT pour la table `user_content_progress`
---
-ALTER TABLE `user_content_progress`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
-
---
--- AUTO_INCREMENT pour la table `user_course_progress`
---
-ALTER TABLE `user_course_progress`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT pour la table `user_flashcard_progress`
---
-ALTER TABLE `user_flashcard_progress`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=46;
-
---
--- AUTO_INCREMENT pour la table `user_lesson_progress`
---
-ALTER TABLE `user_lesson_progress`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT pour la table `user_notification_settings`
---
-ALTER TABLE `user_notification_settings`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
-
---
--- AUTO_INCREMENT pour la table `user_preferences`
---
-ALTER TABLE `user_preferences`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
-
---
--- AUTO_INCREMENT pour la table `user_profiles`
---
-ALTER TABLE `user_profiles`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT pour la table `user_quiz_performance`
---
-ALTER TABLE `user_quiz_performance`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
-
---
--- AUTO_INCREMENT pour la table `user_settings`
---
-ALTER TABLE `user_settings`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
-
---
--- AUTO_INCREMENT pour la table `user_stats`
---
-ALTER TABLE `user_stats`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
-
---
--- AUTO_INCREMENT pour la table `user_subjects`
---
-ALTER TABLE `user_subjects`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
-
---
--- AUTO_INCREMENT pour la table `user_subject_planner_progress`
---
-ALTER TABLE `user_subject_planner_progress`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT pour la table `user_subject_progress`
---
-ALTER TABLE `user_subject_progress`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT pour la table `user_subscriptions`
---
-ALTER TABLE `user_subscriptions`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
