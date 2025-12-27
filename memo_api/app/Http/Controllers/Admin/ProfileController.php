@@ -227,6 +227,9 @@ class ProfileController extends Controller
         // Get Google Sign-In settings
         $googleSettings = AppSetting::getGoogleSettings();
 
+        // Get video player settings
+        $videoPlayerSettings = AppSetting::getVideoPlayerSettings();
+
         // Get list of common timezones
         $timezones = [
             'Africa/Algiers' => 'الجزائر (UTC+1)',
@@ -249,7 +252,7 @@ class ProfileController extends Controller
             'UTC' => 'التوقيت العالمي (UTC)',
         ];
 
-        return view('admin.profile.settings', compact('userSettings', 'appSettings', 'timezones', 'googleSettings'));
+        return view('admin.profile.settings', compact('userSettings', 'appSettings', 'timezones', 'googleSettings', 'videoPlayerSettings'));
     }
 
     /**
@@ -312,6 +315,22 @@ class ProfileController extends Controller
             'auto_backup' => ['nullable', 'boolean'],
             'download_on_wifi_only' => ['nullable', 'boolean'],
             'backup_frequency' => ['nullable', 'string', 'in:daily,weekly,monthly'],
+
+            // Video Players Settings
+            'video_player_chewie_enabled' => ['nullable', 'boolean'],
+            'video_player_media_kit_enabled' => ['nullable', 'boolean'],
+            'video_player_simple_youtube_enabled' => ['nullable', 'boolean'],
+            'video_player_omni_enabled' => ['nullable', 'boolean'],
+            'video_player_orax_enabled' => ['nullable', 'boolean'],
+            'default_upload_player' => ['nullable', 'string', 'in:chewie,media_kit,simple_youtube,omni,orax'],
+            'default_youtube_player' => ['nullable', 'string', 'in:chewie,media_kit,simple_youtube,omni,orax'],
+
+            // Video Players Support Type (youtube, upload, both)
+            'video_player_chewie_supports' => ['nullable', 'string', 'in:youtube,upload,both'],
+            'video_player_media_kit_supports' => ['nullable', 'string', 'in:youtube,upload,both'],
+            'video_player_simple_youtube_supports' => ['nullable', 'string', 'in:youtube,upload,both'],
+            'video_player_omni_supports' => ['nullable', 'string', 'in:youtube,upload,both'],
+            'video_player_orax_supports' => ['nullable', 'string', 'in:youtube,upload,both'],
         ]);
 
         // Update app settings (min_app_version)
@@ -330,6 +349,23 @@ class ProfileController extends Controller
             'client_id' => $request->input('google_client_id'),
             'ios_client_id' => $request->input('google_ios_client_id'),
             'android_client_id' => $request->input('google_android_client_id'),
+        ]);
+
+        // Update video player settings
+        AppSetting::updateVideoPlayerSettings([
+            'chewie_enabled' => $request->has('video_player_chewie_enabled'),
+            'media_kit_enabled' => $request->has('video_player_media_kit_enabled'),
+            'simple_youtube_enabled' => $request->has('video_player_simple_youtube_enabled'),
+            'omni_enabled' => $request->has('video_player_omni_enabled'),
+            'orax_enabled' => $request->has('video_player_orax_enabled'),
+            'default_upload_player' => $request->input('default_upload_player', 'chewie'),
+            'default_youtube_player' => $request->input('default_youtube_player', 'simple_youtube'),
+            // Support types (youtube, upload, both)
+            'chewie_supports' => $request->input('video_player_chewie_supports', 'upload'),
+            'media_kit_supports' => $request->input('video_player_media_kit_supports', 'upload'),
+            'simple_youtube_supports' => $request->input('video_player_simple_youtube_supports', 'youtube'),
+            'omni_supports' => $request->input('video_player_omni_supports', 'both'),
+            'orax_supports' => $request->input('video_player_orax_supports', 'both'),
         ]);
 
         $user = Auth::user();
@@ -388,6 +424,316 @@ class ProfileController extends Controller
             'message' => $message,
             'storage_path' => $storagePath,
             'target_path' => $targetPath,
+        ]);
+    }
+
+    /**
+     * List custom symlinks in storage/app/public/courses/videos
+     */
+    public function listSymlinks()
+    {
+        $videosPath = storage_path('app/public/courses/videos');
+        $symlinks = [];
+
+        if (File::exists($videosPath)) {
+            $items = File::directories($videosPath);
+
+            foreach ($items as $item) {
+                $name = basename($item);
+                $isLink = is_link($item) || (PHP_OS_FAMILY === 'Windows' && $this->isJunction($item));
+
+                if ($isLink || File::isDirectory($item)) {
+                    $target = null;
+                    $valid = false;
+
+                    if (is_link($item)) {
+                        $target = readlink($item);
+                        $valid = File::exists($target);
+                    } elseif (PHP_OS_FAMILY === 'Windows' && $this->isJunction($item)) {
+                        $target = $this->getJunctionTarget($item);
+                        $valid = $target && File::exists($target);
+                    } else {
+                        // Regular directory
+                        $target = $item;
+                        $valid = true;
+                    }
+
+                    $symlinks[] = [
+                        'name' => $name,
+                        'path' => $item,
+                        'target' => $target,
+                        'valid' => $valid,
+                        'is_link' => $isLink,
+                    ];
+                }
+            }
+        }
+
+        return response()->json(['symlinks' => $symlinks]);
+    }
+
+    /**
+     * Create a custom symlink
+     */
+    public function createSymlink(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255|regex:/^[a-zA-Z0-9_\-]+$/',
+            'source' => 'required|string|max:500',
+        ]);
+
+        $name = $request->input('name');
+        $source = $request->input('source');
+
+        // Ensure videos directory exists
+        $videosPath = storage_path('app/public/courses/videos');
+        if (!File::exists($videosPath)) {
+            File::makeDirectory($videosPath, 0755, true);
+        }
+
+        $linkPath = $videosPath . DIRECTORY_SEPARATOR . $name;
+
+        // Check if source exists
+        if (!File::exists($source)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'المجلد المصدر غير موجود: ' . $source,
+            ]);
+        }
+
+        // Check if link already exists
+        if (File::exists($linkPath) || is_link($linkPath)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'يوجد مجلد أو رابط بنفس الاسم بالفعل',
+            ]);
+        }
+
+        try {
+            if (PHP_OS_FAMILY === 'Windows') {
+                // Use junction on Windows (doesn't require admin)
+                $command = 'mklink /J "' . $linkPath . '" "' . $source . '"';
+                exec($command, $output, $returnVar);
+
+                if ($returnVar !== 0) {
+                    // Try symlink as fallback
+                    $command = 'mklink /D "' . $linkPath . '" "' . $source . '"';
+                    exec($command, $output, $returnVar);
+                }
+
+                if ($returnVar !== 0) {
+                    throw new \Exception('فشل في إنشاء الرابط. تأكد من تشغيل الخادم كمسؤول.');
+                }
+            } else {
+                symlink($source, $linkPath);
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => 'تم إنشاء الرابط الرمزي بنجاح!',
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'حدث خطأ: ' . $e->getMessage(),
+            ]);
+        }
+    }
+
+    /**
+     * Delete a custom symlink
+     */
+    public function deleteSymlink(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+        ]);
+
+        $name = $request->input('name');
+        $videosPath = storage_path('app/public/courses/videos');
+        $linkPath = $videosPath . DIRECTORY_SEPARATOR . $name;
+
+        if (!File::exists($linkPath) && !is_link($linkPath)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'الرابط غير موجود',
+            ]);
+        }
+
+        try {
+            if (is_link($linkPath)) {
+                unlink($linkPath);
+            } elseif (PHP_OS_FAMILY === 'Windows' && $this->isJunction($linkPath)) {
+                // Remove junction on Windows
+                rmdir($linkPath);
+            } else {
+                // Don't delete regular directories
+                return response()->json([
+                    'success' => false,
+                    'message' => 'هذا مجلد عادي وليس رابط رمزي. لا يمكن حذفه من هنا.',
+                ]);
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => 'تم حذف الرابط بنجاح!',
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'حدث خطأ: ' . $e->getMessage(),
+            ]);
+        }
+    }
+
+    /**
+     * Check if a path is a Windows junction
+     */
+    private function isJunction($path)
+    {
+        if (PHP_OS_FAMILY !== 'Windows') {
+            return false;
+        }
+
+        $attr = @shell_exec('fsutil reparsepoint query "' . $path . '" 2>nul');
+        return strpos($attr, 'Symbolic Link') !== false || strpos($attr, 'Mount Point') !== false;
+    }
+
+    /**
+     * Get junction target on Windows
+     */
+    private function getJunctionTarget($path)
+    {
+        if (PHP_OS_FAMILY !== 'Windows') {
+            return null;
+        }
+
+        $output = @shell_exec('fsutil reparsepoint query "' . $path . '" 2>nul');
+        if (preg_match('/Print Name:\s*(.+)/i', $output, $matches)) {
+            return trim($matches[1]);
+        }
+
+        // Alternative method using dir
+        $output = @shell_exec('dir "' . dirname($path) . '" 2>nul');
+        if (preg_match('/<JUNCTION>\s+' . preg_quote(basename($path), '/') . '\s+\[(.+?)\]/i', $output, $matches)) {
+            return trim($matches[1]);
+        }
+
+        return null;
+    }
+
+    /**
+     * Check all symlinks status (from filesystems.php links config)
+     */
+    public function checkAllSymlinks()
+    {
+        $links = config('filesystems.links', [
+            public_path('storage') => storage_path('app/public'),
+        ]);
+
+        $results = [];
+
+        foreach ($links as $link => $target) {
+            $exists = false;
+            $linkName = basename($link);
+
+            if (is_link($link)) {
+                $exists = true;
+            } elseif (PHP_OS_FAMILY === 'Windows' && is_dir($link)) {
+                // Check if it's a junction on Windows
+                $exists = $this->isJunction($link);
+            }
+
+            $results[] = [
+                'name' => $linkName,
+                'link' => $link,
+                'target' => $target,
+                'exists' => $exists,
+            ];
+        }
+
+        return response()->json(['links' => $results]);
+    }
+
+    /**
+     * Fix/Create all symlinks from filesystems.php links config
+     */
+    public function fixAllSymlinks()
+    {
+        $links = config('filesystems.links', [
+            public_path('storage') => storage_path('app/public'),
+        ]);
+
+        $created = 0;
+        $skipped = 0;
+        $errors = [];
+
+        foreach ($links as $link => $target) {
+            // Check if link already exists and is valid
+            if (is_link($link) || (PHP_OS_FAMILY === 'Windows' && is_dir($link) && $this->isJunction($link))) {
+                $skipped++;
+                continue;
+            }
+
+            // Make sure target directory exists
+            if (!File::exists($target)) {
+                File::makeDirectory($target, 0755, true);
+            }
+
+            // Remove broken link or directory if exists
+            if (file_exists($link) || is_link($link)) {
+                if (is_link($link)) {
+                    if (PHP_OS_FAMILY === 'Windows') {
+                        @rmdir($link);
+                    } else {
+                        @unlink($link);
+                    }
+                } elseif (is_dir($link)) {
+                    // Don't remove regular directories - just report error
+                    $errors[] = basename($link) . ' هو مجلد عادي وليس رابط رمزي';
+                    continue;
+                }
+            }
+
+            try {
+                if (PHP_OS_FAMILY === 'Windows') {
+                    // Try junction first (doesn't require admin)
+                    $command = 'mklink /J "' . $link . '" "' . $target . '"';
+                    exec($command, $output, $returnVar);
+
+                    if ($returnVar !== 0) {
+                        // Try symlink as fallback
+                        $command = 'mklink /D "' . $link . '" "' . $target . '"';
+                        exec($command, $output, $returnVar);
+                    }
+
+                    if ($returnVar === 0) {
+                        $created++;
+                    } else {
+                        $errors[] = basename($link) . ' - فشل في الإنشاء';
+                    }
+                } else {
+                    symlink($target, $link);
+                    $created++;
+                }
+            } catch (\Exception $e) {
+                $errors[] = basename($link) . ' - ' . $e->getMessage();
+            }
+        }
+
+        $message = "تم إنشاء {$created} رابط، تم تخطي {$skipped} رابط موجود";
+        if (!empty($errors)) {
+            $message .= '. أخطاء: ' . implode(', ', $errors);
+        }
+
+        return response()->json([
+            'success' => empty($errors) || $created > 0,
+            'message' => $message,
+            'created' => $created,
+            'skipped' => $skipped,
+            'errors' => $errors,
         ]);
     }
 

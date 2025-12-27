@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Models\AppSetting;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -57,6 +58,10 @@ class UserSettingsResource extends JsonResource
                 'rtl_mode' => $this->rtl_mode,
                 'preferred_video_player' => $this->preferred_video_player,
             ],
+            'video_players' => [
+                'enabled_players' => $this->getEnabledVideoPlayers(),
+                'default_upload_player' => AppSetting::getDefaultUploadPlayer(),
+            ],
             'study_settings' => [
                 'daily_goal_minutes' => $this->daily_goal_minutes,
                 'show_streak_reminder' => $this->show_streak_reminder,
@@ -73,5 +78,24 @@ class UserSettingsResource extends JsonResource
                 'backup_frequency' => $this->backup_frequency,
             ],
         ];
+    }
+
+    /**
+     * Get list of enabled video players from app settings.
+     *
+     * @return array
+     */
+    private function getEnabledVideoPlayers(): array
+    {
+        $allPlayers = ['chewie', 'media_kit', 'simple_youtube', 'omni', 'orax'];
+        $enabledPlayers = [];
+
+        foreach ($allPlayers as $player) {
+            if (AppSetting::isVideoPlayerEnabled($player)) {
+                $enabledPlayers[] = $player;
+            }
+        }
+
+        return $enabledPlayers;
     }
 }

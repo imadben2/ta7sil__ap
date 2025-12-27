@@ -27,6 +27,7 @@ class _CoursesPageState extends State<CoursesPage>
   String? _selectedLevel;
   bool? _isFreeFilter;
   String _sortBy = 'created_at';
+  bool _hasLoadedData = false; // Prevent duplicate API calls
 
   @override
   void initState() {
@@ -37,9 +38,21 @@ class _CoursesPageState extends State<CoursesPage>
       duration: const Duration(milliseconds: 800),
     )..forward();
 
-    // Load featured courses and all courses
-    context.read<CoursesBloc>().add(const LoadFeaturedCoursesEvent());
-    context.read<CoursesBloc>().add(const LoadCoursesEvent());
+    // Load courses only once - prevent duplicate calls on widget rebuild
+    if (!_hasLoadedData) {
+      _hasLoadedData = true;
+      // Use addPostFrameCallback to ensure context is ready
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          final bloc = context.read<CoursesBloc>();
+          // Check if data is already loaded to avoid unnecessary API calls
+          if (bloc.state is CoursesInitial || bloc.state is CoursesError) {
+            // OPTIMIZED: Single API call for both featured and all courses
+            bloc.add(const LoadAllCoursesDataEvent());
+          }
+        }
+      });
+    }
   }
 
   @override
@@ -56,7 +69,8 @@ class _CoursesPageState extends State<CoursesPage>
 
     _debounceTimer = Timer(const Duration(milliseconds: 500), () {
       if (query.trim().isEmpty) {
-        context.read<CoursesBloc>().add(const LoadCoursesEvent());
+        // Reset to full data when search is cleared
+        context.read<CoursesBloc>().add(const LoadAllCoursesDataEvent());
       } else {
         context.read<CoursesBloc>().add(SearchCoursesEvent(query: query));
       }
@@ -81,9 +95,9 @@ class _CoursesPageState extends State<CoursesPage>
       body: SafeArea(
         child: RefreshIndicator(
           onRefresh: () async {
-            context.read<CoursesBloc>().add(const LoadFeaturedCoursesEvent());
-            context.read<CoursesBloc>().add(const LoadCoursesEvent());
-            await Future.delayed(const Duration(seconds: 1));
+            // OPTIMIZED: Single API call for refresh
+            context.read<CoursesBloc>().add(const LoadAllCoursesDataEvent());
+            await Future.delayed(const Duration(milliseconds: 500));
           },
           color: AppColors.blue500,
           child: CustomScrollView(
@@ -299,7 +313,8 @@ class _CoursesPageState extends State<CoursesPage>
 
   Widget _buildContent(CoursesState state) {
     if (state is CoursesLoaded) {
-      return _buildCoursesList(state.courses);
+      // Show both featured and all courses sections
+      return _buildBothSections(state);
     } else if (state is FeaturedCoursesLoaded) {
       return _buildFeaturedCoursesGrid(state.courses);
     } else if (state is CoursesSearchResultsLoaded) {
@@ -307,6 +322,146 @@ class _CoursesPageState extends State<CoursesPage>
     }
 
     return const SliverToBoxAdapter(child: SizedBox.shrink());
+  }
+
+  /// Build both Featured Courses and All Courses sections
+  Widget _buildBothSections(CoursesLoaded state) {
+    return SliverList(
+      delegate: SliverChildListDelegate([
+        // Featured Courses Section
+        if (state.featuredCourses.isNotEmpty) ...[
+          _buildSectionHeader(
+            title: 'الدورات المميزة',
+            icon: Icons.star_rounded,
+            iconColor: const Color(0xFFF59E0B),
+            onViewAll: () {
+              // Navigate to featured courses view
+            },
+          ),
+          SizedBox(
+            height: 260,
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              itemCount: state.featuredCourses.length,
+              itemBuilder: (context, index) {
+                final course = state.featuredCourses[index];
+                return Padding(
+                  padding: const EdgeInsets.only(left: 12),
+                  child: SizedBox(
+                    width: 180,
+                    child: _ModernCourseCard(
+                      course: course,
+                      onTap: () => context.push('/courses/${course.id}'),
+                      isFeatured: true,
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+          const SizedBox(height: 24),
+        ],
+
+        // All Courses Section
+        _buildSectionHeader(
+          title: 'جميع الدورات',
+          icon: Icons.grid_view_rounded,
+          iconColor: const Color(0xFF667EEA),
+          onViewAll: () {
+            // Already showing all
+          },
+        ),
+
+        // All Courses List
+        if (state.courses.isEmpty)
+          Padding(
+            padding: const EdgeInsets.all(20),
+            child: _buildEmptyState(),
+          )
+        else
+          ...state.courses.map((course) => Padding(
+                padding: const EdgeInsets.fromLTRB(20, 0, 20, 16),
+                child: _ModernCourseListItem(
+                  course: course,
+                  onTap: () => context.push('/courses/${course.id}'),
+                ),
+              )),
+
+        const SizedBox(height: 100),
+      ]),
+    );
+  }
+
+  /// Build section header with title and view all button
+  Widget _buildSectionHeader({
+    required String title,
+    required IconData icon,
+    required Color iconColor,
+    VoidCallback? onViewAll,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 8, 20, 16),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          // View All Button
+          GestureDetector(
+            onTap: onViewAll,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              decoration: BoxDecoration(
+                color: const Color(0xFFF1F5F9),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    Icons.arrow_back_ios_rounded,
+                    size: 12,
+                    color: const Color(0xFF667EEA),
+                  ),
+                  const SizedBox(width: 4),
+                  Text(
+                    'عرض الكل',
+                    style: TextStyle(
+                      fontFamily: 'Cairo',
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: const Color(0xFF667EEA),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          // Title
+          Row(
+            children: [
+              Text(
+                title,
+                style: const TextStyle(
+                  fontFamily: 'Cairo',
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF1E293B),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: iconColor.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Icon(icon, size: 20, color: iconColor),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
   }
 
   Widget _buildFeaturedCoursesGrid(List<CourseEntity> courses) {
@@ -563,7 +718,7 @@ class _CoursesPageState extends State<CoursesPage>
             const SizedBox(height: 24),
             GestureDetector(
               onTap: () {
-                context.read<CoursesBloc>().add(const LoadCoursesEvent());
+                context.read<CoursesBloc>().add(const LoadAllCoursesDataEvent());
               },
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 14),

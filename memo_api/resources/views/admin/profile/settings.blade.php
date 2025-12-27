@@ -588,6 +588,252 @@
                     </div>
                 </div>
 
+                <!-- Video Players Settings -->
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+                    <div class="bg-gradient-to-r from-rose-500 to-pink-600 px-6 py-4">
+                        <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                            <i class="fas fa-play-circle"></i>
+                            إعدادات مشغلات الفيديو
+                        </h2>
+                    </div>
+
+                    <div class="p-6 space-y-6">
+                        <!-- Info Box -->
+                        <div class="bg-rose-50 border border-rose-200 rounded-xl p-4">
+                            <div class="flex items-start gap-3">
+                                <i class="fas fa-info-circle text-rose-600 text-xl mt-1"></i>
+                                <div>
+                                    <h4 class="font-bold text-rose-800 mb-1">معلومات عن المشغلات</h4>
+                                    <p class="text-sm text-rose-700">
+                                        يمكنك تفعيل أو تعطيل مشغلات الفيديو المتاحة في التطبيق.
+                                        المشغلات المعطلة لن تظهر للمستخدمين في إعدادات التطبيق.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Video Players List -->
+                        <div>
+                            <h3 class="text-lg font-bold text-gray-900 mb-4">المشغلات المتاحة</h3>
+                            <div class="space-y-3">
+                                @php
+                                    $videoPlayers = [
+                                        [
+                                            'id' => 'chewie',
+                                            'name' => 'Chewie',
+                                            'description' => 'مشغل بسيط وموثوق للفيديوهات المرفوعة (MP4, HLS)',
+                                            'icon' => 'video',
+                                            'color' => 'blue',
+                                            'supports_youtube' => false,
+                                            'supports_upload' => true,
+                                            'default' => true,
+                                        ],
+                                        [
+                                            'id' => 'media_kit',
+                                            'name' => 'Media Kit',
+                                            'description' => 'مشغل متقدم مع دعم للجودات المتعددة',
+                                            'icon' => 'film',
+                                            'color' => 'purple',
+                                            'supports_youtube' => false,
+                                            'supports_upload' => true,
+                                            'default' => false,
+                                        ],
+                                        [
+                                            'id' => 'simple_youtube',
+                                            'name' => 'YouTube Player',
+                                            'description' => 'مشغل مخصص لفيديوهات يوتيوب',
+                                            'icon' => 'youtube',
+                                            'icon_type' => 'fab',
+                                            'color' => 'red',
+                                            'supports_youtube' => true,
+                                            'supports_upload' => false,
+                                            'default' => true,
+                                        ],
+                                        [
+                                            'id' => 'omni',
+                                            'name' => 'Omni Player',
+                                            'description' => 'مشغل شامل يدعم معظم صيغ الفيديو',
+                                            'icon' => 'play',
+                                            'color' => 'green',
+                                            'supports_youtube' => true,
+                                            'supports_upload' => true,
+                                            'default' => false,
+                                        ],
+                                        [
+                                            'id' => 'orax',
+                                            'name' => 'Orax Player',
+                                            'description' => 'مشغل متخصص بدعم يوتيوب محسّن',
+                                            'icon' => 'cog',
+                                            'color' => 'orange',
+                                            'supports_youtube' => true,
+                                            'supports_upload' => true,
+                                            'default' => false,
+                                        ],
+                                    ];
+                                @endphp
+
+                                @foreach($videoPlayers as $player)
+                                <div class="p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-all border-2 border-transparent hover:border-{{ $player['color'] }}-200">
+                                    <div class="flex items-center justify-between">
+                                        <div class="flex items-center gap-4">
+                                            <div class="w-14 h-14 bg-{{ $player['color'] }}-100 rounded-xl flex items-center justify-center">
+                                                <i class="{{ $player['icon_type'] ?? 'fas' }} fa-{{ $player['icon'] }} text-2xl text-{{ $player['color'] }}-600"></i>
+                                            </div>
+                                            <div>
+                                                <div class="flex items-center gap-2">
+                                                    <p class="font-bold text-gray-900 text-lg">{{ $player['name'] }}</p>
+                                                    @if($player['default'])
+                                                        <span class="px-2 py-0.5 text-xs font-bold rounded-full bg-{{ $player['color'] }}-100 text-{{ $player['color'] }}-700">افتراضي</span>
+                                                    @endif
+                                                </div>
+                                                <p class="text-sm text-gray-600 mt-1">{{ $player['description'] }}</p>
+                                            </div>
+                                        </div>
+                                        <label class="relative inline-flex items-center cursor-pointer">
+                                            <input type="checkbox" name="video_player_{{ $player['id'] }}_enabled" value="1"
+                                                   {{ ($videoPlayerSettings[$player['id'].'_enabled'] ?? $player['default']) ? 'checked' : '' }}
+                                                   class="sr-only peer">
+                                            <div class="w-14 h-7 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-{{ $player['color'] }}-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-{{ $player['color'] }}-600"></div>
+                                        </label>
+                                    </div>
+                                    <!-- Video Type Support Selection -->
+                                    <div class="mt-4 pt-4 border-t border-gray-200">
+                                        <label class="block text-sm font-bold text-gray-700 mb-2">
+                                            <i class="fas fa-video text-{{ $player['color'] }}-500 ml-1"></i>
+                                            نوع الفيديو المدعوم
+                                        </label>
+                                        <select name="video_player_{{ $player['id'] }}_supports"
+                                                class="w-full px-3 py-2 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-{{ $player['color'] }}-500 focus:border-{{ $player['color'] }}-500 text-sm">
+                                            @php
+                                                $currentSupport = $videoPlayerSettings[$player['id'].'_supports'] ??
+                                                    (($player['supports_youtube'] && $player['supports_upload']) ? 'both' :
+                                                    ($player['supports_youtube'] ? 'youtube' : 'upload'));
+                                            @endphp
+                                            <option value="both" {{ $currentSupport === 'both' ? 'selected' : '' }}>
+                                                الكل (YouTube + مرفوع)
+                                            </option>
+                                            <option value="youtube" {{ $currentSupport === 'youtube' ? 'selected' : '' }}>
+                                                YouTube فقط
+                                            </option>
+                                            <option value="upload" {{ $currentSupport === 'upload' ? 'selected' : '' }}>
+                                                مرفوع فقط
+                                            </option>
+                                        </select>
+                                        <div class="flex items-center gap-3 mt-2">
+                                            @php
+                                                $supportsYoutube = $currentSupport === 'both' || $currentSupport === 'youtube';
+                                                $supportsUpload = $currentSupport === 'both' || $currentSupport === 'upload';
+                                            @endphp
+                                            @if($supportsYoutube)
+                                                <span class="inline-flex items-center gap-1 text-xs text-red-600 bg-red-50 px-2 py-1 rounded-full">
+                                                    <i class="fab fa-youtube"></i> YouTube
+                                                </span>
+                                            @endif
+                                            @if($supportsUpload)
+                                                <span class="inline-flex items-center gap-1 text-xs text-blue-600 bg-blue-50 px-2 py-1 rounded-full">
+                                                    <i class="fas fa-upload"></i> مرفوع
+                                                </span>
+                                            @endif
+                                        </div>
+                                    </div>
+                                </div>
+                                @endforeach
+                            </div>
+                        </div>
+
+                        <!-- Default Upload Player Selection -->
+                        <div class="border-t border-gray-200 pt-6">
+                            <h3 class="text-lg font-bold text-gray-900 mb-4">
+                                <i class="fas fa-upload text-blue-500 ml-2"></i>
+                                المشغل الافتراضي للفيديوهات المرفوعة
+                            </h3>
+                            <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                                @php
+                                    // Filter players that support upload based on dynamic settings
+                                    $uploadPlayers = array_filter($videoPlayers, function($p) use ($videoPlayerSettings) {
+                                        $supports = $videoPlayerSettings[$p['id'].'_supports'] ??
+                                            (($p['supports_youtube'] && $p['supports_upload']) ? 'both' :
+                                            ($p['supports_youtube'] ? 'youtube' : 'upload'));
+                                        return $supports === 'both' || $supports === 'upload';
+                                    });
+                                @endphp
+                                @foreach($uploadPlayers as $player)
+                                <label class="relative cursor-pointer">
+                                    <input type="radio" name="default_upload_player" value="{{ $player['id'] }}"
+                                           {{ ($videoPlayerSettings['default_upload_player'] ?? 'chewie') === $player['id'] ? 'checked' : '' }}
+                                           class="sr-only peer">
+                                    <div class="p-4 border-2 border-gray-200 rounded-xl peer-checked:border-{{ $player['color'] }}-600 peer-checked:bg-{{ $player['color'] }}-50 hover:border-{{ $player['color'] }}-300 transition-all">
+                                        <div class="flex flex-col items-center gap-2">
+                                            <div class="w-12 h-12 bg-{{ $player['color'] }}-100 rounded-lg flex items-center justify-center">
+                                                <i class="{{ $player['icon_type'] ?? 'fas' }} fa-{{ $player['icon'] }} text-xl text-{{ $player['color'] }}-600"></i>
+                                            </div>
+                                            <span class="font-semibold text-sm">{{ $player['name'] }}</span>
+                                        </div>
+                                    </div>
+                                </label>
+                                @endforeach
+                            </div>
+                            <p class="text-sm text-gray-500 mt-3">
+                                <i class="fas fa-info-circle text-blue-500 ml-1"></i>
+                                هذا المشغل سيُستخدم افتراضياً لتشغيل الفيديوهات المرفوعة (غير يوتيوب)
+                            </p>
+                        </div>
+
+                        <!-- Default YouTube Player Selection -->
+                        <div class="border-t border-gray-200 pt-6">
+                            <h3 class="text-lg font-bold text-gray-900 mb-4">
+                                <i class="fab fa-youtube text-red-500 ml-2"></i>
+                                المشغل الافتراضي لفيديوهات YouTube
+                            </h3>
+                            <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                                @php
+                                    // Filter players that support YouTube based on dynamic settings
+                                    $youtubePlayers = array_filter($videoPlayers, function($p) use ($videoPlayerSettings) {
+                                        $supports = $videoPlayerSettings[$p['id'].'_supports'] ??
+                                            (($p['supports_youtube'] && $p['supports_upload']) ? 'both' :
+                                            ($p['supports_youtube'] ? 'youtube' : 'upload'));
+                                        return $supports === 'both' || $supports === 'youtube';
+                                    });
+                                @endphp
+                                @foreach($youtubePlayers as $player)
+                                <label class="relative cursor-pointer">
+                                    <input type="radio" name="default_youtube_player" value="{{ $player['id'] }}"
+                                           {{ ($videoPlayerSettings['default_youtube_player'] ?? 'simple_youtube') === $player['id'] ? 'checked' : '' }}
+                                           class="sr-only peer">
+                                    <div class="p-4 border-2 border-gray-200 rounded-xl peer-checked:border-{{ $player['color'] }}-600 peer-checked:bg-{{ $player['color'] }}-50 hover:border-{{ $player['color'] }}-300 transition-all">
+                                        <div class="flex flex-col items-center gap-2">
+                                            <div class="w-12 h-12 bg-{{ $player['color'] }}-100 rounded-lg flex items-center justify-center">
+                                                <i class="{{ $player['icon_type'] ?? 'fas' }} fa-{{ $player['icon'] }} text-xl text-{{ $player['color'] }}-600"></i>
+                                            </div>
+                                            <span class="font-semibold text-sm">{{ $player['name'] }}</span>
+                                        </div>
+                                    </div>
+                                </label>
+                                @endforeach
+                            </div>
+                            <p class="text-sm text-gray-500 mt-3">
+                                <i class="fas fa-info-circle text-red-500 ml-1"></i>
+                                هذا المشغل سيُستخدم افتراضياً لتشغيل فيديوهات YouTube
+                            </p>
+                        </div>
+
+                        <!-- Warning Box -->
+                        <div class="bg-amber-50 border border-amber-200 rounded-xl p-4">
+                            <div class="flex items-start gap-3">
+                                <i class="fas fa-exclamation-triangle text-amber-600 text-xl mt-1"></i>
+                                <div>
+                                    <h4 class="font-bold text-amber-800 mb-1">ملاحظة مهمة</h4>
+                                    <ul class="text-sm text-amber-700 space-y-1 list-disc list-inside">
+                                        <li>تعطيل مشغل قيد الاستخدام سيجعل المستخدمين يرجعون للمشغل الافتراضي</li>
+                                        <li>يُنصح بإبقاء مشغل واحد على الأقل لكل نوع فيديو (YouTube / مرفوع)</li>
+                                        <li>فيديوهات YouTube تحتاج مشغل يدعمها (YouTube Player, Omni, Orax)</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Study Settings -->
                 <div class="bg-white rounded-xl shadow-lg overflow-hidden">
                     <div class="bg-gradient-to-r from-orange-500 to-orange-600 px-6 py-4">
@@ -705,6 +951,128 @@
                             </label>
                         </div>
                         @endforeach
+                    </div>
+                </div>
+
+                <!-- Custom Symlinks Management -->
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+                    <div class="bg-gradient-to-r from-violet-500 to-violet-600 px-6 py-4">
+                        <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                            <i class="fas fa-project-diagram"></i>
+                            روابط رمزية مخصصة (Custom Symlinks)
+                        </h2>
+                    </div>
+
+                    <div class="p-6 space-y-4">
+                        <div class="bg-violet-50 border border-violet-200 rounded-xl p-4 mb-4">
+                            <div class="flex items-start gap-3">
+                                <i class="fas fa-info-circle text-violet-600 text-xl mt-1"></i>
+                                <div>
+                                    <h4 class="font-bold text-violet-800 mb-1">ما هي الروابط الرمزية المخصصة؟</h4>
+                                    <p class="text-sm text-violet-700">
+                                        تتيح لك إنشاء روابط رمزية (Junction/Symlink) من مجلدات خارجية إلى مجلد
+                                        <code class="bg-violet-100 px-1 rounded">storage/app/public</code>
+                                        لإتاحة الوصول للملفات عبر الويب دون نسخها.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Existing Symlinks List -->
+                        <div id="symlinks-list" class="space-y-3">
+                            <div class="flex items-center justify-center py-4">
+                                <i class="fas fa-spinner fa-spin text-violet-500 text-xl"></i>
+                                <span class="mr-2 text-gray-600">جاري تحميل الروابط...</span>
+                            </div>
+                        </div>
+
+                        <!-- Add New Symlink Form -->
+                        <div class="border-t border-gray-200 pt-4 mt-4">
+                            <h4 class="font-bold text-gray-800 mb-3 flex items-center gap-2">
+                                <i class="fas fa-plus-circle text-violet-500"></i>
+                                إضافة رابط رمزي جديد
+                            </h4>
+                            <div class="space-y-3">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">اسم الرابط (سيظهر في storage)</label>
+                                    <input type="text" id="symlink-name" placeholder="مثال: tahfid_videos"
+                                           class="w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-violet-500 focus:border-violet-500">
+                                    <p class="text-xs text-gray-500 mt-1">سيتم إنشاء الرابط في: storage/app/public/courses/videos/[الاسم]</p>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">المسار المصدر (المجلد الأصلي)</label>
+                                    <input type="text" id="symlink-source" placeholder="مثال: H:\Nouveau dossier (27)\his"
+                                           dir="ltr"
+                                           class="w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-violet-500 focus:border-violet-500 font-mono text-sm">
+                                </div>
+                                <button type="button" onclick="createCustomSymlink()"
+                                        class="w-full px-4 py-2 bg-violet-600 hover:bg-violet-700 text-white rounded-lg font-bold transition-all">
+                                    <i class="fas fa-link ml-1"></i>
+                                    إنشاء الرابط الرمزي
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 mt-4">
+                            <div class="flex items-start gap-3">
+                                <i class="fas fa-exclamation-triangle text-amber-600 text-xl mt-1"></i>
+                                <div>
+                                    <h4 class="font-bold text-amber-800 mb-1">ملاحظات مهمة</h4>
+                                    <ul class="text-sm text-amber-700 space-y-1 list-disc list-inside">
+                                        <li>تأكد من وجود المجلد المصدر قبل إنشاء الرابط</li>
+                                        <li>على Windows يتطلب صلاحيات المسؤول أو تفعيل Developer Mode</li>
+                                        <li>الروابط الرمزية لا تنسخ الملفات - بل تشير إليها</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- All Symlinks Management -->
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+                    <div class="bg-gradient-to-r from-emerald-500 to-emerald-600 px-6 py-4">
+                        <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                            <i class="fas fa-magic"></i>
+                            إصلاح جميع الروابط الرمزية
+                        </h2>
+                    </div>
+
+                    <div class="p-6 space-y-4">
+                        <div class="bg-emerald-50 border border-emerald-200 rounded-xl p-4 mb-4">
+                            <div class="flex items-start gap-3">
+                                <i class="fas fa-info-circle text-emerald-600 text-xl mt-1"></i>
+                                <div>
+                                    <h4 class="font-bold text-emerald-800 mb-1">إصلاح شامل</h4>
+                                    <p class="text-sm text-emerald-700">
+                                        هذا الزر يقوم بفحص وإنشاء جميع الروابط الرمزية المطلوبة للتطبيق (storage link + أي روابط مخصصة في إعدادات filesystems.php).
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="all-symlinks-status" class="space-y-3">
+                            <!-- Status will be loaded here -->
+                        </div>
+
+                        <button type="button" id="fix-all-symlinks-btn" onclick="fixAllSymlinks()"
+                                class="w-full px-6 py-4 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white rounded-xl font-bold shadow-lg transition-all flex items-center justify-center gap-3">
+                            <i class="fas fa-wrench text-xl"></i>
+                            <span>إصلاح/إنشاء جميع الروابط الرمزية</span>
+                        </button>
+
+                        <div class="bg-blue-50 border border-blue-200 rounded-xl p-4 mt-4">
+                            <div class="flex items-start gap-3">
+                                <i class="fas fa-list-check text-blue-600 text-xl mt-1"></i>
+                                <div>
+                                    <h4 class="font-bold text-blue-800 mb-2">الروابط المشمولة:</h4>
+                                    <ul class="text-sm text-blue-700 space-y-1 list-disc list-inside">
+                                        <li><code class="bg-blue-100 px-1 rounded">public/storage</code> → <code class="bg-blue-100 px-1 rounded">storage/app/public</code></li>
+                                        <li>أي روابط مخصصة في إعدادات filesystems.php</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -1022,7 +1390,240 @@ function showToast(type, message) {
 // Check storage link on page load
 document.addEventListener('DOMContentLoaded', function() {
     checkStorageLink();
+    loadCustomSymlinks();
+    checkAllSymlinks();
 });
+
+// Fix All Symlinks Functions
+function checkAllSymlinks() {
+    const container = document.getElementById('all-symlinks-status');
+    container.innerHTML = `
+        <div class="flex items-center justify-center py-4">
+            <i class="fas fa-spinner fa-spin text-emerald-500 text-xl ml-2"></i>
+            <span class="text-gray-600">جاري فحص الروابط الرمزية...</span>
+        </div>
+    `;
+
+    fetch('{{ route("admin.symlinks.check-all") }}')
+        .then(response => response.json())
+        .then(data => {
+            renderAllSymlinksStatus(data.links);
+        })
+        .catch(error => {
+            container.innerHTML = `
+                <div class="p-4 bg-red-50 border border-red-200 rounded-lg text-red-700 text-center">
+                    <i class="fas fa-exclamation-circle ml-1"></i>
+                    حدث خطأ أثناء فحص الروابط
+                </div>
+            `;
+        });
+}
+
+function renderAllSymlinksStatus(links) {
+    const container = document.getElementById('all-symlinks-status');
+
+    if (!links || links.length === 0) {
+        container.innerHTML = `
+            <div class="p-4 bg-gray-50 border border-gray-200 rounded-lg text-gray-600 text-center">
+                <i class="fas fa-check-circle text-2xl mb-2"></i>
+                <p>لا توجد روابط مطلوبة</p>
+            </div>
+        `;
+        return;
+    }
+
+    let html = '';
+    links.forEach(link => {
+        const statusColor = link.exists ? 'green' : 'red';
+        const statusIcon = link.exists ? 'check-circle' : 'times-circle';
+        const statusText = link.exists ? 'موجود' : 'غير موجود';
+
+        html += `
+            <div class="p-3 bg-gray-50 border border-gray-200 rounded-lg">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 bg-${statusColor}-100 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-${statusIcon} text-${statusColor}-600"></i>
+                        </div>
+                        <div>
+                            <p class="font-bold text-gray-800 text-sm">${link.name}</p>
+                            <p class="text-xs text-gray-500" dir="ltr">${link.link} → ${link.target}</p>
+                        </div>
+                    </div>
+                    <span class="px-2 py-1 text-xs font-bold rounded-full bg-${statusColor}-100 text-${statusColor}-700">
+                        ${statusText}
+                    </span>
+                </div>
+            </div>
+        `;
+    });
+
+    container.innerHTML = html;
+}
+
+function fixAllSymlinks() {
+    const btn = document.getElementById('fix-all-symlinks-btn');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin text-xl ml-2"></i><span>جاري الإصلاح...</span>';
+
+    fetch('{{ route("admin.symlinks.fix-all") }}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showToast('success', data.message);
+            // Re-check all symlinks status
+            checkAllSymlinks();
+            checkStorageLink();
+        } else {
+            showToast('error', data.message);
+        }
+    })
+    .catch(error => {
+        showToast('error', 'حدث خطأ أثناء الإصلاح');
+    })
+    .finally(() => {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-wrench text-xl"></i><span>إصلاح/إنشاء جميع الروابط الرمزية</span>';
+    });
+}
+
+// Custom Symlinks Functions
+function loadCustomSymlinks() {
+    fetch('{{ route("admin.symlinks.list") }}')
+        .then(response => response.json())
+        .then(data => {
+            renderSymlinksList(data.symlinks);
+        })
+        .catch(error => {
+            document.getElementById('symlinks-list').innerHTML = `
+                <div class="p-4 bg-red-50 border border-red-200 rounded-lg text-red-700 text-center">
+                    <i class="fas fa-exclamation-circle ml-1"></i>
+                    حدث خطأ أثناء تحميل الروابط
+                </div>
+            `;
+        });
+}
+
+function renderSymlinksList(symlinks) {
+    const container = document.getElementById('symlinks-list');
+
+    if (!symlinks || symlinks.length === 0) {
+        container.innerHTML = `
+            <div class="p-4 bg-gray-50 border border-gray-200 rounded-lg text-gray-600 text-center">
+                <i class="fas fa-folder-open text-2xl mb-2"></i>
+                <p>لا توجد روابط رمزية مخصصة</p>
+            </div>
+        `;
+        return;
+    }
+
+    let html = '';
+    symlinks.forEach(link => {
+        const statusColor = link.valid ? 'green' : 'red';
+        const statusIcon = link.valid ? 'check-circle' : 'exclamation-circle';
+        const statusText = link.valid ? 'نشط' : 'غير صالح';
+
+        html += `
+            <div class="p-4 bg-gray-50 border border-gray-200 rounded-lg hover:border-violet-300 transition-all">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 bg-${statusColor}-100 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-${statusIcon} text-${statusColor}-600"></i>
+                        </div>
+                        <div>
+                            <p class="font-bold text-gray-800">${link.name}</p>
+                            <p class="text-xs text-gray-500" dir="ltr">${link.target || 'غير معروف'}</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="px-2 py-1 text-xs font-bold rounded-full bg-${statusColor}-100 text-${statusColor}-700">
+                            ${statusText}
+                        </span>
+                        <button onclick="deleteSymlink('${link.name}')" class="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-all" title="حذف الرابط">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+    });
+
+    container.innerHTML = html;
+}
+
+function createCustomSymlink() {
+    const name = document.getElementById('symlink-name').value.trim();
+    const source = document.getElementById('symlink-source').value.trim();
+
+    if (!name || !source) {
+        showToast('error', 'يرجى ملء جميع الحقول');
+        return;
+    }
+
+    const btn = event.target;
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin ml-1"></i> جاري الإنشاء...';
+
+    fetch('{{ route("admin.symlinks.create") }}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+        },
+        body: JSON.stringify({ name: name, source: source })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showToast('success', data.message);
+            document.getElementById('symlink-name').value = '';
+            document.getElementById('symlink-source').value = '';
+            loadCustomSymlinks();
+        } else {
+            showToast('error', data.message);
+        }
+    })
+    .catch(error => {
+        showToast('error', 'حدث خطأ أثناء إنشاء الرابط');
+    })
+    .finally(() => {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-link ml-1"></i> إنشاء الرابط الرمزي';
+    });
+}
+
+function deleteSymlink(name) {
+    if (!confirm(`هل أنت متأكد من حذف الرابط "${name}"؟`)) {
+        return;
+    }
+
+    fetch('{{ route("admin.symlinks.delete") }}', {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+        },
+        body: JSON.stringify({ name: name })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showToast('success', data.message);
+            loadCustomSymlinks();
+        } else {
+            showToast('error', data.message);
+        }
+    })
+    .catch(error => {
+        showToast('error', 'حدث خطأ أثناء حذف الرابط');
+    });
+}
 </script>
 @endpush
 @endsection

@@ -24,6 +24,7 @@ class Course extends Model
         'thumbnail_url',
         'trailer_video_url',
         'trailer_video_type',
+        'allowed_video_type',
         'subject_id',
         'level',
         'tags',

@@ -38,6 +38,7 @@ class CourseLesson extends Model
         'is_published' => 'boolean',
     ];
 
+
     // Relationships
     public function module(): BelongsTo
     {
@@ -60,6 +61,82 @@ class CourseLesson extends Model
     }
 
     // Helper methods
+
+    /**
+     * Accessor for video_url that returns full URL for uploaded videos.
+     * This ensures the API always returns playable URLs.
+     *
+     * @return string|null
+     */
+    public function getVideoUrlAttribute($value): ?string
+    {
+        if (!$value) {
+            return null;
+        }
+
+        // YouTube videos - return as-is (already full URL)
+        if ($this->attributes['video_type'] === 'youtube') {
+            return $value;
+        }
+
+        // Uploaded videos - convert relative path to full URL
+        if ($this->attributes['video_type'] === 'upload') {
+            // Already a full URL
+            if (str_starts_with($value, 'http://') || str_starts_with($value, 'https://')) {
+                return $value;
+            }
+
+            // Get base URL - detect if web browser request or API request
+            $baseUrl = $this->getBaseUrlForContext();
+
+            // Relative storage path starting with /storage
+            if (str_starts_with($value, '/storage')) {
+                return $baseUrl . $value;
+            }
+
+            // Storage path without leading slash
+            if (str_starts_with($value, 'storage/')) {
+                return $baseUrl . '/' . $value;
+            }
+
+            // Fallback: assume it's in public storage
+            return $baseUrl . '/storage/' . ltrim($value, '/');
+        }
+
+        // Other types (hls, etc.) - return as-is
+        return $value;
+    }
+
+    /**
+     * Get the appropriate base URL based on context.
+     * For admin panel (web), use the request URL.
+     * For API (mobile app), use APP_URL from config.
+     *
+     * @return string
+     */
+    private function getBaseUrlForContext(): string
+    {
+        $request = request();
+
+        // Check if this is a web/admin request (not API)
+        if ($request && !$request->is('api/*')) {
+            // Use the current request's scheme and host for admin panel
+            $scheme = $request->getScheme();
+            $host = $request->getHost();
+            $port = $request->getPort();
+
+            // Only add port if it's not default (80 for http, 443 for https)
+            if (($scheme === 'http' && $port != 80) || ($scheme === 'https' && $port != 443)) {
+                return "{$scheme}://{$host}:{$port}";
+            }
+
+            return "{$scheme}://{$host}";
+        }
+
+        // For API requests, use APP_URL (configured for mobile app)
+        return rtrim(config('app.url'), '/');
+    }
+
     public function getSignedVideoUrl(int $expiresInMinutes = 60): string
     {
         if ($this->video_type === 'youtube') {

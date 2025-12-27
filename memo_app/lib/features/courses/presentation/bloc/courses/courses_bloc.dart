@@ -6,6 +6,7 @@ import '../../../domain/usecases/get_course_details_usecase.dart';
 import '../../../domain/usecases/get_course_modules_usecase.dart';
 import '../../../domain/usecases/get_courses_usecase.dart';
 import '../../../domain/usecases/get_featured_courses_usecase.dart';
+import '../../../domain/usecases/get_complete_courses_usecase.dart';
 import '../../../domain/usecases/get_course_reviews_usecase.dart';
 import 'courses_event.dart';
 import 'courses_state.dart';
@@ -13,6 +14,7 @@ import 'courses_state.dart';
 class CoursesBloc extends Bloc<CoursesEvent, CoursesState> {
   final GetCoursesUseCase getCoursesUseCase;
   final GetFeaturedCoursesUseCase getFeaturedCoursesUseCase;
+  final GetCompleteCoursesUseCase getCompleteCoursesUseCase;
   final GetCourseDetailsUseCase getCourseDetailsUseCase;
   final GetCourseModulesUseCase getCourseModulesUseCase;
   final CheckCourseAccessUseCase checkCourseAccessUseCase;
@@ -21,11 +23,13 @@ class CoursesBloc extends Bloc<CoursesEvent, CoursesState> {
   CoursesBloc({
     required this.getCoursesUseCase,
     required this.getFeaturedCoursesUseCase,
+    required this.getCompleteCoursesUseCase,
     required this.getCourseDetailsUseCase,
     required this.getCourseModulesUseCase,
     required this.checkCourseAccessUseCase,
     this.getCourseReviewsUseCase,
   }) : super(CoursesInitial()) {
+    on<LoadAllCoursesDataEvent>(_onLoadAllCoursesData);
     on<LoadCoursesEvent>(_onLoadCourses);
     on<LoadFeaturedCoursesEvent>(_onLoadFeaturedCourses);
     on<LoadCourseDetailsEvent>(_onLoadCourseDetails);
@@ -40,6 +44,39 @@ class CoursesBloc extends Bloc<CoursesEvent, CoursesState> {
   }
 
   // ========== Browse & Discover Handlers ==========
+
+  /// OPTIMIZED: Load all courses data in single API call
+  Future<void> _onLoadAllCoursesData(
+    LoadAllCoursesDataEvent event,
+    Emitter<CoursesState> emit,
+  ) async {
+    emit(CoursesLoading());
+
+    final result = await getCompleteCoursesUseCase(
+      GetCompleteCoursesParams(
+        search: event.search,
+        subjectId: event.subjectId,
+        level: event.level,
+        isFree: event.isFree,
+        sortBy: event.sortBy,
+        sortOrder: event.sortOrder,
+        page: event.page,
+        perPage: event.perPage,
+      ),
+    );
+
+    result.fold(
+      (failure) => emit(CoursesError(message: failure.message)),
+      (data) => emit(
+        CoursesLoaded(
+          courses: data.courses,
+          featuredCourses: data.featuredCourses,
+          currentPage: data.currentPage,
+          hasMorePages: data.currentPage < data.lastPage,
+        ),
+      ),
+    );
+  }
 
   Future<void> _onLoadCourses(
     LoadCoursesEvent event,

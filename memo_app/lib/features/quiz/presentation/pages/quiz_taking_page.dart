@@ -53,10 +53,16 @@ class _QuizTakingPageState extends State<QuizTakingPage> {
         if (state is QuizAttemptSubmitted) {
           context.go('/quiz/results/${state.result.attemptId}');
         } else if (state is QuizAttemptAbandoned) {
-          context.pop();
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(const SnackBar(content: Text('تم إلغاء الاختبار')));
+          // Navigate back to quiz detail page
+          context.go('/quiz/${state.quizId}');
+          // Show snackbar after a short delay to ensure the new page is mounted
+          Future.delayed(const Duration(milliseconds: 100), () {
+            if (context.mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('تم إلغاء الاختبار')),
+              );
+            }
+          });
         } else if (state is QuizAttemptError) {
           // Show error message for any failures
           ScaffoldMessenger.of(

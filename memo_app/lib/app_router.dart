@@ -253,7 +253,7 @@ class AppRouter {
               ),
               BlocProvider(
                 create: (context) =>
-                    sl<CoursesBloc>()..add(const LoadFeaturedCoursesEvent(limit: 5)),
+                    sl<CoursesBloc>()..add(const LoadAllCoursesDataEvent()),
               ),
             ],
             child: const MainScreen(),

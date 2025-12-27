@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../../../../core/constants/app_colors.dart';
+import '../../../../injection_container.dart';
 import '../../domain/entities/course_lesson_entity.dart';
+import '../../../profile/domain/usecases/get_settings_usecase.dart';
 import '../../../videoplayer/videoplayer.dart';
 
 /// Video Player Page for Courses
@@ -24,10 +26,50 @@ class VideoPlayerPage extends StatefulWidget {
 class _VideoPlayerPageState extends State<VideoPlayerPage> {
   late int _currentLessonIndex;
 
+  // Video player settings
+  String _preferredVideoPlayer = 'chewie';
+  bool _settingsLoaded = false;
+
   @override
   void initState() {
     super.initState();
     _currentLessonIndex = _findCurrentLessonIndex();
+    _loadPreferredVideoPlayer();
+  }
+
+  Future<void> _loadPreferredVideoPlayer() async {
+    debugPrint('🔄 Loading video player settings...');
+    try {
+      final getSettingsUseCase = sl<GetSettingsUseCase>();
+      debugPrint('🔄 Got GetSettingsUseCase, calling...');
+      final result = await getSettingsUseCase();
+      result.fold(
+        (failure) {
+          debugPrint('❌ Failed to load video player settings: ${failure.message}');
+          if (mounted) {
+            setState(() {
+              _settingsLoaded = true;
+            });
+          }
+        },
+        (settings) {
+          if (mounted) {
+            setState(() {
+              _preferredVideoPlayer = settings.preferredVideoPlayer;
+              _settingsLoaded = true;
+            });
+            debugPrint('✅ Loaded preferred video player: $_preferredVideoPlayer');
+          }
+        },
+      );
+    } catch (e) {
+      debugPrint('❌ Error loading video player settings: $e');
+      if (mounted) {
+        setState(() {
+          _settingsLoaded = true;
+        });
+      }
+    }
   }
 
   int _findCurrentLessonIndex() {
@@ -70,8 +112,40 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
 
   @override
   Widget build(BuildContext context) {
+    debugPrint('🔨 Building VideoPlayerPage - settingsLoaded: $_settingsLoaded, preferredPlayer: $_preferredVideoPlayer');
+    // Wait for settings to load before creating video config
+    if (!_settingsLoaded) {
+      return Directionality(
+        textDirection: TextDirection.rtl,
+        child: Scaffold(
+          backgroundColor: Colors.black,
+          appBar: AppBar(
+            backgroundColor: Colors.black,
+            elevation: 0,
+            leading: IconButton(
+              icon: const Icon(Icons.arrow_back_ios_rounded, color: Colors.white),
+              onPressed: () => Navigator.of(context).pop(),
+            ),
+          ),
+          body: const Center(
+            child: CircularProgressIndicator(color: AppColors.emerald500),
+          ),
+        ),
+      );
+    }
+
+    // Choose player based on video type:
+    // - YouTube videos → use simple_youtube player
+    // - Uploaded videos → use user's preferred player (chewie, media_kit, etc.)
+    final effectivePlayer = _currentLesson.videoType == 'youtube'
+        ? 'simple_youtube'
+        : _preferredVideoPlayer;
+
+    debugPrint('🎬 Video type: ${_currentLesson.videoType}, using player: $effectivePlayer');
+
     final config = VideoConfig.course(
       videoUrl: _currentLesson.videoUrl ?? '',
+      preferredPlayer: effectivePlayer,
       accentColorValue: AppColors.emerald500.toARGB32(),
     );
 

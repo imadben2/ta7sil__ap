@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
@@ -64,18 +65,29 @@ class DioClient {
   /// GET request with automatic deduplication
   /// If the same request is already in-flight, returns the pending Future
   /// instead of making a duplicate request
+  ///
+  /// Note: Deduplication key is based on path + original query params
+  /// (excludes year_id, stream_id which are added by AuthInterceptor)
   Future<Response> get(
     String path, {
     Map<String, dynamic>? queryParameters,
     Options? options,
     bool deduplicate = true,
   }) async {
+    // Generate key from original params (before interceptor adds year_id/stream_id)
     final requestKey = _getRequestKey(path, queryParameters);
 
     // Check if same request is already in-flight
     if (deduplicate && _inFlightRequests.containsKey(requestKey)) {
-      debugPrint('[DioClient] Deduplicating request: $path');
-      return _inFlightRequests[requestKey]!;
+      debugPrint('[DioClient] ✓ Deduplicating request: $path');
+      // Return the same future - don't create a new request
+      try {
+        return await _inFlightRequests[requestKey]!;
+      } catch (e) {
+        // If the original request failed, remove it and let the caller handle it
+        _inFlightRequests.remove(requestKey);
+        rethrow;
+      }
     }
 
     // Create the request future
@@ -90,9 +102,12 @@ class DioClient {
       final response = await requestFuture;
       return response;
     } finally {
-      // Remove from in-flight map when complete
+      // Remove from in-flight map when complete (with small delay to catch rapid duplicates)
       if (deduplicate) {
-        _inFlightRequests.remove(requestKey);
+        // Use scheduleMicrotask to allow near-simultaneous requests to share the future
+        scheduleMicrotask(() {
+          _inFlightRequests.remove(requestKey);
+        });
       }
     }
   }

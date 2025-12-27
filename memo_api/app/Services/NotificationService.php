@@ -441,13 +441,18 @@ class NotificationService
     protected function sendToSingleToken(string $apiUrl, string $accessToken, string $token, Notification $notification): array
     {
         try {
+            // Add RTL mark (U+200F) to force RTL layout for Arabic text
+            $rlm = "\u{200F}";
+            $title = $rlm . $notification->title_ar;
+            $body = $rlm . $notification->body_ar;
+
             // Build FCM message payload
             $message = [
                 'message' => [
                     'token' => $token,
                     'notification' => [
-                        'title' => $notification->title_ar,
-                        'body' => $notification->body_ar,
+                        'title' => $title,
+                        'body' => $body,
                     ],
                     'data' => [
                         'notification_id' => (string) $notification->id,
@@ -469,8 +474,8 @@ class NotificationService
                         'payload' => [
                             'aps' => [
                                 'alert' => [
-                                    'title' => $notification->title_ar,
-                                    'body' => $notification->body_ar,
+                                    'title' => $title,
+                                    'body' => $body,
                                 ],
                                 'sound' => config('firebase.fcm.default_sound', 'default'),
                                 'badge' => 1,

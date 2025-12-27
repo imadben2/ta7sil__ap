@@ -288,6 +288,165 @@ class AppSetting extends Model
         }
     }
 
+    // =====================================================
+    // Video Player Settings
+    // =====================================================
+
+    /**
+     * Check if a video player is enabled
+     *
+     * @param string $player (chewie, media_kit, simple_youtube, omni, orax)
+     * @return bool
+     */
+    public static function isVideoPlayerEnabled(string $player): bool
+    {
+        // Default enabled players: chewie and simple_youtube
+        $defaultEnabled = in_array($player, ['chewie', 'simple_youtube']);
+        return (bool) static::getValue("video_player_{$player}_enabled", $defaultEnabled);
+    }
+
+    /**
+     * Toggle video player enabled status
+     *
+     * @param string $player
+     * @param bool|null $enabled
+     * @return bool New state
+     */
+    public static function toggleVideoPlayer(string $player, ?bool $enabled = null): bool
+    {
+        if ($enabled === null) {
+            $enabled = !static::isVideoPlayerEnabled($player);
+        }
+
+        static::setValue("video_player_{$player}_enabled", $enabled ? '1' : '0');
+
+        return $enabled;
+    }
+
+    /**
+     * Get default player for uploaded videos
+     *
+     * @return string
+     */
+    public static function getDefaultUploadPlayer(): string
+    {
+        return (string) static::getValue('default_upload_player', 'chewie');
+    }
+
+    /**
+     * Set default player for uploaded videos
+     *
+     * @param string $player
+     * @return void
+     */
+    public static function setDefaultUploadPlayer(string $player): void
+    {
+        static::setValue('default_upload_player', $player);
+    }
+
+    /**
+     * Get default YouTube player
+     *
+     * @return string
+     */
+    public static function getDefaultYoutubePlayer(): string
+    {
+        return static::getValue('default_youtube_player') ?? 'simple_youtube';
+    }
+
+    /**
+     * Set default YouTube player
+     *
+     * @param string $player
+     * @return void
+     */
+    public static function setDefaultYoutubePlayer(string $player): void
+    {
+        static::setValue('default_youtube_player', $player);
+    }
+
+    /**
+     * Get all video player settings
+     *
+     * @return array
+     */
+    public static function getVideoPlayerSettings(): array
+    {
+        return [
+            'chewie_enabled' => static::isVideoPlayerEnabled('chewie'),
+            'media_kit_enabled' => static::isVideoPlayerEnabled('media_kit'),
+            'simple_youtube_enabled' => static::isVideoPlayerEnabled('simple_youtube'),
+            'omni_enabled' => static::isVideoPlayerEnabled('omni'),
+            'orax_enabled' => static::isVideoPlayerEnabled('orax'),
+            'default_upload_player' => static::getDefaultUploadPlayer(),
+            'default_youtube_player' => static::getDefaultYoutubePlayer(),
+            // Support types (youtube, upload, both)
+            'chewie_supports' => static::getVideoPlayerSupports('chewie', 'upload'),
+            'media_kit_supports' => static::getVideoPlayerSupports('media_kit', 'upload'),
+            'simple_youtube_supports' => static::getVideoPlayerSupports('simple_youtube', 'youtube'),
+            'omni_supports' => static::getVideoPlayerSupports('omni', 'both'),
+            'orax_supports' => static::getVideoPlayerSupports('orax', 'both'),
+        ];
+    }
+
+    /**
+     * Get video player support type
+     *
+     * @param string $player
+     * @param string $default
+     * @return string
+     */
+    public static function getVideoPlayerSupports(string $player, string $default = 'both'): string
+    {
+        $value = static::getValue("video_player_{$player}_supports");
+        return $value ?? $default;
+    }
+
+    /**
+     * Set video player support type
+     *
+     * @param string $player
+     * @param string $supports (youtube, upload, both)
+     * @return void
+     */
+    public static function setVideoPlayerSupports(string $player, string $supports): void
+    {
+        static::setValue("video_player_{$player}_supports", $supports);
+    }
+
+    /**
+     * Update all video player settings
+     *
+     * @param array $settings
+     * @return void
+     */
+    public static function updateVideoPlayerSettings(array $settings): void
+    {
+        $players = ['chewie', 'media_kit', 'simple_youtube', 'omni', 'orax'];
+
+        foreach ($players as $player) {
+            // Update enabled status
+            $enabledKey = "{$player}_enabled";
+            if (array_key_exists($enabledKey, $settings)) {
+                static::toggleVideoPlayer($player, (bool) $settings[$enabledKey]);
+            }
+
+            // Update support type
+            $supportsKey = "{$player}_supports";
+            if (array_key_exists($supportsKey, $settings)) {
+                static::setVideoPlayerSupports($player, $settings[$supportsKey]);
+            }
+        }
+
+        if (array_key_exists('default_upload_player', $settings)) {
+            static::setDefaultUploadPlayer($settings['default_upload_player']);
+        }
+
+        if (array_key_exists('default_youtube_player', $settings)) {
+            static::setDefaultYoutubePlayer($settings['default_youtube_player']);
+        }
+    }
+
     /**
      * Cast value based on type
      *

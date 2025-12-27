@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/constants/app_colors.dart';
+import '../../../../core/services/notification_service.dart';
+import '../../../../injection_container.dart' as di;
 import '../../domain/entities/settings_entity.dart';
 import '../bloc/settings/settings_cubit.dart';
 import '../bloc/settings/settings_state.dart';
@@ -290,8 +292,52 @@ class _SettingsPageState extends State<SettingsPage> {
             }
           },
         ),
+        Divider(height: 1, color: AppColors.slate500.withOpacity(0.1)),
+        // Test notification button
+        _buildOptionTile(
+          icon: Icons.notifications_active_rounded,
+          title: 'اختبار الإشعارات المحلية',
+          subtitle: 'إرسال إشعار تجريبي للتأكد من العمل',
+          onTap: _testLocalNotification,
+        ),
       ],
     );
+  }
+
+  /// Test local notification
+  Future<void> _testLocalNotification() async {
+    try {
+      final notificationService = di.sl<NotificationService>();
+      await notificationService.testLocalNotification();
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text(
+              'تم إرسال إشعار تجريبي',
+              style: TextStyle(fontFamily: 'Cairo'),
+            ),
+            backgroundColor: AppColors.emerald500,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'فشل إرسال الإشعار: $e',
+              style: const TextStyle(fontFamily: 'Cairo'),
+            ),
+            backgroundColor: AppColors.error,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          ),
+        );
+      }
+    }
   }
 
   /// حوار الإشعارات قريباً

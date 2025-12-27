@@ -1,5 +1,5 @@
 import 'package:get_it/get_it.dart';
-import 'package:dio/dio.dart';
+import '../../../core/network/dio_client.dart';
 import '../../../core/network/network_info.dart';
 
 // Data Sources
@@ -14,6 +14,7 @@ import '../domain/repositories/subscription_repository.dart';
 // Use Cases - Courses
 import '../domain/usecases/get_courses_usecase.dart';
 import '../domain/usecases/get_featured_courses_usecase.dart';
+import '../domain/usecases/get_complete_courses_usecase.dart';
 import '../domain/usecases/get_course_details_usecase.dart';
 import '../domain/usecases/get_course_modules_usecase.dart';
 import '../domain/usecases/check_course_access_usecase.dart';
@@ -44,9 +45,9 @@ final getIt = GetIt.instance;
 Future<void> initCoursesInjection() async {
   // ========== Data Sources ==========
 
-  // Remote Data Source
+  // Remote Data Source - uses DioClient for request deduplication
   getIt.registerLazySingleton<CoursesRemoteDataSource>(
-    () => CoursesRemoteDataSourceImpl(dio: getIt<Dio>()),
+    () => CoursesRemoteDataSourceImpl(client: getIt<DioClient>()),
   );
 
   // ========== Repositories ==========
@@ -73,6 +74,10 @@ Future<void> initCoursesInjection() async {
 
   getIt.registerLazySingleton(
     () => GetFeaturedCoursesUseCase(getIt<CoursesRepository>()),
+  );
+
+  getIt.registerLazySingleton(
+    () => GetCompleteCoursesUseCase(getIt<CoursesRepository>()),
   );
 
   getIt.registerLazySingleton(
@@ -152,6 +157,7 @@ Future<void> initCoursesInjection() async {
     () => CoursesBloc(
       getCoursesUseCase: getIt<GetCoursesUseCase>(),
       getFeaturedCoursesUseCase: getIt<GetFeaturedCoursesUseCase>(),
+      getCompleteCoursesUseCase: getIt<GetCompleteCoursesUseCase>(),
       getCourseDetailsUseCase: getIt<GetCourseDetailsUseCase>(),
       getCourseModulesUseCase: getIt<GetCourseModulesUseCase>(),
       checkCourseAccessUseCase: getIt<CheckCourseAccessUseCase>(),

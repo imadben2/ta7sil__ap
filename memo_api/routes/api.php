@@ -682,6 +682,7 @@ Route::prefix('v1')->group(function () {
         Route::prefix('courses')->withoutMiddleware('auth:sanctum')->group(function () {
             Route::get('/', [CourseApiController::class, 'index']);
             Route::get('/featured', [CourseApiController::class, 'featured']);
+            Route::get('/complete', [CourseApiController::class, 'complete']); // OPTIMIZED: Single call for courses page
             Route::get('/search', [CourseApiController::class, 'search']);
             Route::get('/{id}', [CourseApiController::class, 'show']);
             Route::get('/{id}/modules', [CourseApiController::class, 'modules']);

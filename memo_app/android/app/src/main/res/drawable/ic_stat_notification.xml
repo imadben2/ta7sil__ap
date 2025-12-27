@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <!-- تحصيل app icon - book with chevrons (white on transparent) -->
+    <!-- Top bookmark/book shape -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M12,2L7,5.5V9.5L12,6L17,9.5V5.5L12,2Z"/>
+    <!-- Middle chevron -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M7,11L12,14.5L17,11V13L12,16.5L7,13V11Z"/>
+    <!-- Bottom chevron -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M7,17L12,20.5L17,17V19L12,22L7,19V17Z"/>
+</vector>

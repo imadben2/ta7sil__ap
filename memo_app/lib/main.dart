@@ -23,6 +23,8 @@ import 'features/profile/presentation/bloc/profile/profile_bloc.dart';
 import 'features/profile/presentation/bloc/settings/settings_cubit.dart';
 import 'features/profile/presentation/bloc/settings/settings_state.dart';
 import 'features/courses/presentation/bloc/subscription/subscription_bloc.dart';
+import 'features/notifications/presentation/bloc/notifications_bloc.dart';
+import 'features/notifications/presentation/bloc/notifications_event.dart';
 import 'features/planner/data/local/hive_adapters/register_adapters.dart';
 import 'features/planner/data/datasources/planner_sync_queue.dart';
 import 'features/planner/data/services/background_sync_service.dart';
@@ -160,6 +162,7 @@ class MemoApp extends StatelessWidget {
         BlocProvider(create: (_) => di.sl<ProfileBloc>()),
         BlocProvider(create: (_) => di.sl<SettingsCubit>()..loadSettings()),
         BlocProvider(create: (_) => di.sl<SubscriptionBloc>()),
+        BlocProvider(create: (_) => di.sl<NotificationsBloc>()..add(const LoadNotifications())),
       ],
       child: BlocBuilder<SettingsCubit, SettingsState>(
         builder: (context, settingsState) {
@@ -208,7 +211,7 @@ class MemoApp extends StatelessWidget {
   }
 }
 
-/// Convert theme mode string to ThemeMode enum
+/// Convert theme mode string to ThemeMode enum 033359
 ThemeMode _convertThemeMode(String themeModeString) {
   switch (themeModeString) {
     case 'light':

@@ -181,17 +181,29 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
                         ),
                         if (unreadNotificationCount > 0)
                           Positioned(
-                            right: -4,
-                            top: -4,
+                            right: -6,
+                            top: -6,
                             child: Container(
-                              padding: const EdgeInsets.all(4),
-                              constraints: const BoxConstraints(
-                                minWidth: 18,
-                                minHeight: 18,
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 5,
+                                vertical: 2,
                               ),
-                              decoration: const BoxDecoration(
-                                color: AppColors.fireRed,
-                                shape: BoxShape.circle,
+                              constraints: const BoxConstraints(
+                                minWidth: 16,
+                                minHeight: 16,
+                              ),
+                              decoration: BoxDecoration(
+                                gradient: const LinearGradient(
+                                  colors: [Color(0xFFFF6B6B), Color(0xFFFF4757)],
+                                ),
+                                borderRadius: BorderRadius.circular(10),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: const Color(0xFFFF4757).withOpacity(0.4),
+                                    blurRadius: 4,
+                                    offset: const Offset(0, 2),
+                                  ),
+                                ],
                               ),
                               child: Center(
                                 child: Text(
@@ -200,9 +212,10 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
                                       : '$unreadNotificationCount',
                                   style: const TextStyle(
                                     fontFamily: 'Cairo',
-                                    fontSize: 10,
+                                    fontSize: 9,
                                     fontWeight: FontWeight.w700,
                                     color: Colors.white,
+                                    height: 1,
                                   ),
                                 ),
                               ),

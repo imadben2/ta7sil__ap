@@ -4,8 +4,30 @@ import '../entities/stats_entity.dart';
 import '../entities/study_session_entity.dart';
 import '../entities/subject_progress_entity.dart';
 
+/// Complete dashboard data from unified endpoint
+class CompleteDashboardEntity {
+  final StatsEntity stats;
+  final List<StudySessionEntity> todaySessions;
+  final List<SubjectProgressEntity> subjectsProgress;
+  final List<Map<String, dynamic>> featuredCourses;
+  final List<Map<String, dynamic>> sponsors;
+  final List<Map<String, dynamic>> promos;
+
+  const CompleteDashboardEntity({
+    required this.stats,
+    required this.todaySessions,
+    required this.subjectsProgress,
+    required this.featuredCourses,
+    required this.sponsors,
+    required this.promos,
+  });
+}
+
 /// Repository interface for Home dashboard data
 abstract class HomeRepository {
+  /// OPTIMIZED: Get all dashboard data in a single API call
+  Future<Either<Failure, CompleteDashboardEntity>> getCompleteDashboard();
+
   /// Get user statistics for dashboard
   Future<Either<Failure, StatsEntity>> getStats();
 

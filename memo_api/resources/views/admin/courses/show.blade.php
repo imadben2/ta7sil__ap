@@ -536,6 +536,9 @@
 
                     <!-- Video Content Fields -->
                     <div id="video_fields" class="content-fields">
+                        @php
+                            $allowedVideoType = $course->allowed_video_type ?? 'both';
+                        @endphp
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-sm font-bold text-gray-700 mb-2 flex items-center gap-2">
@@ -545,9 +548,19 @@
                                 <select name="video_type" id="add_video_type"
                                         class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 transition-all"
                                         onchange="toggleVideoInput('add')">
-                                    <option value="youtube">YouTube</option>
-                                    <option value="upload">رفع ملف</option>
+                                    @if($allowedVideoType === 'both' || $allowedVideoType === 'youtube')
+                                        <option value="youtube">YouTube</option>
+                                    @endif
+                                    @if($allowedVideoType === 'both' || $allowedVideoType === 'upload')
+                                        <option value="upload">رفع ملف</option>
+                                    @endif
                                 </select>
+                                @if($allowedVideoType !== 'both')
+                                    <p class="text-xs text-purple-600 mt-1">
+                                        <i class="fas fa-info-circle"></i>
+                                        هذه الدورة تسمح بـ {{ $allowedVideoType === 'youtube' ? 'YouTube فقط' : 'رفع ملف فقط' }}
+                                    </p>
+                                @endif
                             </div>
                             <div>
                                 <label class="block text-sm font-bold text-gray-700 mb-2 flex items-center gap-2">

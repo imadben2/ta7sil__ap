@@ -84,7 +84,22 @@ class SubscriptionApiController extends Controller
             ]);
         }
 
-        $isValid = $code->isValid();
+        // Check specific validation errors
+        $errorReason = null;
+        $errorCode = null;
+
+        if (!$code->is_active) {
+            $errorReason = 'رمز الاشتراك غير مفعل';
+            $errorCode = 'code_inactive';
+        } elseif ($code->expires_at && $code->expires_at->isPast()) {
+            $errorReason = 'رمز الاشتراك منتهي الصلاحية';
+            $errorCode = 'code_expired';
+        } elseif ($code->current_uses >= $code->max_uses) {
+            $errorReason = 'تم استخدام هذا الرمز بالكامل';
+            $errorCode = 'code_exhausted';
+        }
+
+        $isValid = $errorReason === null;
 
         $data = [
             'success' => true,
@@ -94,6 +109,8 @@ class SubscriptionApiController extends Controller
                 'type' => $code->code_type,
                 'remaining_uses' => $code->getRemainingUses(),
                 'expires_at' => $code->expires_at?->format('Y-m-d H:i:s'),
+                'max_uses' => $code->max_uses,
+                'current_uses' => $code->current_uses,
             ],
         ];
 
@@ -105,7 +122,8 @@ class SubscriptionApiController extends Controller
             }
             $data['message'] = 'الرمز صالح للاستخدام';
         } else {
-            $data['message'] = 'الرمز غير صالح أو منتهي الصلاحية';
+            $data['message'] = $errorReason;
+            $data['error_code'] = $errorCode;
         }
 
         return response()->json($data);

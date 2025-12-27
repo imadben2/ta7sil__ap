@@ -138,7 +138,12 @@ class QuizAttemptAbandoning extends QuizAttemptState {
 
 /// Quiz abandoned
 class QuizAttemptAbandoned extends QuizAttemptState {
-  const QuizAttemptAbandoned();
+  final int quizId;
+
+  const QuizAttemptAbandoned({required this.quizId});
+
+  @override
+  List<Object?> get props => [quizId];
 }
 
 /// Error state

@@ -40,6 +40,10 @@ class NotificationService {
   String? _fcmToken;
   String? get fcmToken => _fcmToken;
 
+  /// Permission status
+  bool _permissionsGranted = false;
+  bool get permissionsGranted => _permissionsGranted;
+
   /// Stream controller for token refresh
   final StreamController<String> _tokenRefreshController =
       StreamController<String>.broadcast();
@@ -108,11 +112,16 @@ class NotificationService {
       }
 
       // Request notification permission
-      await requestPermission();
+      _permissionsGranted = await requestPermission();
+      debugPrint('[NotificationService] Permissions granted: $_permissionsGranted');
 
       // Get initial FCM token
       _fcmToken = await _messaging?.getToken();
-      debugPrint('[NotificationService] FCM Token: $_fcmToken');
+      debugPrint('[NotificationService] FCM Token: ${_fcmToken != null ? '${_fcmToken!.substring(0, 20)}...' : 'null'}');
+
+      if (_fcmToken == null) {
+        debugPrint('[NotificationService] WARNING: FCM token is null - push notifications will not work');
+      }
 
       // Listen for token refresh
       _messaging?.onTokenRefresh.listen((token) {
@@ -543,6 +552,36 @@ class NotificationService {
       debugPrint('[NotificationService] Get launch details error: $e');
       return null;
     }
+  }
+
+  /// Get list of pending scheduled notifications (for debugging)
+  Future<List<PendingNotificationRequest>> getPendingNotifications() async {
+    try {
+      final pending = await _localNotifications.pendingNotificationRequests();
+      debugPrint('[NotificationService] Pending notifications: ${pending.length}');
+      for (final notification in pending) {
+        debugPrint('[NotificationService] - ID: ${notification.id}, Title: ${notification.title}');
+      }
+      return pending;
+    } catch (e) {
+      debugPrint('[NotificationService] Error getting pending notifications: $e');
+      return [];
+    }
+  }
+
+  /// Check if notification system is fully initialized and working
+  Future<Map<String, dynamic>> getNotificationStatus() async {
+    final pending = await getPendingNotifications();
+    final notificationsEnabled = await areNotificationsEnabled();
+
+    return {
+      'fcmToken': _fcmToken != null,
+      'fcmTokenValue': _fcmToken,
+      'permissionsGranted': _permissionsGranted,
+      'notificationsEnabled': notificationsEnabled,
+      'pendingNotificationsCount': pending.length,
+      'firebaseInitialized': _messaging != null,
+    };
   }
 
   /// Dispose the service

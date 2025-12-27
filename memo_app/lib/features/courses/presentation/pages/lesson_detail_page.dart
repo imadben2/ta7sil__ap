@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/constants/app_colors.dart';
+import '../../../../injection_container.dart';
 import '../../domain/entities/course_lesson_entity.dart';
 import '../../domain/entities/course_module_entity.dart';
 import '../../domain/entities/lesson_attachment_entity.dart';
@@ -9,6 +10,7 @@ import '../bloc/courses/courses_bloc.dart';
 import '../bloc/courses/courses_event.dart';
 import '../bloc/courses/courses_state.dart';
 import '../widgets/attachment_card.dart';
+import '../../../profile/domain/usecases/get_settings_usecase.dart';
 import '../../../videoplayer/videoplayer.dart';
 
 /// صفحة تفاصيل الدرس الموحدة - عرض الفيديو مباشرة مع المعلومات والمرفقات
@@ -37,10 +39,49 @@ class _LessonDetailPageState extends State<LessonDetailPage> {
   List<CourseLessonEntity> _allLessons = [];
   int _currentLessonIndex = -1;
 
+  // Video player settings
+  String _preferredVideoPlayer = 'chewie';
+  bool _settingsLoaded = false;
+
   @override
   void initState() {
     super.initState();
     _loadData();
+    _loadPreferredVideoPlayer();
+  }
+
+  Future<void> _loadPreferredVideoPlayer() async {
+    debugPrint('🔄 LessonDetailPage: Loading video player settings...');
+    try {
+      final getSettingsUseCase = sl<GetSettingsUseCase>();
+      final result = await getSettingsUseCase();
+      result.fold(
+        (failure) {
+          debugPrint('❌ Failed to load video player settings: ${failure.message}');
+          if (mounted) {
+            setState(() {
+              _settingsLoaded = true;
+            });
+          }
+        },
+        (settings) {
+          if (mounted) {
+            setState(() {
+              _preferredVideoPlayer = settings.preferredVideoPlayer;
+              _settingsLoaded = true;
+            });
+            debugPrint('✅ LessonDetailPage: Loaded preferred video player: $_preferredVideoPlayer');
+          }
+        },
+      );
+    } catch (e) {
+      debugPrint('❌ Error loading video player settings: $e');
+      if (mounted) {
+        setState(() {
+          _settingsLoaded = true;
+        });
+      }
+    }
   }
 
   void _loadData() {
@@ -252,8 +293,18 @@ class _LessonDetailPageState extends State<LessonDetailPage> {
       );
     }
 
+    // Choose player based on video type:
+    // - YouTube videos → use simple_youtube player
+    // - Uploaded videos → use user's preferred player (chewie, media_kit, etc.)
+    final effectivePlayer = _lesson?.videoType == 'youtube'
+        ? 'simple_youtube'
+        : _preferredVideoPlayer;
+
+    debugPrint('🎬 Video type: ${_lesson?.videoType}, using player: $effectivePlayer');
+
     final config = VideoConfig.course(
       videoUrl: videoUrl,
+      preferredPlayer: effectivePlayer,
       accentColorValue: AppColors.emerald500.toARGB32(),
     );
 

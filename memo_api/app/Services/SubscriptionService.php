@@ -171,13 +171,17 @@ class SubscriptionService
             throw new \Exception('لديك اشتراك نشط بالفعل في هذه الدورة');
         }
 
+        // Calculate expires_at from course duration_days (default to 365 days if not set)
+        $durationDays = $course->duration_days ?? 365;
+        $expiresAt = now()->addDays($durationDays);
+
         $subscription = UserSubscription::create([
             'user_id' => $user->id,
             'course_id' => $course->id,
             'status' => 'active',
             'activated_at' => now(),
             'started_at' => now(),
-            'expires_at' => null, // Course subscriptions don't expire by default
+            'expires_at' => $expiresAt,
             ...$additionalData,
         ]);
 

@@ -162,17 +162,38 @@ class NotificationsResponse {
   });
 
   factory NotificationsResponse.fromJson(Map<String, dynamic> json) {
-    final notificationsData = json['notifications'] ?? json['data'] ?? [];
-    final meta = json['meta'];
+    // Handle nested API response structure:
+    // { "success": true, "data": { "current_page": 1, "data": [...] } }
+    dynamic responseData = json;
+
+    // If response has 'success' and 'data' wrapper, unwrap it
+    if (json['success'] != null && json['data'] is Map) {
+      responseData = json['data'];
+    }
+
+    // Get notifications list - could be in 'data' (Laravel pagination) or 'notifications'
+    List<dynamic> notificationsData;
+    if (responseData['data'] is List) {
+      notificationsData = responseData['data'] as List;
+    } else if (responseData['notifications'] is List) {
+      notificationsData = responseData['notifications'] as List;
+    } else {
+      notificationsData = [];
+    }
+
+    // Get pagination info
+    final int currentPage = responseData['current_page'] ?? json['current_page'] ?? 1;
+    final int lastPage = responseData['last_page'] ?? json['last_page'] ?? 1;
+    final int total = responseData['total'] ?? json['total'] ?? notificationsData.length;
 
     return NotificationsResponse(
-      notifications: (notificationsData as List)
-          .map((n) => NotificationModel.fromJson(n))
+      notifications: notificationsData
+          .map((n) => NotificationModel.fromJson(n as Map<String, dynamic>))
           .toList(),
-      unreadCount: json['unread_count'] ?? 0,
-      total: meta?['total'] ?? json['total'] ?? notificationsData.length,
-      currentPage: meta?['current_page'] ?? json['current_page'] ?? 1,
-      lastPage: meta?['last_page'] ?? json['last_page'] ?? 1,
+      unreadCount: json['unread_count'] ?? responseData['unread_count'] ?? 0,
+      total: total,
+      currentPage: currentPage,
+      lastPage: lastPage,
     );
   }
 

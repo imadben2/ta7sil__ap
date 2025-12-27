@@ -98,6 +98,9 @@
                 <!-- Video Content Fields -->
                 <div id="edit_video_fields_{{ $lesson->id }}" class="content-fields-edit-{{ $lesson->id }} {{ old('content_type', $lesson->content_type ?? 'video') !== 'video' ? 'hidden' : '' }}">
                     <div class="bg-purple-50 border-2 border-purple-200 rounded-xl p-4 space-y-4">
+                        @php
+                            $allowedVideoType = $lesson->module->course->allowed_video_type ?? 'both';
+                        @endphp
                         <div class="grid grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-sm font-bold text-gray-700 mb-2 flex items-center gap-2">
@@ -107,9 +110,19 @@
                                 <select name="video_type" id="edit_video_type_{{ $lesson->id }}"
                                         class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 transition-all"
                                         onchange="toggleVideoInputEdit({{ $lesson->id }})">
-                                    <option value="youtube" {{ old('video_type', $lesson->video_type) === 'youtube' ? 'selected' : '' }}>YouTube</option>
-                                    <option value="upload" {{ old('video_type', $lesson->video_type) === 'upload' ? 'selected' : '' }}>رفع ملف</option>
+                                    @if($allowedVideoType === 'both' || $allowedVideoType === 'youtube')
+                                        <option value="youtube" {{ old('video_type', $lesson->video_type) === 'youtube' ? 'selected' : '' }}>YouTube</option>
+                                    @endif
+                                    @if($allowedVideoType === 'both' || $allowedVideoType === 'upload')
+                                        <option value="upload" {{ old('video_type', $lesson->video_type) === 'upload' ? 'selected' : '' }}>رفع ملف</option>
+                                    @endif
                                 </select>
+                                @if($allowedVideoType !== 'both')
+                                    <p class="text-xs text-purple-600 mt-1">
+                                        <i class="fas fa-info-circle"></i>
+                                        هذه الدورة تسمح بـ {{ $allowedVideoType === 'youtube' ? 'YouTube فقط' : 'رفع ملف فقط' }}
+                                    </p>
+                                @endif
                             </div>
                             <div>
                                 <label class="block text-sm font-bold text-gray-700 mb-2 flex items-center gap-2">
@@ -142,12 +155,20 @@
                             </label>
                             <input type="file" name="video" accept="video/mp4,video/mov,video/avi"
                                    class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 transition-all">
-                            @if($lesson->video_type === 'upload' && $lesson->video_path)
-                            <p class="text-xs text-gray-500 mt-1">
-                                <a href="{{ Storage::url($lesson->video_path) }}" target="_blank" class="text-blue-600 hover:underline">
-                                    <i class="fas fa-video mr-1"></i> عرض الفيديو الحالي
-                                </a>
-                            </p>
+                            @if($lesson->video_type === 'upload' && ($lesson->video_path || $lesson->video_url))
+                            <div class="mt-2 p-3 bg-green-50 rounded-lg border border-green-200">
+                                <p class="text-xs text-gray-600 mb-1 flex items-center gap-1">
+                                    <i class="fas fa-check-circle text-green-500"></i>
+                                    الفيديو الحالي:
+                                </p>
+                                @php
+                                    $videoSrc = $lesson->video_path ? Storage::url($lesson->video_path) : $lesson->video_url;
+                                @endphp
+                                <video controls class="w-full max-h-48 rounded-lg mt-2">
+                                    <source src="{{ $videoSrc }}" type="video/mp4">
+                                </video>
+                                <p class="text-xs text-gray-500 mt-1 truncate" title="{{ $videoSrc }}">{{ basename($videoSrc) }}</p>
+                            </div>
                             @endif
                         </div>
 

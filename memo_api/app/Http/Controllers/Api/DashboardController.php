@@ -1017,15 +1017,15 @@ class DashboardController extends Controller
         return $courses->map(function ($course) {
             return [
                 'id' => $course->id,
-                'title' => $course->title_ar ?? $course->title,
-                'description' => $course->short_description_ar ?? $course->short_description ?? '',
-                'thumbnail_url' => $course->thumbnail_url,
-                'price' => $course->price ?? 0,
-                'discount_price' => $course->discount_price,
-                'is_featured' => (bool) $course->is_featured,
+                'title' => $course->title_ar ?? '',
+                'description' => $course->short_description_ar ?? '',
+                'thumbnail_url' => $course->thumbnail_url ?? null,
+                'price' => $course->price_dzd ?? 0,
+                'is_free' => (bool) ($course->is_free ?? false),
+                'is_featured' => (bool) ($course->is_featured ?? false),
                 'instructor_name' => $course->instructor_name ?? '',
                 'rating' => $course->average_rating ?? 0,
-                'students_count' => $course->students_count ?? 0,
+                'students_count' => $course->enrollment_count ?? 0,
             ];
         })->toArray();
     }

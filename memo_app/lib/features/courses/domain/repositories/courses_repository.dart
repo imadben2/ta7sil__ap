@@ -8,11 +8,24 @@ import '../entities/course_module_entity.dart';
 import '../entities/course_progress_entity.dart';
 import '../entities/course_review_entity.dart';
 import '../entities/lesson_progress_entity.dart';
+import '../usecases/get_complete_courses_usecase.dart';
 
 /// Courses Repository Interface
 /// يحدد العقد للعمليات المتعلقة بالدورات
 abstract class CoursesRepository {
   // ========== Browse & Discover ==========
+
+  /// OPTIMIZED: الحصول على جميع بيانات الدورات في طلب واحد
+  Future<Either<Failure, CompleteCoursesData>> getCompleteCourses({
+    String? search,
+    int? subjectId,
+    String? level,
+    bool? isFree,
+    String sortBy = 'created_at',
+    String sortOrder = 'desc',
+    int page = 1,
+    int perPage = 20,
+  });
 
   /// الحصول على قائمة الدورات مع الفلترة والبحث
   Future<Either<Failure, List<CourseEntity>>> getCourses({

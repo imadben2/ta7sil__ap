@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'dart:ui';
 import '../../../../core/constants/app_colors.dart';
 import '../../domain/entities/course_entity.dart';
@@ -82,6 +83,9 @@ class _CourseDetailPageState extends State<CourseDetailPage>
         body: BlocListener<CoursesBloc, CoursesState>(
           listener: (context, state) {
             if (state is CourseDetailsLoaded) {
+              debugPrint('=== COURSE LOADED ===');
+              debugPrint('thumbnailUrl: ${state.course.thumbnailUrl}');
+              debugPrint('=====================');
               setState(() {
                 _course = state.course;
                 _isLoading = false;
@@ -229,12 +233,19 @@ class _CourseDetailPageState extends State<CourseDetailPage>
         background: Stack(
           fit: StackFit.expand,
           children: [
-            // Course Image
+            // Course Image - Using CachedNetworkImage for better connection handling
             if (_course!.thumbnailUrl != null && _course!.thumbnailUrl!.isNotEmpty)
-              Image.network(
-                _course!.thumbnailUrl!,
+              CachedNetworkImage(
+                imageUrl: _course!.thumbnailUrl!,
                 fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) => _buildPlaceholderImage(),
+                width: double.infinity,
+                height: double.infinity,
+                placeholder: (context, url) => _buildPlaceholderImage(),
+                errorWidget: (context, url, error) {
+                  debugPrint('Course thumbnail error: $error');
+                  debugPrint('URL was: $url');
+                  return _buildPlaceholderImage();
+                },
               )
             else
               _buildPlaceholderImage(),

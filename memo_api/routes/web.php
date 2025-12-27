@@ -172,6 +172,13 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/storage/check', [AdminProfileController::class, 'checkStorageLink'])->name('storage.check');
     Route::post('/storage/link', [AdminProfileController::class, 'createStorageLink'])->name('storage.link');
 
+    // Custom Symlinks Management
+    Route::get('/symlinks/list', [AdminProfileController::class, 'listSymlinks'])->name('symlinks.list');
+    Route::post('/symlinks/create', [AdminProfileController::class, 'createSymlink'])->name('symlinks.create');
+    Route::delete('/symlinks/delete', [AdminProfileController::class, 'deleteSymlink'])->name('symlinks.delete');
+    Route::get('/symlinks/check-all', [AdminProfileController::class, 'checkAllSymlinks'])->name('symlinks.check-all');
+    Route::post('/symlinks/fix-all', [AdminProfileController::class, 'fixAllSymlinks'])->name('symlinks.fix-all');
+
     // Quiz Management
     Route::prefix('quizzes')->name('quizzes.')->group(function () {
         // Main CRUD (list and create first)

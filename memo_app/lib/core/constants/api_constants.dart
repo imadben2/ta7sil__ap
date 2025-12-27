@@ -7,8 +7,8 @@ class ApiConstants {
 
   // Base URL - Update this for production
   // 10.0.2.2 is the Android emulator's alias for localhost
-  static const String baseUrl = 'https://tahssil.site/api';
-  // static const String baseUrl = 'http://10.0.2.2:8084/api';
+  //static const String baseUrl = 'https://tahssil.site/api';
+   static const String baseUrl = 'http://10.0.2.2:8084/api';
 
   // Version Check Endpoint
   static const String versionCheck = '/app/version-check';
@@ -17,7 +17,7 @@ class ApiConstants {
   static const Duration connectTimeout = Duration(seconds: 30);
   static const Duration receiveTimeout = Duration(seconds: 30);
   static const Duration sendTimeout = Duration(seconds: 30);
-
+ 
   // Auth Endpoints
   static const String login = '/auth/login';
   static const String register = '/auth/register';
@@ -142,6 +142,8 @@ class ApiConstants {
   static const String courseDetail = '/courses';
   static const String courseLessons = '/courses/lessons';
   static const String coursePurchase = '/courses/purchase';
+  /// OPTIMIZED: Single call for courses page - returns featured + all courses
+  static const String coursesComplete = '/v1/courses/complete';
 
   // Statistics Endpoints
   static const String statistics = '/v1/statistics';

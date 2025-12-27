@@ -9,6 +9,32 @@ abstract class CoursesEvent extends Equatable {
 
 // ========== Browse & Discover ==========
 
+/// OPTIMIZED: Load all courses data in single API call (featured + list)
+class LoadAllCoursesDataEvent extends CoursesEvent {
+  final String? search;
+  final int? subjectId;
+  final String? level;
+  final bool? isFree;
+  final String sortBy;
+  final String sortOrder;
+  final int page;
+  final int perPage;
+
+  const LoadAllCoursesDataEvent({
+    this.search,
+    this.subjectId,
+    this.level,
+    this.isFree,
+    this.sortBy = 'created_at',
+    this.sortOrder = 'desc',
+    this.page = 1,
+    this.perPage = 20,
+  });
+
+  @override
+  List<Object?> get props => [search, subjectId, level, isFree, sortBy, sortOrder, page, perPage];
+}
+
 /// Load all courses with optional filters
 class LoadCoursesEvent extends CoursesEvent {
   final String? search;

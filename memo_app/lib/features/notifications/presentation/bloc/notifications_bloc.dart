@@ -80,16 +80,20 @@ class NotificationsBloc extends Bloc<NotificationsEvent, NotificationsState> {
         type: _filterType,
       );
 
-      result.fold(
-        (failure) async {
-          final cached = await _repository.getCachedNotifications();
+      // Use pattern matching to handle Either properly
+      if (result.isLeft()) {
+        final failure = result.fold((l) => l, (r) => null)!;
+        final cached = await _repository.getCachedNotifications();
+        if (!emit.isDone) {
           emit(NotificationsError(
             message: failure.message,
             cachedNotifications: cached,
           ));
-        },
-        (notificationsList) {
-          _currentPage = notificationsList.currentPage;
+        }
+      } else {
+        final notificationsList = result.fold((l) => null, (r) => r)!;
+        _currentPage = notificationsList.currentPage;
+        if (!emit.isDone) {
           emit(NotificationsLoaded(
             notifications: notificationsList.notifications,
             unreadCount: notificationsList.unreadCount,
@@ -98,11 +102,13 @@ class NotificationsBloc extends Bloc<NotificationsEvent, NotificationsState> {
             lastPage: notificationsList.lastPage,
             hasMore: notificationsList.hasMore,
           ));
-        },
-      );
+        }
+      }
     } catch (e) {
       debugPrint('[NotificationsBloc] Load error: $e');
-      emit(NotificationsError(message: 'خطأ في تحميل الإشعارات'));
+      if (!emit.isDone) {
+        emit(NotificationsError(message: 'خطأ في تحميل الإشعارات'));
+      }
     }
   }
 

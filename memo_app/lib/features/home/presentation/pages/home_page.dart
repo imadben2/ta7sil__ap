@@ -105,8 +105,8 @@ class _HomePageState extends State<HomePage>
     )..forward();
 
     context.read<HomeBloc>().add(const DashboardLoadRequested());
-    // Load featured courses
-    context.read<CoursesBloc>().add(const LoadFeaturedCoursesEvent(limit: 5));
+    // Load courses data (featured + all in single call)
+    context.read<CoursesBloc>().add(const LoadAllCoursesDataEvent());
   }
 
   @override
@@ -758,7 +758,7 @@ class _HomePageState extends State<HomePage>
                   ElevatedButton(
                     onPressed: () {
                       context.read<CoursesBloc>().add(
-                        const LoadFeaturedCoursesEvent(limit: 5),
+                        const LoadAllCoursesDataEvent(),
                       );
                     },
                     child: const Text('إعادة المحاولة'),

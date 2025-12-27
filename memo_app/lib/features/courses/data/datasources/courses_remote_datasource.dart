@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
+import '../../../../core/network/dio_client.dart';
 import '../models/certificate_model.dart';
 import '../models/course_lesson_model.dart';
 import '../models/course_model.dart';
@@ -12,9 +13,39 @@ import '../models/payment_receipt_model.dart';
 import '../models/subscription_package_model.dart';
 import '../models/user_subscription_model.dart';
 
+/// Complete courses data from unified endpoint
+class CompletCoursesData {
+  final List<CourseModel> featuredCourses;
+  final List<CourseModel> courses;
+  final int currentPage;
+  final int lastPage;
+  final int total;
+
+  CompletCoursesData({
+    required this.featuredCourses,
+    required this.courses,
+    required this.currentPage,
+    required this.lastPage,
+    required this.total,
+  });
+}
+
 /// Remote Data Source للدورات
 abstract class CoursesRemoteDataSource {
   // ========== Browse & Discover ==========
+
+  /// OPTIMIZED: Get both featured and all courses in single API call
+  Future<CompletCoursesData> getCompleteCourses({
+    String? search,
+    int? subjectId,
+    String? level,
+    bool? isFree,
+    String sortBy = 'created_at',
+    String sortOrder = 'desc',
+    int page = 1,
+    int perPage = 20,
+  });
+
   Future<List<CourseModel>> getCourses({
     String? search,
     int? subjectId,
@@ -94,11 +125,77 @@ abstract class CoursesRemoteDataSource {
 }
 
 class CoursesRemoteDataSourceImpl implements CoursesRemoteDataSource {
-  final Dio dio;
+  final DioClient client;
 
-  CoursesRemoteDataSourceImpl({required this.dio});
+  /// Raw Dio instance for requests that don't need deduplication (POST, file uploads)
+  Dio get dio => client.dio;
+
+  CoursesRemoteDataSourceImpl({required this.client});
 
   // ========== Browse & Discover ==========
+
+  /// OPTIMIZED: Get both featured and all courses in single API call
+  @override
+  Future<CompletCoursesData> getCompleteCourses({
+    String? search,
+    int? subjectId,
+    String? level,
+    bool? isFree,
+    String sortBy = 'created_at',
+    String sortOrder = 'desc',
+    int page = 1,
+    int perPage = 20,
+  }) async {
+    try {
+      final queryParams = <String, dynamic>{
+        'page': page,
+        'per_page': perPage,
+        'sort_by': sortBy,
+        'sort_order': sortOrder,
+        if (search != null) 'search': search,
+        if (subjectId != null) 'subject_id': subjectId,
+        if (level != null) 'level': level,
+        if (isFree != null) 'is_free': isFree ? 1 : 0,
+      };
+
+      final response = await client.get('/v1/courses/complete', queryParameters: queryParams);
+
+      if (response.statusCode == 200) {
+        final data = response.data['data'];
+
+        // Parse featured courses
+        final featuredList = data['featured_courses'] as List? ?? [];
+        final featuredCourses = featuredList.map((json) {
+          final courseData = Map<String, dynamic>.from(json as Map);
+          _ensureRequiredFields(courseData);
+          return CourseModel.fromJson(courseData);
+        }).toList();
+
+        // Parse all courses
+        final coursesData = data['courses'];
+        final coursesList = coursesData['data'] as List? ?? [];
+        final courses = coursesList.map((json) {
+          final courseData = Map<String, dynamic>.from(json as Map);
+          _ensureRequiredFields(courseData);
+          return CourseModel.fromJson(courseData);
+        }).toList();
+
+        debugPrint('📚 Loaded ${featuredCourses.length} featured + ${courses.length} courses (1 API call)');
+
+        return CompletCoursesData(
+          featuredCourses: featuredCourses,
+          courses: courses,
+          currentPage: coursesData['current_page'] ?? 1,
+          lastPage: coursesData['last_page'] ?? 1,
+          total: coursesData['total'] ?? courses.length,
+        );
+      } else {
+        throw Exception('فشل تحميل الدورات');
+      }
+    } on DioException catch (e) {
+      throw _handleDioError(e);
+    }
+  }
 
   @override
   Future<List<CourseModel>> getCourses({
@@ -127,15 +224,7 @@ class CoursesRemoteDataSourceImpl implements CoursesRemoteDataSource {
         if (isFree != null) 'is_free': isFree ? 1 : 0,
       };
 
-      final response = await dio.get('/v1/courses', queryParameters: queryParams);
-
-      // Log API response for courses list
-      debugPrint('╔══════════════════════════════════════════════════════════════');
-      debugPrint('║ 📚 GET COURSES API RESPONSE');
-      debugPrint('╠══════════════════════════════════════════════════════════════');
-      debugPrint('║ Status: ${response.statusCode}');
-      debugPrint('║ Full Response: ${response.data}');
-      debugPrint('╚══════════════════════════════════════════════════════════════');
+      final response = await client.get('/v1/courses', queryParameters: queryParams);
 
       if (response.statusCode == 200) {
         final data = response.data['data'];
@@ -147,11 +236,7 @@ class CoursesRemoteDataSourceImpl implements CoursesRemoteDataSource {
           coursesList = data['data'] as List;
         }
 
-        // Log each course's thumbnail info
-        for (var course in coursesList) {
-          debugPrint('║ Course: ${course['title_ar']} | thumbnail_url: ${course['thumbnail_url']} | thumbnail_full_url: ${course['thumbnail_full_url']}');
-        }
-
+        debugPrint('📚 Loaded ${coursesList.length} courses');
         return coursesList.map((json) {
           final courseData = Map<String, dynamic>.from(json as Map);
           _ensureRequiredFields(courseData);
@@ -168,26 +253,15 @@ class CoursesRemoteDataSourceImpl implements CoursesRemoteDataSource {
   @override
   Future<List<CourseModel>> getFeaturedCourses({int limit = 5}) async {
     try {
-      final response = await dio.get(
+      final response = await client.get(
         '/v1/courses/featured',
         queryParameters: {'limit': limit},
       );
 
-      // Log API response for featured courses
-      debugPrint('╔══════════════════════════════════════════════════════════════');
-      debugPrint('║ ⭐ FEATURED COURSES API RESPONSE');
-      debugPrint('╠══════════════════════════════════════════════════════════════');
-      debugPrint('║ Status: ${response.statusCode}');
-      debugPrint('║ Full Response: ${response.data}');
-      debugPrint('╚══════════════════════════════════════════════════════════════');
-
       if (response.statusCode == 200) {
         final data = response.data['data'];
         if (data is List) {
-          // Log each featured course's thumbnail info
-          for (var course in data) {
-            debugPrint('║ ⭐ Featured: ${course['title_ar']} | thumbnail_url: ${course['thumbnail_url']} | thumbnail_full_url: ${course['thumbnail_full_url']}');
-          }
+          debugPrint('⭐ Loaded ${data.length} featured courses');
           return data.map((json) {
             final courseData = Map<String, dynamic>.from(json as Map);
             _ensureRequiredFields(courseData);
@@ -206,16 +280,7 @@ class CoursesRemoteDataSourceImpl implements CoursesRemoteDataSource {
   @override
   Future<CourseModel> getCourseDetails(int courseId) async {
     try {
-      final response = await dio.get('/v1/courses/$courseId');
-
-      // Log full API response for debugging
-      debugPrint('╔══════════════════════════════════════════════════════════════');
-      debugPrint('║ 📚 COURSE DETAILS API RESPONSE (Course ID: $courseId)');
-      debugPrint('╠══════════════════════════════════════════════════════════════');
-      debugPrint('║ Status Code: ${response.statusCode}');
-      debugPrint('║ Full Response Data:');
-      debugPrint('║ ${response.data}');
-      debugPrint('╚══════════════════════════════════════════════════════════════');
+      final response = await client.get('/v1/courses/$courseId');
 
       if (response.statusCode == 200) {
         final data = response.data['data'];
@@ -228,18 +293,7 @@ class CoursesRemoteDataSourceImpl implements CoursesRemoteDataSource {
             ? Map<String, dynamic>.from(data['course'] as Map)
             : Map<String, dynamic>.from(data as Map);
 
-        // Log parsed course data
-        debugPrint('╔══════════════════════════════════════════════════════════════');
-        debugPrint('║ 🎯 PARSED COURSE DATA:');
-        debugPrint('║ thumbnail_url: ${courseData['thumbnail_url']}');
-        debugPrint('║ thumbnail_full_url: ${courseData['thumbnail_full_url']}');
-        debugPrint('║ title_ar: ${courseData['title_ar']}');
-        debugPrint('║ price_dzd: ${courseData['price_dzd']}');
-        debugPrint('║ is_featured: ${courseData['is_featured']}');
-        debugPrint('║ modules_count: ${courseData['modules_count']}');
-        debugPrint('║ lessons_count: ${courseData['lessons_count']}');
-        debugPrint('╚══════════════════════════════════════════════════════════════');
-
+        debugPrint('📚 Loaded course details: ${courseData['title_ar']}');
         _ensureRequiredFields(courseData);
         return CourseModel.fromJson(courseData);
       } else {
@@ -253,7 +307,7 @@ class CoursesRemoteDataSourceImpl implements CoursesRemoteDataSource {
   @override
   Future<List<CourseModuleModel>> getCourseModules(int courseId) async {
     try {
-      final response = await dio.get('/v1/courses/$courseId/modules');
+      final response = await client.get('/v1/courses/$courseId/modules');
 
       if (response.statusCode == 200) {
         final data = response.data['data'] as List;
@@ -269,7 +323,7 @@ class CoursesRemoteDataSourceImpl implements CoursesRemoteDataSource {
   @override
   Future<List<CourseModel>> searchCourses(String query) async {
     try {
-      final response = await dio.get(
+      final response = await client.get(
         '/v1/courses/search',
         queryParameters: {'q': query},
       );
@@ -294,7 +348,7 @@ class CoursesRemoteDataSourceImpl implements CoursesRemoteDataSource {
   @override
   Future<bool> checkCourseAccess(int courseId) async {
     try {
-      final response = await dio.get('/v1/courses/$courseId/check-access');
+      final response = await client.get('/v1/courses/$courseId/check-access');
 
       if (response.statusCode == 200) {
         // API returns has_access directly in response, not inside 'data'
@@ -320,7 +374,7 @@ class CoursesRemoteDataSourceImpl implements CoursesRemoteDataSource {
   @override
   Future<CourseLessonModel> getLessonDetails(int lessonId) async {
     try {
-      final response = await dio.get('/v1/lessons/$lessonId');
+      final response = await client.get('/v1/lessons/$lessonId');
 
       if (response.statusCode == 200) {
         return CourseLessonModel.fromJson(response.data['data']);
@@ -335,7 +389,7 @@ class CoursesRemoteDataSourceImpl implements CoursesRemoteDataSource {
   @override
   Future<String> getSignedVideoUrl(int lessonId) async {
     try {
-      final response = await dio.get('/v1/lessons/$lessonId/signed-video-url');
+      final response = await client.get('/v1/lessons/$lessonId/signed-video-url');
 
       if (response.statusCode == 200) {
         return response.data['data']['signed_url'] as String;
@@ -352,7 +406,7 @@ class CoursesRemoteDataSourceImpl implements CoursesRemoteDataSource {
   @override
   Future<CourseProgressModel> getCourseProgress(int courseId) async {
     try {
-      final response = await dio.get('/v1/progress/courses/$courseId/my-progress');
+      final response = await client.get('/v1/progress/courses/$courseId/my-progress');
 
       if (response.statusCode == 200) {
         return CourseProgressModel.fromJson(response.data['data']);
@@ -367,7 +421,7 @@ class CoursesRemoteDataSourceImpl implements CoursesRemoteDataSource {
   @override
   Future<LessonProgressModel?> getLessonProgress(int lessonId) async {
     try {
-      final response = await dio.get('/v1/progress/lessons/$lessonId/progress');
+      final response = await client.get('/v1/progress/lessons/$lessonId/progress');
 
       if (response.statusCode == 200) {
         final data = response.data['data'];
@@ -428,7 +482,7 @@ class CoursesRemoteDataSourceImpl implements CoursesRemoteDataSource {
   @override
   Future<CourseLessonModel?> getNextLesson(int courseId) async {
     try {
-      final response = await dio.get('/v1/progress/courses/$courseId/next-lesson');
+      final response = await client.get('/v1/progress/courses/$courseId/next-lesson');
 
       if (response.statusCode == 200) {
         final data = response.data['data'];
@@ -448,7 +502,7 @@ class CoursesRemoteDataSourceImpl implements CoursesRemoteDataSource {
         if (status != null) 'status': status,
       };
 
-      final response = await dio.get(
+      final response = await client.get(
         '/v1/progress/my-courses',
         queryParameters: queryParams,
       );
@@ -473,7 +527,7 @@ class CoursesRemoteDataSourceImpl implements CoursesRemoteDataSource {
   @override
   Future<CertificateModel> generateCertificate(int courseId) async {
     try {
-      final response = await dio.get('/v1/progress/courses/$courseId/certificate');
+      final response = await client.get('/v1/progress/courses/$courseId/certificate');
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         return CertificateModel.fromJson(response.data['data']);
@@ -501,7 +555,7 @@ class CoursesRemoteDataSourceImpl implements CoursesRemoteDataSource {
         if (rating != null) 'rating': rating,
       };
 
-      final response = await dio.get(
+      final response = await client.get(
         '/v1/reviews/courses/$courseId/reviews',
         queryParameters: queryParams,
       );
@@ -552,7 +606,7 @@ class CoursesRemoteDataSourceImpl implements CoursesRemoteDataSource {
   @override
   Future<bool> canReviewCourse(int courseId) async {
     try {
-      final response = await dio.get('/v1/reviews/courses/$courseId/can-review');
+      final response = await client.get('/v1/reviews/courses/$courseId/can-review');
 
       if (response.statusCode == 200) {
         return response.data['data']['can_review'] as bool? ?? false;
@@ -574,7 +628,7 @@ class CoursesRemoteDataSourceImpl implements CoursesRemoteDataSource {
         if (activeOnly != null) 'active_only': activeOnly ? 1 : 0,
       };
 
-      final response = await dio.get(
+      final response = await client.get(
         '/v1/subscriptions/my-subscriptions',
         queryParameters: queryParams,
       );
@@ -595,7 +649,7 @@ class CoursesRemoteDataSourceImpl implements CoursesRemoteDataSource {
   @override
   Future<Map<String, dynamic>> getMyStats() async {
     try {
-      final response = await dio.get('/v1/subscriptions/my-stats');
+      final response = await client.get('/v1/subscriptions/my-stats');
 
       if (response.statusCode == 200) {
         return response.data['data'] as Map<String, dynamic>;
@@ -626,13 +680,9 @@ class CoursesRemoteDataSourceImpl implements CoursesRemoteDataSource {
           throw Exception(message);
         }
 
-        // Return the data if code is valid
-        final data = response.data['data'];
-        if (data == null) {
-          throw Exception('رمز الاشتراك غير صالح');
-        }
-
-        return data as Map<String, dynamic>;
+        // Return the full response data (code and course info are at root level)
+        // API returns: { success, valid, code: {...}, course: {...} }
+        return response.data as Map<String, dynamic>;
       } else {
         throw Exception('فشل التحقق من الكود');
       }
@@ -683,7 +733,7 @@ class CoursesRemoteDataSourceImpl implements CoursesRemoteDataSource {
         if (activeOnly != null) 'active_only': activeOnly ? 1 : 0,
       };
 
-      final response = await dio.get(
+      final response = await client.get(
         '/v1/subscription-packages',
         queryParameters: queryParams,
       );
@@ -721,7 +771,7 @@ class CoursesRemoteDataSourceImpl implements CoursesRemoteDataSource {
   @override
   Future<SubscriptionPackageModel> getPackageDetails(int packageId) async {
     try {
-      final response = await dio.get('/v1/subscription-packages/$packageId');
+      final response = await client.get('/v1/subscription-packages/$packageId');
 
       if (response.statusCode == 200) {
         return SubscriptionPackageModel.fromJson(response.data['data']);
@@ -778,7 +828,7 @@ class CoursesRemoteDataSourceImpl implements CoursesRemoteDataSource {
         if (status != null) 'status': status,
       };
 
-      final response = await dio.get(
+      final response = await client.get(
         '/v1/subscriptions/my-payment-receipts',
         queryParameters: queryParams,
       );
@@ -797,7 +847,7 @@ class CoursesRemoteDataSourceImpl implements CoursesRemoteDataSource {
   @override
   Future<PaymentReceiptModel> getReceiptDetails(int receiptId) async {
     try {
-      final response = await dio.get('/v1/subscriptions/payment-receipts/$receiptId');
+      final response = await client.get('/v1/subscriptions/payment-receipts/$receiptId');
 
       if (response.statusCode == 200) {
         return PaymentReceiptModel.fromJson(response.data['data']);

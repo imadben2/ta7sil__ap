@@ -25,6 +25,9 @@ import '../../../profile/presentation/bloc/profile/profile_bloc.dart';
 import '../../../profile/presentation/bloc/profile/profile_event.dart';
 import '../../../bac_study_schedule/presentation/bloc/bac_study_bloc.dart';
 import '../../../bac_study_schedule/presentation/pages/bac_study_main_page.dart';
+import '../../../notifications/presentation/bloc/notifications_bloc.dart';
+import '../../../notifications/presentation/bloc/notifications_event.dart';
+import '../../../notifications/presentation/bloc/notifications_state.dart';
 
 // Category page views
 import 'home_content_view.dart';
@@ -67,6 +70,18 @@ class _MainScreenState extends State<MainScreen> {
 
     // Listen for order changes
     _tabOrderService.addListener(_onTabOrderChanged);
+
+    // Load unread notification count
+    _loadUnreadNotificationCount();
+  }
+
+  /// Load unread notification count for badge
+  void _loadUnreadNotificationCount() {
+    try {
+      context.read<NotificationsBloc>().add(const RefreshUnreadCount());
+    } catch (e) {
+      // NotificationsBloc might not be available yet
+    }
   }
 
   void _onTabOrderChanged() {
@@ -208,8 +223,7 @@ class _MainScreenState extends State<MainScreen> {
         // دوراتنا (Our Courses) - with BlocProvider
         return BlocProvider(
           create: (context) => sl<CoursesBloc>()
-            ..add(const LoadFeaturedCoursesEvent(limit: 10))
-            ..add(const LoadCoursesEvent()),
+            ..add(const LoadAllCoursesDataEvent()),
           child: const CoursesView(),
         );
       case 6:
@@ -251,8 +265,7 @@ class _MainScreenState extends State<MainScreen> {
         // الدورات - Courses (browse all courses)
         return BlocProvider(
           create: (context) => sl<CoursesBloc>()
-            ..add(const LoadFeaturedCoursesEvent(limit: 10))
-            ..add(const LoadCoursesEvent()),
+            ..add(const LoadAllCoursesDataEvent()),
           child: const CoursesView(),
         );
       case 3:
@@ -299,6 +312,17 @@ class _MainScreenState extends State<MainScreen> {
       }
     }
 
+    // Get unread notification count
+    int unreadNotificationCount = 0;
+    try {
+      final notificationsState = context.watch<NotificationsBloc>().state;
+      if (notificationsState is NotificationsLoaded) {
+        unreadNotificationCount = notificationsState.unreadCount;
+      }
+    } catch (e) {
+      // NotificationsBloc might not be available
+    }
+
     return Scaffold(
       // Only show custom app bar on home tab (index 0)
       appBar: _selectedNavIndex == 0
@@ -308,6 +332,7 @@ class _MainScreenState extends State<MainScreen> {
               onCategorySelected: _onCategorySelected,
               userName: userName,
               streakCount: 0,
+              unreadNotificationCount: unreadNotificationCount,
               onProfileTap: () {
                 setState(() {
                   _selectedNavIndex = 4; // Go to profile

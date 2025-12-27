@@ -926,7 +926,7 @@ class _PlannerMainScreenState extends State<PlannerMainScreen>
     );
   }
 
-  /// Export schedule to PDF - All sessions in French
+  /// Export schedule to PDF - All sessions in Arabic (RTL)
   Future<void> _exportScheduleToPdf(BuildContext context) async {
     final bloc = context.read<PlannerBloc>();
 
@@ -945,7 +945,7 @@ class _PlannerMainScreenState extends State<PlannerMainScreen>
                 ),
               ),
               SizedBox(width: 12),
-              Text('Chargement des seances...'),
+              Text('جاري تحميل الجلسات...', style: TextStyle(fontFamily: 'Cairo')),
             ],
           ),
           backgroundColor: AppColors.primary,
@@ -988,7 +988,7 @@ class _PlannerMainScreenState extends State<PlannerMainScreen>
               children: [
                 Icon(Icons.info_outline_rounded, color: Colors.white),
                 SizedBox(width: 12),
-                Text('Aucune seance a exporter'),
+                Text('لا توجد جلسات للتصدير', style: TextStyle(fontFamily: 'Cairo')),
               ],
             ),
             backgroundColor: AppColors.slate600,
@@ -1018,7 +1018,7 @@ class _PlannerMainScreenState extends State<PlannerMainScreen>
                   ),
                 ),
                 const SizedBox(width: 12),
-                Text('Creation du PDF (${sessions.length} seances)...'),
+                Text('جاري إنشاء ملف PDF (${sessions.length} جلسة)...', style: const TextStyle(fontFamily: 'Cairo')),
               ],
             ),
             backgroundColor: AppColors.primary,
@@ -1031,56 +1031,64 @@ class _PlannerMainScreenState extends State<PlannerMainScreen>
         );
       }
 
-      // No need to load fonts for French - standard PDF fonts work fine
+      // Load Arabic fonts for PDF
+      final fontsLoaded = await PdfFontLoader.loadFonts();
+      if (!fontsLoaded) {
+        print('⚠️ Arabic fonts not loaded - PDF may not display Arabic correctly');
+      }
+
+      // Get Arabic theme with Cairo font
+      final arabicTheme = PdfFontLoader.getArabicTheme();
 
       // Create PDF document
       final pdf = pw.Document();
 
-      // Group sessions by date
-      final sessionsByDate = <DateTime, List<StudySession>>{};
-      for (final session in sessions) {
-        // Filter out breaks and prayer times
-        if (session.isBreak || session.isPrayerTime) continue;
+      // Get today's date (start of day)
+      final now = DateTime.now();
+      final today = DateTime(now.year, now.month, now.day);
 
-        final dateKey = DateTime(
+      // Filter sessions for TODAY only (exclude breaks and prayer times)
+      final todaySessions = sessions.where((session) {
+        if (session.isBreak || session.isPrayerTime) return false;
+        final sessionDate = DateTime(
           session.scheduledDate.year,
           session.scheduledDate.month,
           session.scheduledDate.day,
         );
-        sessionsByDate.putIfAbsent(dateKey, () => []).add(session);
-      }
+        return sessionDate.isAtSameMomentAs(today);
+      }).toList();
 
-      // Sort dates
-      final sortedDates = sessionsByDate.keys.toList()
-        ..sort((a, b) => a.compareTo(b));
+      // Sort today's sessions by time
+      todaySessions.sort((a, b) =>
+        a.scheduledStartTime.hour * 60 + a.scheduledStartTime.minute -
+        (b.scheduledStartTime.hour * 60 + b.scheduledStartTime.minute)
+      );
 
-      // Calculate statistics
-      final totalSessions = sessions.where((s) => !s.isBreak && !s.isPrayerTime).length;
-      final completedSessions = sessions.where((s) => s.isCompleted && !s.isBreak && !s.isPrayerTime).length;
-      final totalMinutes = sessions
-          .where((s) => !s.isBreak && !s.isPrayerTime)
-          .fold<int>(0, (sum, s) => sum + s.duration.inMinutes);
+      // Calculate statistics for today only
+      final totalSessions = todaySessions.length;
+      final completedSessions = todaySessions.where((s) => s.isCompleted).length;
+      final totalMinutes = todaySessions.fold<int>(0, (sum, s) => sum + s.duration.inMinutes);
       final totalHours = (totalMinutes / 60).toStringAsFixed(1);
 
-      // Format dates in French
-      final dateFormatter = DateFormat('dd/MM/yyyy', 'fr');
-      final dayFormatter = DateFormat('EEEE', 'fr');
-      final now = DateTime.now();
+      // Format dates with Western numbers (use 'en' locale for numbers)
+      final dateFormatter = DateFormat('dd/MM/yyyy', 'en');
+      final timeFormatter = DateFormat('HH:mm', 'en');
 
-      // Add pages with standard PDF fonts (French doesn't need special fonts)
+      // Add pages with Arabic fonts (RTL)
       pdf.addPage(
         pw.MultiPage(
           pageFormat: PdfPageFormat.a4,
-          textDirection: pw.TextDirection.ltr,  // Left-to-right for French
+          textDirection: pw.TextDirection.rtl,  // Right-to-left for Arabic
+          theme: arabicTheme,
           build: (context) => [
             // Header
             pw.Header(
               level: 0,
               child: pw.Column(
-                crossAxisAlignment: pw.CrossAxisAlignment.start,
+                crossAxisAlignment: pw.CrossAxisAlignment.end,
                 children: [
                   pw.Text(
-                    'Planning d\'Études - Planificateur Intelligent',
+                    'جدول الدراسة - المخطط الذكي',
                     style: pw.TextStyle(
                       fontSize: 24,
                       fontWeight: pw.FontWeight.bold,
@@ -1088,12 +1096,12 @@ class _PlannerMainScreenState extends State<PlannerMainScreen>
                   ),
                   pw.SizedBox(height: 8),
                   pw.Text(
-                    'Date d\'export: ${dateFormatter.format(now)}',
+                    'تاريخ التصدير: ${dateFormatter.format(now)}',
                     style: const pw.TextStyle(fontSize: 12),
                   ),
                   pw.SizedBox(height: 4),
                   pw.Text(
-                    'Période: ${sortedDates.isNotEmpty ? dateFormatter.format(sortedDates.first) : "-"} au ${sortedDates.isNotEmpty ? dateFormatter.format(sortedDates.last) : "-"}',
+                    '${_getArabicDayName(today)} - ${dateFormatter.format(today)}',
                     style: const pw.TextStyle(fontSize: 12),
                   ),
                   pw.Divider(thickness: 2),
@@ -1110,10 +1118,10 @@ class _PlannerMainScreenState extends State<PlannerMainScreen>
                 borderRadius: const pw.BorderRadius.all(pw.Radius.circular(8)),
               ),
               child: pw.Column(
-                crossAxisAlignment: pw.CrossAxisAlignment.start,
+                crossAxisAlignment: pw.CrossAxisAlignment.end,
                 children: [
                   pw.Text(
-                    'Statistiques',
+                    'الإحصائيات',
                     style: pw.TextStyle(
                       fontSize: 16,
                       fontWeight: pw.FontWeight.bold,
@@ -1123,16 +1131,16 @@ class _PlannerMainScreenState extends State<PlannerMainScreen>
                   pw.Row(
                     mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
                     children: [
-                      pw.Text('Total des séances: $totalSessions'),
-                      pw.Text('Séances complétées: $completedSessions'),
+                      pw.Text('الجلسات المكتملة: $completedSessions'),
+                      pw.Text('إجمالي الجلسات: $totalSessions'),
                     ],
                   ),
                   pw.SizedBox(height: 4),
                   pw.Row(
                     mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
                     children: [
-                      pw.Text('Total d\'heures: $totalHours h'),
-                      pw.Text('Nombre de jours: ${sortedDates.length}'),
+                      pw.Text('عدد الأيام: 1'),
+                      pw.Text('إجمالي الساعات: $totalHours س'),
                     ],
                   ),
                 ],
@@ -1141,8 +1149,73 @@ class _PlannerMainScreenState extends State<PlannerMainScreen>
 
             pw.SizedBox(height: 24),
 
-            // Sessions by date
-            ..._buildSessionsByDate(sortedDates, sessionsByDate, dateFormatter, dayFormatter),
+            // Today's sessions table
+            if (todaySessions.isNotEmpty) ...[
+              // Date header
+              pw.Container(
+                padding: const pw.EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+                decoration: const pw.BoxDecoration(
+                  color: PdfColors.grey200,
+                  borderRadius: pw.BorderRadius.all(pw.Radius.circular(4)),
+                ),
+                child: pw.Row(
+                  mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                  children: [
+                    pw.Text(
+                      '$totalSessions جلسة',
+                      style: const pw.TextStyle(fontSize: 12),
+                    ),
+                    pw.Text(
+                      '${_getArabicDayName(today)} - ${dateFormatter.format(today)}',
+                      style: pw.TextStyle(
+                        fontSize: 14,
+                        fontWeight: pw.FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              pw.SizedBox(height: 8),
+
+              // Sessions table (columns ordered for RTL display: الحالة، النوع، المدة، الوقت، المادة)
+              pw.Table(
+                border: pw.TableBorder.all(color: PdfColors.grey300),
+                children: [
+                  // Header row (reversed order for RTL)
+                  pw.TableRow(
+                    decoration: const pw.BoxDecoration(
+                      color: PdfColors.grey100,
+                    ),
+                    children: [
+                      _buildPdfTableCell('الحالة', isHeader: true),
+                      _buildPdfTableCell('النوع', isHeader: true),
+                      _buildPdfTableCell('المدة', isHeader: true),
+                      _buildPdfTableCell('الوقت', isHeader: true),
+                      _buildPdfTableCell('المادة', isHeader: true),
+                    ],
+                  ),
+                  // Data rows (reversed order for RTL)
+                  ...todaySessions.map((session) => pw.TableRow(
+                    children: [
+                      _buildPdfTableCell(_getStatusTextAr(session.status)),
+                      _buildPdfTableCell(_getSessionTypeTextAr(session.sessionType, session.rawSessionType)),
+                      _buildPdfTableCell('${session.duration.inMinutes} د'),
+                      _buildPdfTableCell(
+                        '${_formatTimeOfDay(session.scheduledStartTime)} - ${_formatTimeOfDay(session.scheduledEndTime)}',
+                      ),
+                      _buildPdfTableCell(session.subjectName),
+                    ],
+                  )),
+                ],
+              ),
+            ] else ...[
+              pw.Center(
+                child: pw.Text(
+                  'لا توجد جلسات لهذا اليوم',
+                  style: const pw.TextStyle(fontSize: 14),
+                ),
+              ),
+            ],
 
             // Footer
             pw.SizedBox(height: 32),
@@ -1150,7 +1223,7 @@ class _PlannerMainScreenState extends State<PlannerMainScreen>
             pw.SizedBox(height: 8),
             pw.Center(
               child: pw.Text(
-                'Rapport généré par l\'application MEMO - ${DateFormat('dd/MM/yyyy HH:mm', 'fr').format(now)}',
+                'تم إنشاء التقرير بواسطة تطبيق MEMO - ${dateFormatter.format(now)} ${timeFormatter.format(now)}',
                 style: const pw.TextStyle(
                   fontSize: 10,
                   color: PdfColors.grey,
@@ -1196,11 +1269,11 @@ class _PlannerMainScreenState extends State<PlannerMainScreen>
       }
 
       if (mounted) {
-        // Show success dialog with option to share (French)
+        // Show success dialog with option to share (Arabic)
         showDialog(
           context: context,
           builder: (dialogContext) => Directionality(
-            textDirection: TextDirection.ltr,
+            textDirection: TextDirection.rtl,
             child: AlertDialog(
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(20),
@@ -1220,10 +1293,13 @@ class _PlannerMainScreenState extends State<PlannerMainScreen>
                     ),
                   ),
                   const SizedBox(width: 12),
-                  const Text(
-                    'PDF cree avec succes!',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
+                  const Expanded(
+                    child: Text(
+                      'تم إنشاء ملف PDF بنجاح!',
+                      style: TextStyle(
+                        fontFamily: 'Cairo',
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                 ],
@@ -1233,8 +1309,8 @@ class _PlannerMainScreenState extends State<PlannerMainScreen>
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Planning exporte (${sessions.length} seances)',
-                    style: const TextStyle(fontSize: 16),
+                    'تم تصدير جدول اليوم ($totalSessions جلسة)',
+                    style: const TextStyle(fontFamily: 'Cairo', fontSize: 16),
                   ),
                   const SizedBox(height: 12),
                   Container(
@@ -1268,18 +1344,19 @@ class _PlannerMainScreenState extends State<PlannerMainScreen>
                         ),
                         if (serverUrl != null) ...[
                           const SizedBox(height: 8),
-                          Row(
+                          const Row(
                             children: [
-                              const Icon(
+                              Icon(
                                 Icons.cloud_done_rounded,
                                 color: Color(0xFF10B981),
                                 size: 16,
                               ),
-                              const SizedBox(width: 4),
-                              const Expanded(
+                              SizedBox(width: 4),
+                              Expanded(
                                 child: Text(
-                                  'Televerse sur le serveur',
+                                  'تم الرفع على الخادم',
                                   style: TextStyle(
+                                    fontFamily: 'Cairo',
                                     fontSize: 12,
                                     color: Color(0xFF10B981),
                                   ),
@@ -1297,8 +1374,8 @@ class _PlannerMainScreenState extends State<PlannerMainScreen>
                 TextButton(
                   onPressed: () => Navigator.pop(dialogContext),
                   child: const Text(
-                    'Fermer',
-                    style: TextStyle(color: AppColors.slate600),
+                    'إغلاق',
+                    style: TextStyle(fontFamily: 'Cairo', color: AppColors.slate600),
                   ),
                 ),
                 ElevatedButton.icon(
@@ -1307,16 +1384,17 @@ class _PlannerMainScreenState extends State<PlannerMainScreen>
                     // Share the file
                     await Share.shareXFiles(
                       [XFile(file.path)],
-                      subject: 'Planning MEMO',
+                      subject: 'جدول الدراسة MEMO',
                       text: serverUrl != null
-                          ? 'Mon planning d\'etudes MEMO\n\nLien: $serverUrl'
-                          : 'Mon planning d\'etudes MEMO',
+                          ? 'جدول دراستي من تطبيق MEMO\n\nالرابط: $serverUrl'
+                          : 'جدول دراستي من تطبيق MEMO',
                     );
                   },
                   icon: const Icon(Icons.share_rounded, size: 18),
                   label: const Text(
-                    'Partager',
+                    'مشاركة',
                     style: TextStyle(
+                      fontFamily: 'Cairo',
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -1342,7 +1420,7 @@ class _PlannerMainScreenState extends State<PlannerMainScreen>
               children: [
                 const Icon(Icons.error_outline_rounded, color: Colors.white),
                 const SizedBox(width: 12),
-                Expanded(child: Text('Erreur lors de l\'export: ${e.toString()}')),
+                Expanded(child: Text('خطأ في التصدير: ${e.toString()}', style: const TextStyle(fontFamily: 'Cairo'))),
               ],
             ),
             backgroundColor: AppColors.red500,
@@ -1356,7 +1434,7 @@ class _PlannerMainScreenState extends State<PlannerMainScreen>
     }
   }
 
-  /// Helper to build PDF table cell (French version - LTR)
+  /// Helper to build PDF table cell (Arabic version - RTL)
   pw.Widget _buildPdfTableCell(String text, {bool isHeader = false}) {
     return pw.Padding(
       padding: const pw.EdgeInsets.all(8),
@@ -1378,70 +1456,34 @@ class _PlannerMainScreenState extends State<PlannerMainScreen>
     return '$hour:$minute';
   }
 
-  /// Get session type text in French
+  /// Get session type text in Arabic for PDF
   /// Uses rawSessionType if available for more accurate display
-  String _getSessionTypeTextFr(SessionType type, [String? rawSessionType]) {
+  String _getSessionTypeTextAr(SessionType type, [String? rawSessionType]) {
     // If we have the raw API session type, use it for more accurate labels
     if (rawSessionType != null) {
       switch (rawSessionType) {
         case 'lesson_review':
-          return 'Leçon';
+          return 'درس';
         case 'exercises':
-          return 'Exercices';
+          return 'تمارين';
         case 'topic_test':
-          return 'Test';
+          return 'اختبار';
         case 'unit_test':
-          return 'Test Unité';
+          return 'اختبار وحدة';
         case 'spaced_review':
-          return 'Révision';
+          return 'مراجعة';
         case 'language_daily':
-          return 'Langue';
+          return 'لغة';
         case 'mock_test':
-          return 'Examen Blanc';
+          return 'اختبار تجريبي';
         case 'break':
-          return 'Pause';
+          return 'استراحة';
         case 'study':
-          return 'Étude';
+          return 'دراسة';
       }
     }
 
     // Fallback to SessionType enum
-    switch (type) {
-      case SessionType.study:
-        return 'Étude';
-      case SessionType.regular:
-        return 'Régulière';
-      case SessionType.revision:
-        return 'Révision';
-      case SessionType.practice:
-        return 'Exercices';
-      case SessionType.exam:
-        return 'Examen';
-      case SessionType.longRevision:
-        return 'Révision complète';
-    }
-  }
-
-  /// Get status text in French
-  String _getStatusTextFr(SessionStatus status) {
-    switch (status) {
-      case SessionStatus.scheduled:
-        return 'Planifiée';
-      case SessionStatus.inProgress:
-        return 'En cours';
-      case SessionStatus.paused:
-        return 'En pause';
-      case SessionStatus.completed:
-        return 'Complétée';
-      case SessionStatus.missed:
-        return 'Manquée';
-      case SessionStatus.skipped:
-        return 'Sautée';
-    }
-  }
-
-  /// Get session type text in Arabic (kept for UI compatibility)
-  String _getSessionTypeText(SessionType type) {
     switch (type) {
       case SessionType.study:
         return 'دراسة';
@@ -1458,8 +1500,8 @@ class _PlannerMainScreenState extends State<PlannerMainScreen>
     }
   }
 
-  /// Get status text in Arabic (kept for UI compatibility)
-  String _getStatusText(SessionStatus status) {
+  /// Get status text in Arabic for PDF
+  String _getStatusTextAr(SessionStatus status) {
     switch (status) {
       case SessionStatus.scheduled:
         return 'مجدولة';
@@ -1476,181 +1518,17 @@ class _PlannerMainScreenState extends State<PlannerMainScreen>
     }
   }
 
-  /// Capitalize first letter of a French string
-  String _capitalizeFrench(String text) {
-    if (text.isEmpty) return text;
-    return text[0].toUpperCase() + text.substring(1);
-  }
-
-  /// Translate Arabic subject names to French for PDF export
-  String _translateSubjectToFrench(String arabicName) {
-    // Map of Arabic subject names to French translations
-    const translations = {
-      // Sciences
-      'الرياضيات': 'Mathematiques',
-      'رياضيات': 'Mathematiques',
-      'الفيزياء': 'Physique',
-      'فيزياء': 'Physique',
-      'الكيمياء': 'Chimie',
-      'كيمياء': 'Chimie',
-      'العلوم الطبيعية': 'Sciences Naturelles',
-      'علوم الطبيعة والحياة': 'Sciences de la Nature et de la Vie',
-      'علوم الطبيعة': 'Sciences Naturelles',
-      'العلوم الفيزيائية': 'Sciences Physiques',
-      'علوم فيزيائية': 'Sciences Physiques',
-
-      // Languages
-      'اللغة العربية': 'Langue Arabe',
-      'العربية': 'Arabe',
-      'عربية': 'Arabe',
-      'اللغة الفرنسية': 'Langue Francaise',
-      'الفرنسية': 'Francais',
-      'فرنسية': 'Francais',
-      'اللغة الإنجليزية': 'Langue Anglaise',
-      'الإنجليزية': 'Anglais',
-      'إنجليزية': 'Anglais',
-      'اللغة الانجليزية': 'Langue Anglaise',
-      'الانجليزية': 'Anglais',
-      'انجليزية': 'Anglais',
-
-      // Humanities
-      'التاريخ': 'Histoire',
-      'تاريخ': 'Histoire',
-      'الجغرافيا': 'Geographie',
-      'جغرافيا': 'Geographie',
-      'التاريخ والجغرافيا': 'Histoire et Geographie',
-      'الفلسفة': 'Philosophie',
-      'فلسفة': 'Philosophie',
-      'العلوم الإسلامية': 'Sciences Islamiques',
-      'علوم إسلامية': 'Sciences Islamiques',
-      'التربية الإسلامية': 'Education Islamique',
-      'الشريعة الإسلامية': 'Charia Islamique',
-
-      // Technical
-      'الإعلام الآلي': 'Informatique',
-      'إعلام آلي': 'Informatique',
-      'الحاسوب': 'Informatique',
-      'التكنولوجيا': 'Technologie',
-      'تكنولوجيا': 'Technologie',
-      'الهندسة الكهربائية': 'Genie Electrique',
-      'هندسة كهربائية': 'Genie Electrique',
-      'الهندسة المدنية': 'Genie Civil',
-      'هندسة مدنية': 'Genie Civil',
-      'الهندسة الميكانيكية': 'Genie Mecanique',
-      'هندسة ميكانيكية': 'Genie Mecanique',
-      'هندسة الطرائق': 'Genie des Procedes',
-
-      // Economy & Management
-      'الاقتصاد': 'Economie',
-      'اقتصاد': 'Economie',
-      'التسيير المحاسبي والمالي': 'Gestion Comptable et Financiere',
-      'تسيير محاسبي': 'Gestion Comptable',
-      'القانون': 'Droit',
-      'قانون': 'Droit',
-
-      // Arts & Sports
-      'التربية البدنية': 'Education Physique',
-      'تربية بدنية': 'Education Physique',
-      'التربية الفنية': 'Education Artistique',
-      'الموسيقى': 'Musique',
-      'الرسم': 'Dessin',
-
-      // Other
-      'علوم تجريبية': 'Sciences Experimentales',
-      'آداب وفلسفة': 'Lettres et Philosophie',
-      'تقني رياضي': 'Technique Mathematique',
-      'رياضيات تقنية': 'Mathematiques Techniques',
-      'لغات أجنبية': 'Langues Etrangeres',
-      'تسيير واقتصاد': 'Gestion et Economie',
+  /// Get Arabic day name from date
+  String _getArabicDayName(DateTime date) {
+    const arabicDays = {
+      1: 'الإثنين',
+      2: 'الثلاثاء',
+      3: 'الأربعاء',
+      4: 'الخميس',
+      5: 'الجمعة',
+      6: 'السبت',
+      7: 'الأحد',
     };
-
-    // Return the translation if found, otherwise return original name
-    return translations[arabicName] ?? arabicName;
-  }
-
-  /// Build PDF widgets for sessions grouped by date
-  List<pw.Widget> _buildSessionsByDate(
-    List<DateTime> sortedDates,
-    Map<DateTime, List<StudySession>> sessionsByDate,
-    DateFormat dateFormatter,
-    DateFormat dayFormatter,
-  ) {
-    final widgets = <pw.Widget>[];
-
-    for (final date in sortedDates) {
-      final daySessions = List<StudySession>.from(sessionsByDate[date]!);
-      daySessions.sort((a, b) =>
-        a.scheduledStartTime.hour * 60 + a.scheduledStartTime.minute -
-        (b.scheduledStartTime.hour * 60 + b.scheduledStartTime.minute)
-      );
-
-      widgets.add(
-        pw.Column(
-          crossAxisAlignment: pw.CrossAxisAlignment.start,
-          children: [
-            // Date header
-            pw.Container(
-              padding: const pw.EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-              decoration: const pw.BoxDecoration(
-                color: PdfColors.grey200,
-                borderRadius: pw.BorderRadius.all(pw.Radius.circular(4)),
-              ),
-              child: pw.Row(
-                mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-                children: [
-                  pw.Text(
-                    '${_capitalizeFrench(dayFormatter.format(date))} - ${dateFormatter.format(date)}',
-                    style: pw.TextStyle(
-                      fontSize: 14,
-                      fontWeight: pw.FontWeight.bold,
-                    ),
-                  ),
-                  pw.Text(
-                    '${daySessions.length} séance${daySessions.length > 1 ? 's' : ''}',
-                    style: const pw.TextStyle(fontSize: 12),
-                  ),
-                ],
-              ),
-            ),
-            pw.SizedBox(height: 8),
-
-            // Sessions table
-            pw.Table(
-              border: pw.TableBorder.all(color: PdfColors.grey300),
-              children: [
-                // Header row
-                pw.TableRow(
-                  decoration: const pw.BoxDecoration(
-                    color: PdfColors.grey100,
-                  ),
-                  children: [
-                    _buildPdfTableCell('Matière', isHeader: true),
-                    _buildPdfTableCell('Horaire', isHeader: true),
-                    _buildPdfTableCell('Durée', isHeader: true),
-                    _buildPdfTableCell('Type', isHeader: true),
-                    _buildPdfTableCell('Statut', isHeader: true),
-                  ],
-                ),
-                // Data rows - translate subject names to French
-                ...daySessions.map((session) => pw.TableRow(
-                  children: [
-                    _buildPdfTableCell(_translateSubjectToFrench(session.subjectName)),
-                    _buildPdfTableCell(
-                      '${_formatTimeOfDay(session.scheduledStartTime)} - ${_formatTimeOfDay(session.scheduledEndTime)}',
-                    ),
-                    _buildPdfTableCell('${session.duration.inMinutes} min'),
-                    _buildPdfTableCell(_getSessionTypeTextFr(session.sessionType, session.rawSessionType)),
-                    _buildPdfTableCell(_getStatusTextFr(session.status)),
-                  ],
-                )),
-              ],
-            ),
-            pw.SizedBox(height: 16),
-          ],
-        ),
-      );
-    }
-
-    return widgets;
+    return arabicDays[date.weekday] ?? '';
   }
 }

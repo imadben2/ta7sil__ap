@@ -203,6 +203,7 @@ class QuizAttemptBloc extends Bloc<QuizAttemptEvent, QuizAttemptState> {
     if (state is! QuizAttemptActive) return;
 
     final currentState = state as QuizAttemptActive;
+    final quizId = currentState.attempt.quizId;
 
     emit(const QuizAttemptAbandoning());
 
@@ -218,7 +219,7 @@ class QuizAttemptBloc extends Bloc<QuizAttemptEvent, QuizAttemptState> {
         );
       },
       (_) {
-        emit(const QuizAttemptAbandoned());
+        emit(QuizAttemptAbandoned(quizId: quizId));
       },
     );
   }

@@ -10,6 +10,7 @@ import '../../domain/entities/course_progress_entity.dart';
 import '../../domain/entities/course_review_entity.dart';
 import '../../domain/entities/lesson_progress_entity.dart';
 import '../../domain/repositories/courses_repository.dart';
+import '../../domain/usecases/get_complete_courses_usecase.dart';
 import '../datasources/courses_remote_datasource.dart';
 
 class CoursesRepositoryImpl implements CoursesRepository {
@@ -22,6 +23,44 @@ class CoursesRepositoryImpl implements CoursesRepository {
   });
 
   // ========== Browse & Discover ==========
+
+  @override
+  Future<Either<Failure, CompleteCoursesData>> getCompleteCourses({
+    String? search,
+    int? subjectId,
+    String? level,
+    bool? isFree,
+    String sortBy = 'created_at',
+    String sortOrder = 'desc',
+    int page = 1,
+    int perPage = 20,
+  }) async {
+    if (!await networkInfo.isConnected) {
+      return const Left(NetworkFailure('لا يوجد اتصال بالإنترنت'));
+    }
+
+    try {
+      final data = await remoteDataSource.getCompleteCourses(
+        search: search,
+        subjectId: subjectId,
+        level: level,
+        isFree: isFree,
+        sortBy: sortBy,
+        sortOrder: sortOrder,
+        page: page,
+        perPage: perPage,
+      );
+      return Right(CompleteCoursesData(
+        featuredCourses: data.featuredCourses.map((m) => m.toEntity()).toList(),
+        courses: data.courses.map((m) => m.toEntity()).toList(),
+        currentPage: data.currentPage,
+        lastPage: data.lastPage,
+        total: data.total,
+      ));
+    } on Exception catch (e) {
+      return Left(_handleException(e));
+    }
+  }
 
   @override
   Future<Either<Failure, List<CourseEntity>>> getCourses({

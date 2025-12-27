@@ -55,39 +55,59 @@ class FcmTokenService {
   }
 
   /// Register FCM token with the API
-  Future<bool> registerToken() async {
-    try {
-      final token = _notificationService.fcmToken;
+  /// Includes retry logic for transient failures
+  Future<bool> registerToken({int maxRetries = 3}) async {
+    for (int attempt = 1; attempt <= maxRetries; attempt++) {
+      try {
+        final token = _notificationService.fcmToken;
 
-      if (token == null) {
-        debugPrint('[FcmTokenService] No FCM token available');
-        return false;
+        if (token == null) {
+          debugPrint('[FcmTokenService] No FCM token available (attempt $attempt/$maxRetries)');
+          if (attempt < maxRetries) {
+            // Wait and try to get token again
+            await Future.delayed(Duration(seconds: attempt * 2));
+            continue;
+          }
+          debugPrint('[FcmTokenService] WARNING: FCM token is null after $maxRetries attempts');
+          debugPrint('[FcmTokenService] Push notifications will not work for this device');
+          return false;
+        }
+
+        if (_deviceUuid == null) {
+          await _getDeviceInfo();
+        }
+
+        debugPrint('[FcmTokenService] Registering token (attempt $attempt/$maxRetries)');
+        debugPrint('[FcmTokenService] Token: ${token.substring(0, 20)}...');
+        debugPrint('[FcmTokenService] Device UUID: $_deviceUuid');
+        debugPrint('[FcmTokenService] Platform: $_platform');
+
+        final response = await _dio.post(
+          '${ApiConstants.baseUrl}${ApiConstants.notificationsFcmToken}',
+          data: {
+            'fcm_token': token,
+            'device_uuid': _deviceUuid,
+            'device_platform': _platform,
+          },
+        );
+
+        if (response.statusCode == 200 || response.statusCode == 201) {
+          debugPrint('[FcmTokenService] Token registered successfully');
+          return true;
+        }
+
+        debugPrint('[FcmTokenService] Registration failed: ${response.statusCode}');
+        if (attempt < maxRetries) {
+          await Future.delayed(Duration(seconds: attempt * 2));
+        }
+      } catch (e) {
+        debugPrint('[FcmTokenService] Registration error (attempt $attempt/$maxRetries): $e');
+        if (attempt < maxRetries) {
+          await Future.delayed(Duration(seconds: attempt * 2));
+        }
       }
-
-      if (_deviceUuid == null) {
-        await _getDeviceInfo();
-      }
-
-      final response = await _dio.post(
-        '${ApiConstants.baseUrl}${ApiConstants.notificationsFcmToken}',
-        data: {
-          'fcm_token': token,
-          'device_uuid': _deviceUuid,
-          'device_platform': _platform,
-        },
-      );
-
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        debugPrint('[FcmTokenService] Token registered successfully');
-        return true;
-      }
-
-      debugPrint('[FcmTokenService] Registration failed: ${response.statusCode}');
-      return false;
-    } catch (e) {
-      debugPrint('[FcmTokenService] Registration error: $e');
-      return false;
     }
+    return false;
   }
 
   /// Refresh FCM token with the API

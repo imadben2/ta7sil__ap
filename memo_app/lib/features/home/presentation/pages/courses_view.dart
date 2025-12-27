@@ -28,8 +28,8 @@ class _CoursesViewState extends State<CoursesView> {
   @override
   void initState() {
     super.initState();
-    context.read<CoursesBloc>().add(const LoadFeaturedCoursesEvent(limit: 10));
-    context.read<CoursesBloc>().add(const LoadCoursesEvent());
+    // OPTIMIZED: Single API call for both featured and all courses
+    context.read<CoursesBloc>().add(const LoadAllCoursesDataEvent());
   }
 
   @override
@@ -45,9 +45,9 @@ class _CoursesViewState extends State<CoursesView> {
       body: SafeArea(
         child: RefreshIndicator(
         onRefresh: () async {
-          context.read<CoursesBloc>().add(const LoadFeaturedCoursesEvent(limit: 10));
-          context.read<CoursesBloc>().add(const LoadCoursesEvent());
-          await Future.delayed(const Duration(seconds: 1));
+          // OPTIMIZED: Single API call for refresh
+          context.read<CoursesBloc>().add(const LoadAllCoursesDataEvent());
+          await Future.delayed(const Duration(milliseconds: 500));
         },
         color: const Color(0xFF667EEA),
         child: CustomScrollView(

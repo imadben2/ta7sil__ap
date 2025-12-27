@@ -360,6 +360,27 @@
                     </div>
 
                     <div class="space-y-4">
+                        <!-- Allowed Video Type -->
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-2 flex items-center gap-2">
+                                <i class="fas fa-video text-purple-500 text-xs"></i>
+                                نوع الفيديو المسموح في الدروس
+                            </label>
+                            <select name="allowed_video_type"
+                                    class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all">
+                                <option value="both" {{ old('allowed_video_type', $course->allowed_video_type ?? 'both') == 'both' ? 'selected' : '' }}>
+                                    الكل (YouTube + رفع ملف)
+                                </option>
+                                <option value="youtube" {{ old('allowed_video_type', $course->allowed_video_type) == 'youtube' ? 'selected' : '' }}>
+                                    YouTube فقط
+                                </option>
+                                <option value="upload" {{ old('allowed_video_type', $course->allowed_video_type) == 'upload' ? 'selected' : '' }}>
+                                    رفع ملف فقط
+                                </option>
+                            </select>
+                            <p class="text-xs text-gray-500 mt-1">تحديد نوع الفيديو المسموح للدروس في هذه الدورة</p>
+                        </div>
+
                         <div class="flex items-center bg-green-50 border-2 border-green-200 rounded-xl p-4 hover:bg-green-100 transition-colors cursor-pointer">
                             <input type="checkbox" name="is_published" id="is_published" value="1"
                                    {{ old('is_published', $course->is_published) ? 'checked' : '' }}

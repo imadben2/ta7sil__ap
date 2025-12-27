@@ -63,16 +63,33 @@ class SubscriptionCodeValidationResult {
   });
 
   factory SubscriptionCodeValidationResult.fromJson(Map<String, dynamic> json) {
+    // API response format:
+    // { success: true, valid: true, code: {...}, course: {...} or package: {...} }
+    final codeData = json['code'] as Map<String, dynamic>?;
+    final courseData = json['course'] as Map<String, dynamic>?;
+    final packageData = json['package'] as Map<String, dynamic>?;
+
+    // Determine code type from the code object
+    final codeType = codeData?['type'] as String?;
+
+    // Get duration_days from course or package
+    int? durationDays;
+    if (courseData != null && courseData['duration_days'] != null) {
+      durationDays = courseData['duration_days'] as int?;
+    } else if (packageData != null && packageData['duration_days'] != null) {
+      durationDays = packageData['duration_days'] as int?;
+    }
+
     return SubscriptionCodeValidationResult(
-      isValid: json['is_valid'] ?? false,
+      isValid: json['valid'] ?? json['is_valid'] ?? false,
       message: json['message'],
-      codeType: json['code_type'],
-      courseId: json['course_id'],
-      packageId: json['package_id'],
-      courseTitleAr: json['course_title_ar'],
-      packageNameAr: json['package_name_ar'],
-      durationDays: json['duration_days'],
-      remainingUses: json['remaining_uses'],
+      codeType: codeType,
+      courseId: courseData?['id'] as int?,
+      packageId: packageData?['id'] as int?,
+      courseTitleAr: courseData?['title_ar'] as String?,
+      packageNameAr: packageData?['name_ar'] as String?,
+      durationDays: durationDays,
+      remainingUses: codeData?['remaining_uses'] as int?,
     );
   }
 
