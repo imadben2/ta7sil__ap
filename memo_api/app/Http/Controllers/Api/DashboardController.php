@@ -9,6 +9,7 @@ use App\Models\UserSubject;
 use App\Models\QuizAttempt;
 use App\Models\UserActivityLog;
 use App\Models\Achievement;
+use App\Models\AppSetting;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -940,6 +941,9 @@ class DashboardController extends Controller
         // 6. Get promos
         $promos = $this->getPromos();
 
+        // 7. Get video player settings
+        $videoPlayerSettings = AppSetting::getVideoPlayerSettings();
+
         // Format response for Flutter compatibility
         return response()->json([
             'success' => true,
@@ -994,6 +998,9 @@ class DashboardController extends Controller
 
                 // Promos
                 'promos' => $promos,
+
+                // Video player settings from admin panel
+                'video_player_settings' => $videoPlayerSettings,
             ],
             'meta' => [
                 'last_updated' => now()->toIso8601String(),

@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import '../../../../core/network/dio_client.dart';
 import '../../../../core/constants/api_constants.dart';
+import '../../../../core/video_player/domain/video_player_settings_service.dart';
 import '../models/stats_model.dart';
 import '../models/study_session_model.dart';
 import '../models/subject_progress_model.dart';
@@ -105,6 +106,13 @@ class HomeRemoteDataSourceImpl implements HomeRemoteDataSource {
       final promos = promosData
           .map((json) => Map<String, dynamic>.from(json as Map))
           .toList();
+
+      // Parse and update video player settings
+      final videoPlayerSettingsData = data['video_player_settings'] as Map<String, dynamic>?;
+      if (videoPlayerSettingsData != null) {
+        await VideoPlayerSettingsService().updateFromServer(videoPlayerSettingsData);
+        debugPrint('🎬 HOME_DATASOURCE: Video player settings updated from server');
+      }
 
       debugPrint('✅ HOME_DATASOURCE: Complete dashboard loaded - '
           '${todaySessions.length} sessions, '

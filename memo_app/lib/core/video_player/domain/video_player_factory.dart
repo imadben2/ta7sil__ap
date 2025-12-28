@@ -1,4 +1,6 @@
+import 'package:flutter/foundation.dart';
 import 'video_player_interface.dart';
+import 'video_player_settings_service.dart';
 import '../infrastructure/chewie_player_impl.dart';
 import '../infrastructure/media_kit_player_impl.dart';
 import '../infrastructure/simple_youtube_player_impl.dart';
@@ -8,9 +10,11 @@ import '../infrastructure/orax_player_impl.dart';
 /// Factory for creating video player instances
 ///
 /// This factory creates the appropriate video player implementation
-/// based on user preferences. It provides a fallback chain:
-/// - User's preferred player (from settings)
-/// - If that fails, fallback to Chewie (default)
+/// based on user preferences and server settings. It provides:
+/// - Automatic player selection based on video type (YouTube vs uploaded)
+/// - Server-configured default players
+/// - User preference override
+/// - Fallback chain if preferred player fails
 class VideoPlayerFactory {
   /// Create a video player instance based on player type
   ///
@@ -43,6 +47,33 @@ class VideoPlayerFactory {
     }
   }
 
+  /// Create the best video player for a specific video URL
+  ///
+  /// This method automatically:
+  /// 1. Detects if the URL is YouTube or uploaded video
+  /// 2. Uses server-configured default player for that video type
+  /// 3. Falls back to user's preferred player if set
+  /// 4. Ensures the player is enabled in server settings
+  ///
+  /// [videoUrl] - The video URL to play
+  /// [userPreferredPlayer] - Optional user override
+  ///
+  /// Returns an instance of IVideoPlayer optimized for the video type
+  static IVideoPlayer createForVideo(
+    String videoUrl, {
+    String? userPreferredPlayer,
+  }) {
+    final service = VideoPlayerSettingsService();
+    final recommendedPlayer = service.getRecommendedPlayer(
+      videoUrl,
+      userPreferredPlayer: userPreferredPlayer,
+    );
+
+    debugPrint('[VideoPlayerFactory] Creating player: $recommendedPlayer for URL: ${videoUrl.substring(0, videoUrl.length.clamp(0, 50))}...');
+
+    return create(recommendedPlayer);
+  }
+
   /// Create a video player with fallback support
   ///
   /// Tries to create the preferred player, and falls back to Chewie if it fails.
@@ -67,14 +98,38 @@ class VideoPlayerFactory {
     }
   }
 
-  /// Get list of available player types
-  static List<String> get availablePlayers => [
+  /// Get list of all player types (regardless of server settings)
+  static List<String> get allPlayers => [
         'chewie',
         'media_kit',
         'simple_youtube',
         'omni',
         'orax',
       ];
+
+  /// Get list of available player types (only enabled by server)
+  static List<String> get availablePlayers {
+    final service = VideoPlayerSettingsService();
+    return allPlayers.where((player) => service.settings.isPlayerEnabled(player)).toList();
+  }
+
+  /// Get list of available players for uploaded videos
+  static List<String> get availableUploadPlayers {
+    final service = VideoPlayerSettingsService();
+    return allPlayers.where((player) {
+      return service.settings.isPlayerEnabled(player) &&
+          service.settings.playerSupportsVideoType(player, 'upload');
+    }).toList();
+  }
+
+  /// Get list of available players for YouTube videos
+  static List<String> get availableYoutubePlayers {
+    final service = VideoPlayerSettingsService();
+    return allPlayers.where((player) {
+      return service.settings.isPlayerEnabled(player) &&
+          service.settings.playerSupportsVideoType(player, 'youtube');
+    }).toList();
+  }
 
   /// Get player display name in Arabic
   static String getPlayerDisplayName(String playerType) {
@@ -116,9 +171,33 @@ class VideoPlayerFactory {
 
   /// Check if a player type is valid
   static bool isValidPlayerType(String playerType) {
-    return availablePlayers.contains(playerType.toLowerCase());
+    return allPlayers.contains(playerType.toLowerCase());
   }
 
-  /// Get default player type
+  /// Check if a player is enabled by server settings
+  static bool isPlayerEnabled(String playerType) {
+    final service = VideoPlayerSettingsService();
+    return service.settings.isPlayerEnabled(playerType);
+  }
+
+  /// Get what video types a player supports: 'youtube', 'upload', or 'both'
+  static String getPlayerSupports(String playerType) {
+    final service = VideoPlayerSettingsService();
+    return service.settings.getPlayerSupports(playerType);
+  }
+
+  /// Get default player for uploaded videos (from server settings)
+  static String get defaultUploadPlayer {
+    final service = VideoPlayerSettingsService();
+    return service.settings.defaultUploadPlayer;
+  }
+
+  /// Get default player for YouTube videos (from server settings)
+  static String get defaultYoutubePlayer {
+    final service = VideoPlayerSettingsService();
+    return service.settings.defaultYoutubePlayer;
+  }
+
+  /// Get default player type (fallback)
   static String get defaultPlayer => 'chewie';
 }

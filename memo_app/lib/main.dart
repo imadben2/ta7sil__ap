@@ -34,6 +34,7 @@ import 'core/services/fcm_token_service.dart';
 import 'core/services/connectivity_service.dart';
 import 'core/services/tab_order_service.dart';
 import 'core/services/app_lifecycle_observer.dart';
+import 'core/video_player/domain/video_player_settings_service.dart';
 import 'app_router.dart';
 
 void main() async {
@@ -104,6 +105,10 @@ void main() async {
 
   // Initialize tab order service (loads saved preferences from Hive)
   await di.sl<TabOrderService>().init();
+
+  // Initialize video player settings service (loads cached settings from Hive)
+  await VideoPlayerSettingsService().initialize();
+  debugPrint('[main] VideoPlayerSettingsService initialized');
 
   // Initialize app lifecycle observer (handles notification sync on app resume/midnight)
   di.sl<AppLifecycleObserver>().init();

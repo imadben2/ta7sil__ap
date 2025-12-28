@@ -3,6 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/services/notification_service.dart';
+import '../../../../core/video_player/domain/video_player_settings_service.dart';
+import '../../../../core/video_player/domain/video_player_factory.dart';
 import '../../../../injection_container.dart' as di;
 import '../../domain/entities/settings_entity.dart';
 import '../bloc/settings/settings_cubit.dart';
@@ -826,21 +828,30 @@ class _SettingsPageState extends State<SettingsPage> {
 
   /// اختيار المشغل
   Widget _buildPlayerSelector() {
-    final players = ['chewie', 'media_kit', 'simple_youtube', 'omni', 'orax_video_player'];
-    final playersAr = {
-      'chewie': 'تشيوي (افتراضي)',
-      'media_kit': 'ميديا كيت (أداء عالي)',
-      'simple_youtube': 'يوتيوب بسيط (فيديوهات يوتيوب)',
-      'omni': 'أومني (يوتيوب + شبكة)',
-      'orax_video_player': 'أوراكس (يوتيوب + جودات)',
-    };
-    final playersDesc = {
-      'chewie': 'بسيط وموثوق',
-      'media_kit': 'أداء عالي للفيديوهات عالية الدقة',
-      'simple_youtube': 'مشغل يوتيوب المدمج للفيديوهات على يوتيوب',
-      'omni': 'دعم يوتيوب وفيميو مع واجهة مخصصة',
-      'orax_video_player': 'دعم يوتيوب، اختيار الجودة، ترجمات، تكبير',
-    };
+    // Get available players from server settings
+    final settingsService = VideoPlayerSettingsService();
+    final availablePlayers = settingsService.getAvailablePlayersForSettings();
+
+    // If no enabled players from server, fallback to all players
+    final players = availablePlayers.isNotEmpty
+        ? availablePlayers
+        : [
+            PlayerOption(id: 'chewie', nameAr: 'تشيوي (افتراضي)', description: 'بسيط وموثوق', enabled: true, supports: 'upload'),
+            PlayerOption(id: 'simple_youtube', nameAr: 'يوتيوب بسيط', description: 'مشغل يوتيوب المدمج', enabled: true, supports: 'youtube'),
+          ];
+
+    // Ensure selected player is in the available list
+    String effectiveSelectedPlayer = _selectedPlayer;
+    if (!players.any((p) => p.id == _selectedPlayer || (p.id == 'orax' && _selectedPlayer == 'orax_video_player'))) {
+      effectiveSelectedPlayer = players.first.id;
+      // Update state to use the first available player
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted && _selectedPlayer != effectiveSelectedPlayer) {
+          setState(() => _selectedPlayer = effectiveSelectedPlayer);
+          context.read<SettingsCubit>().changeVideoPlayer(effectiveSelectedPlayer);
+        }
+      });
+    }
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
@@ -869,7 +880,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 ),
                 const SizedBox(height: 4),
                 DropdownButton<String>(
-                  value: _selectedPlayer,
+                  value: effectiveSelectedPlayer,
                   isExpanded: true,
                   underline: Container(),
                   style: const TextStyle(
@@ -880,21 +891,42 @@ class _SettingsPageState extends State<SettingsPage> {
                   ),
                   items: players.map((player) {
                     return DropdownMenuItem(
-                      value: player,
+                      value: player.id,
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Text(
-                            playersAr[player] ?? player,
-                            style: const TextStyle(
-                              fontFamily: 'Cairo',
-                              fontSize: 15,
-                              fontWeight: FontWeight.w600,
-                            ),
+                          Row(
+                            children: [
+                              Text(
+                                player.nameAr,
+                                style: const TextStyle(
+                                  fontFamily: 'Cairo',
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                decoration: BoxDecoration(
+                                  color: _getSupportsColor(player.supports).withOpacity(0.15),
+                                  borderRadius: BorderRadius.circular(6),
+                                ),
+                                child: Text(
+                                  player.supportsLabel,
+                                  style: TextStyle(
+                                    fontFamily: 'Cairo',
+                                    fontSize: 9,
+                                    fontWeight: FontWeight.w600,
+                                    color: _getSupportsColor(player.supports),
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                           Text(
-                            playersDesc[player] ?? '',
+                            player.description,
                             style: TextStyle(
                               fontFamily: 'Cairo',
                               fontSize: 11,
@@ -933,6 +965,20 @@ class _SettingsPageState extends State<SettingsPage> {
         ],
       ),
     );
+  }
+
+  /// Get color for player support type badge
+  Color _getSupportsColor(String supports) {
+    switch (supports) {
+      case 'youtube':
+        return Colors.red;
+      case 'upload':
+        return AppColors.emerald500;
+      case 'both':
+        return AppColors.primary;
+      default:
+        return AppColors.slate500;
+    }
   }
 
   /// زر إعادة التعيين
